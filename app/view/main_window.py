@@ -7,9 +7,10 @@ from qfluentwidgets import (NavigationAvatarWidget, NavigationItemPosition, Mess
                             SplashScreen)
 from qfluentwidgets import FluentIcon as FIF
 
-from .gallery_interface import GalleryInterface
-from .home_interface import HomeInterface
-from .setting_interface import SettingInterface
+from .home.gallery_interface import GalleryInterface
+from .home.home_interface import HomeInterface
+from ..view import BelieverInterface
+from .utils.setting_interface import SettingInterface
 from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
 from ..common.icon import Icon
 from ..common.signal_bus import signalBus
@@ -34,7 +35,7 @@ class MainWindow(FluentWindow):
 
         # create sub interface
         self.homeInterface = HomeInterface(self)
-        self.listBiliever = Widget("Believer", self)
+        self.listBiliever = BelieverInterface()
         self.settingInterface = SettingInterface(self)
 
         # enable acrylic effect
