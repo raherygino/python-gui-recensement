@@ -12,7 +12,7 @@ class BelieverInterface(QWidget):
 
         self.vBoxLayout = QVBoxLayout(self)
         self.commandBar = CommandBar(self)
-        self.dropDownButton = self.createDropDownButton()
+        
 
         self.vBoxLayout.addWidget(self.commandBar, 0)
 
@@ -22,19 +22,8 @@ class BelieverInterface(QWidget):
         # self.commandBar.setButtonTight(True)
         # setFont(self.commandBar, 14)
 
-        self.addButton(FluentIcon.ADD, 'Add')
-        self.commandBar.addSeparator()
-
-        self.commandBar.addAction(Action(FluentIcon.EDIT, 'Edit', triggered=self.onEdit, checkable=True))
-        self.addButton(FluentIcon.COPY, 'Copy')
-        self.addButton(FluentIcon.SHARE, 'Share')
-
         # add custom widget
-        self.commandBar.addWidget(self.dropDownButton)
-
-        # add hidden actions
-        self.commandBar.addHiddenAction(Action(FluentIcon.SCROLL, 'Sort', triggered=lambda: print('排序')))
-        self.commandBar.addHiddenAction(Action(FluentIcon.SETTING, 'Settings', shortcut='Ctrl+S'))
+        #self.commandBar.addWidget(self.dropDownButton)
 
         self.tableView = TableWidget(self)
 
@@ -81,7 +70,6 @@ class BelieverInterface(QWidget):
 
     def addButton(self, icon, text):
         action = Action(icon, text, self)
-        action.triggered.connect(lambda: print(text))
         self.commandBar.addAction(action)
 
     def onEdit(self, isChecked):

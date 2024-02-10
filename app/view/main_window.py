@@ -42,7 +42,6 @@ class MainWindow(FluentWindow):
 
         believerModel = BelieverModel()
         believerPresenter = BelieverPresenter(self.believerInterface, believerModel)
-        self.believerInterface.presenter = believerPresenter
 
         # enable acrylic effect
         self.navigationInterface.setAcrylicEnabled(True)

@@ -1,1 +1,2 @@
 from .believer.interface.believer_interface import BelieverInterface
+from .believer.dialog.believer_new_dialog import BelieverNewDialog
