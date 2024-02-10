@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QFrame, QLabel, QVBoxLayout, QWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QFrame, QAbstractItemView, QVBoxLayout, QWidget, QTableWidgetItem, QHeaderView
 from PyQt5.QtCore import Qt
 from qfluentwidgets import (CommandBar, FluentIcon, Action, TransparentDropDownPushButton,
                             setFont, RoundMenu, TableWidget, isDarkTheme, setTheme, Theme, TableView, TableItemDelegate, setCustomStyleSheet)
@@ -47,12 +47,14 @@ class BelieverInterface(QWidget):
         # enable border
         self.tableView.setBorderVisible(True)
         self.tableView.setBorderRadius(8)
-
+        #self.tableView.resizeColumnsToContents()
+        self.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        #self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tableView.setWordWrap(False)
         self.tableView.setRowCount(6)
         self.tableView.setColumnCount(5)
         songInfos = [
-            ['かばん', 'aiko', 'かばん', '2004', '5:04'],
+            ['Raherinomenjanahary Georginot Armelin', 'aiko', 'かばん', '2004', '5:04'],
             ['爱你', '王心凌', '爱你', '2004', '3:39'],
             ['星のない世界', 'aiko', '星のない世界/横顔', '2007', '5:30'],
             ['横顔', 'aiko', '星のない世界/横顔', '2007', '5:06'],

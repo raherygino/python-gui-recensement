@@ -16,6 +16,8 @@ from ..common.icon import Icon
 from ..common.signal_bus import signalBus
 from ..common.translator import Translator
 from ..common import resource
+from ..models import BelieverModel
+from ..presenter import BelieverPresenter
 
 class Widget(QFrame):
 
@@ -35,8 +37,12 @@ class MainWindow(FluentWindow):
 
         # create sub interface
         self.homeInterface = HomeInterface(self)
-        self.listBiliever = BelieverInterface()
+        self.believerInterface = BelieverInterface()
         self.settingInterface = SettingInterface(self)
+
+        believerModel = BelieverModel()
+        believerPresenter = BelieverPresenter(self.believerInterface, believerModel)
+        self.believerInterface.presenter = believerPresenter
 
         # enable acrylic effect
         self.navigationInterface.setAcrylicEnabled(True)
@@ -56,7 +62,7 @@ class MainWindow(FluentWindow):
         # add navigation items
         t = Translator()
         self.addSubInterface(self.homeInterface, FIF.HOME, self.tr('Home'))
-        self.addSubInterface(self.listBiliever, Icon.GRID, t.icons)
+        self.addSubInterface(self.believerInterface, Icon.GRID, t.icons)
 
         # add custom widget to bottom
         self.navigationInterface.addItem(
