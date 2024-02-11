@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout
 from qfluentwidgets import MessageBoxBase, SubtitleLabel, LineEdit, PushButton, setTheme, Theme, BodyLabel
 
 class editWithLabel(QVBoxLayout):
-    def __init__(self, label:str,size,parent=None, **kwargs):
+    def __init__(self, label:str,parent=None, **kwargs):
         super().__init__(None)
         self.parent = parent
         self.setContentsMargins(0,0,0,0)
@@ -13,18 +13,25 @@ class editWithLabel(QVBoxLayout):
         self.label = BodyLabel(parent)
         self.label.setText(label)
         self.addWidget(self.label)
-        self.LineEdit(size)
+        self.args = kwargs
+        self.lineEdits = []
+        self.LineEdit()
 
-
-    def LineEdit(self, size):
+    def LineEdit(self):
         self.hBoxLayout = QHBoxLayout()
-        for i in range(size):
+        self.lineEdits.clear()
+        placeholders = self.args.get("placeholders")
+        for placeholder in placeholders:
             lineEdit = LineEdit(self.parent)
             lineEdit.setClearButtonEnabled(True)
+            lineEdit.setPlaceholderText(placeholder)
             self.hBoxLayout.addWidget(lineEdit)
+            self.lineEdits.append(lineEdit)
         self.addLayout(self.hBoxLayout)
-
-
+        
+    def text(self, pos:int):
+        return self.lineEdits[pos].text()
+        
 
 
 class BelieverNewDialog(MessageBoxBase):
@@ -34,40 +41,44 @@ class BelieverNewDialog(MessageBoxBase):
         self.titleLabel = SubtitleLabel('Mampiditra', self)
 
         self.row = QHBoxLayout()
-        self.lastnameEdit = editWithLabel("Anarana",1, self)
-        self.firstnameEdit = editWithLabel("Fanampiny",1, self)
+        self.lastnameEdit = editWithLabel("Anarana", self, placeholders=["Anarana"])
+        self.firstnameEdit = editWithLabel("Fanampiny", self, placeholders=["Fanampiny"])
         self.row.addLayout(self.lastnameEdit)
         self.row.addLayout(self.firstnameEdit)
         
         self.row_2 = QHBoxLayout()
-        self.addressEdit = editWithLabel("Adiresy",1, self)
-        self.regionEdit = editWithLabel("Faritra",1, self)
+        self.addressEdit = editWithLabel("Adiresy", self, placeholders=["Adiresy"])
+        self.regionEdit = editWithLabel("Faritra", self, placeholders=["Faritra"])
         self.row_2.addLayout(self.addressEdit)
         self.row_2.addLayout(self.regionEdit)
         
         self.row_3 = QHBoxLayout()
-        self.diaconEdit = editWithLabel("Diakonina miandraikitra",1, self)
-        self.birthdayEdit = editWithLabel("Daty sy toerana nahaterahana",2, self)
+        self.diaconEdit = editWithLabel("Diakonina miandraikitra", self, placeholders=["Diakonina miandraikitra"])
+        self.birthdayEdit = editWithLabel("Daty sy toerana nahaterahana", self, placeholders=["Daty", "Toerana"])
         self.row_3.addLayout(self.diaconEdit)
         self.row_3.addLayout(self.birthdayEdit)
         
         self.row_4 = QHBoxLayout()
-        self.nameFatherEdit = editWithLabel("Anaran'i Ray",1, self)
-        self.nameMotherEdit = editWithLabel("Anaran'i Reny",1, self)
+        self.nameFatherEdit = editWithLabel("Anaran'i Ray", self, placeholders=["Anaran'i Ray"])
+        self.nameMotherEdit = editWithLabel("Anaran'i Reny", self, placeholders=["Anaran'i Reny"])
         self.row_4.addLayout(self.nameFatherEdit)
         self.row_4.addLayout(self.nameMotherEdit)
-
+        
         self.row_5 = QHBoxLayout()
-        self.recipientEdit = editWithLabel("Daty, toerana, laharana mpandray",3, self)
-        self.row_5.addLayout(self.recipientEdit)
+        self.baptismEdit = editWithLabel("Daty sy toerana batisa", self, placeholders=["Daty", "Toerana"])
+        self.row_5.addLayout(self.baptismEdit)
 
         self.row_6 = QHBoxLayout()
-        self.phoneEdit = editWithLabel("Laharan'ny finday",1, self)
-        self.deptWorkEdit = editWithLabel("Sampana na/sy sampan'asa",1, self)
-        self.responsibilityEdit = editWithLabel("Andraikitra",1, self)
-        self.row_6.addLayout(self.phoneEdit)
-        self.row_6.addLayout(self.deptWorkEdit)
-        self.row_6.addLayout(self.responsibilityEdit)
+        self.recipientEdit = editWithLabel("Daty, toerana, laharana mpandray", self, placeholders=["Daty", "Toerana", "Laharana"])
+        self.row_6.addLayout(self.recipientEdit)
+
+        self.row_7 = QHBoxLayout()
+        self.phoneEdit = editWithLabel("Laharan'ny finday", self, placeholders=["Laharan'ny finday"])
+        self.deptWorkEdit = editWithLabel("Sampana na/sy sampan'asa", self, placeholders=["Sampana na/sy sampan'asa"])
+        self.responsibilityEdit = editWithLabel("Andraikitra", self, placeholders=["Andraikitra"])
+        self.row_7.addLayout(self.phoneEdit)
+        self.row_7.addLayout(self.deptWorkEdit)
+        self.row_7.addLayout(self.responsibilityEdit)
 
         # add widget to view layout
         self.viewLayout.addWidget(self.titleLabel)
@@ -78,12 +89,12 @@ class BelieverNewDialog(MessageBoxBase):
         self.viewLayout.addLayout(self.row_4)
         self.viewLayout.addLayout(self.row_5)
         self.viewLayout.addLayout(self.row_6)
+        self.viewLayout.addLayout(self.row_7)
 
         # change the text of button
-        self.yesButton.setText('打开')
-        self.cancelButton.setText('取消')
+        self.yesButton.setText('Ampidirina')
+        self.cancelButton.setText('Asorina')
 
         self.widget.setMinimumWidth(650)
-        self.yesButton.setDisabled(True)
 
         # self.hideYesButton()
