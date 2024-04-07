@@ -2,7 +2,7 @@ from PyQt5.QtCore import QThread, QPoint
 from PyQt5.QtGui import QCursor
 from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action
 from ..models import DatabaseWorker, BelieverModel, Believer
-from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface
+from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, ShowBelieverDialog
 
 class BelieverPresenter:
     
@@ -16,26 +16,79 @@ class BelieverPresenter:
         self.addView = addView
         self.model = model
         self.workerThread = None
-        self.fetchData(model.fetch_all(pos_family="Loha-mpianakaviana"))
+        self.query = {'pos_family': 'Loha-mpianakaviana'}
+        self.fetchData(model.fetch_all(**self.query))
         self.family = []
         
     def __configView(self):
-        self.setTableHeaderLabels([
+        self.labels = [
             'ID', 'Anarana', 'Fanampiny','Daty sy toerana nahaterahana', 'Asa', 
             'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
-            'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday'])
-        self.addView.familyTableView.setHorizontalHeaderLabels([
+            'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday']
+        self.labelsFamily = [
             'ID', 'Anarana', 'Fanampiny','Lahy sa vavy','Amin\'ny fianakaviana', 'Daty sy toerana nahaterahana', 'Asa',
             'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
-            'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday'])
+            'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday']
+        self.setTableHeaderLabels(self.labels)
+        self.addView.familyTableView.setHorizontalHeaderLabels(self.labelsFamily)
         
     def __actions(self):
         #self.view.addAction.triggered.connect(self.addBielever)
         self.addView.btnAdd.clicked.connect(self.addBeliver)
         self.addView.btnAddFamily.clicked.connect(self.addFamily)
-        self.addView.familyTableView.contextMenuEvent = lambda e : self.rightClicked(e)
+        self.addView.familyTableView.contextMenuEvent = lambda e : self.tableFamilyRightClicked(e)
+        self.view.tableView.contextMenuEvent = lambda e : self.tableRightClicked(e)
+    
+    def tableRightClicked(self, event):
+        selectedItems = self.view.tableView.selectedItems()
+        if len(selectedItems) != 0:
+            itemId = selectedItems[0].text()
+            believer: Believer = self.model.fetch_item_by_id(itemId)
+            row1 = [
+            ["Anarana", believer.lastname],
+            ["Fanampiny", believer.firstname],
+            ["Adiresy", believer.address],
+            ["Faritra", believer.region],
+            ["Diakonina miandraikitra", believer.diacon]
+            ]
+        
+            row2 = [
+            ["Daty sy toerana nahaterahana", f'{believer.birthday} {believer.birthplace}'],
+            ["Anaran'i Reny", believer.name_mother],
+            ["Anaran'i Ray", believer.name_father],
+            ["Anaran'i Reny", believer.name_mother],
+            ["Daty ny batisa", believer.date_of_baptism],
+            ]
+        
+            row3 = [
+            ["Toerana ny batisa", believer.place_of_baptism],
+            ["Daty nahampandray", believer.date_of_recipient],
+            ["Toerana nahampandray", believer.place_of_recipient],
+            ["Laharana ny mpandray", believer.number_recipient],
+            ["Laharan'ny finday", believer.phone],
+            ]
+        
+            row4 = [
+            ["Sampana na/sy sampan'asa", believer.dept_work],
+                ["Andraikitra", believer.responsibility],
+            ]
             
-    def rightClicked(self, event):
+            allRows =  [row1, row2, row3, row4]
+            dialog = ShowBelieverDialog(self.view)
+            dialog.table.setHorizontalHeaderLabels(self.labelsFamily)
+            
+            for i, row in enumerate(allRows):
+                for j, column in enumerate(row):
+                    dialog.addLabelValue(column[0], column[1], i,j)
+                    
+            data = self.model.fetch_all(id_conjoint=itemId)
+            for value in self.model.fetch_all(id_father=itemId):
+                data.append(value)
+                
+            self.setData(dialog.table, data)
+            dialog.exec()
+        
+    def tableFamilyRightClicked(self, event):
         selectedItems = self.addView.familyTableView.selectedItems()
         if (len(selectedItems) != 0):
             idItem = selectedItems[0].text()
@@ -97,10 +150,10 @@ class BelieverPresenter:
         for family in self.family:
             if family.pos_family == "Zanaka":
                 family['id_father'] = lastBeliever.id
-            elif family.pos_family == "Vady":
+            else:
                 family['id_conjoint'] = lastBeliever.id
             self.model.create(family)
-            
+        self.fetchData(self.model.fetch_all(**self.query))
                 
     def addFamily(self):
         w = AddBelieverDialog(self.view.nParent)
@@ -148,17 +201,17 @@ class BelieverPresenter:
             '''["", lastname, firstname, gender, posFamily, f'{birthday} {birthplace}', deptWork, dateBaptism, placeBaptism,
                  dateRecipient, placeRecipient, numberRecipient, deptWork, responsability]
             )'''
-            self.setData(self.family)
+            self.setData(self.addView.familyTableView, self.family)
             #self.model.create(believer)
             #self.fetchData(self.model.fetch_all())
-    def setData(self, believers: list[Believer]):
+    def setData(self, table, believers: list[Believer]):
         data = []
         for i, believer in enumerate(believers):
             data.append([str(i), believer.lastname, believer.firstname, believer.gender, believer.pos_family, 
                          f'{believer.birthday} {believer.birthplace}', believer.dept_work, believer.date_of_baptism, 
                          believer.place_of_baptism, believer.date_of_recipient, believer.place_of_recipient, 
                          believer.number_recipient, "", believer.responsibility])
-        self.addView.familyTableView.setData(data)
+        table.setData(data)
     
     def fetchData(self, data):
         self.view.progressBar.setVisible(True)
