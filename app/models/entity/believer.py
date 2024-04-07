@@ -6,8 +6,11 @@ from dataclasses import dataclass
 class Believer(Entity):
     """Believer information """
     id: int = 0
+    id_conjoint = 0
     lastname: str = ""
     firstname: str = ""
+    gender: str = ""
+    pos_family: str = ""
     address: str = ""
     region: str = ""
     diacon: str = ""

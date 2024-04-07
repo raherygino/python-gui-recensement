@@ -1,4 +1,6 @@
 from PyQt5.QtCore import QThread, QPoint
+from PyQt5.QtGui import QCursor
+from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action
 from ..models import DatabaseWorker, BelieverModel, Believer
 from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface
 
@@ -14,42 +16,64 @@ class BelieverPresenter:
         self.addView = addView
         self.model = model
         self.workerThread = None
-        self.fetchData(model.fetch_all())
+        self.fetchData(model.fetch_all(pos_family="Loha-mpianakaviana"))
+        self.family = []
         
     def __configView(self):
         self.setTableHeaderLabels([
             'ID', 'Anarana', 'Fanampiny','Daty sy toerana nahaterahana', 'Asa', 
             'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
             'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday'])
+        self.addView.familyTableView.setHorizontalHeaderLabels([
+            'ID', 'Anarana', 'Fanampiny','Lahy sa vavy','Amin\'ny fianakaviana', 'Daty sy toerana nahaterahana', 'Asa',
+            'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
+            'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday'])
         
     def __actions(self):
-        self.view.addAction.triggered.connect(self.addBielever)
-        self.addView.btnAddFamily.clicked.connect(self.addBielever)
-        
-    def addBielever(self):
-        w = AddBelieverDialog(self.view.nParent)
-        if w.exec():
-            lastname = w.lastnameEdit.text(0)
-            firstname = w.firstnameEdit.text(0)
-            address = w.addressEdit.text(0)
-            region = w.regionEdit.text(0)
-            diacon = w.diaconEdit.text(0)
-            birthday = w.birthdayEdit.text(0)
-            birthplace = w.birthdayEdit.text(1)
-            nameFather = w.nameFatherEdit.text(0)
-            nameMother = w.nameMotherEdit.text(0)
-            dateBaptism = w.baptismEdit.text(0)
-            placeBaptism = w.baptismEdit.text(1)
-            dateRecipient = w.recipientEdit.text(0)
-            placeRecipient = w.recipientEdit.text(1)
-            numberRecipient = w.recipientEdit.text(2)
-            phone = w.phoneEdit.text(0)
-            deptWork = w.deptWorkEdit.text(0)
-            responsability = w.responsibilityEdit.text(0)
+        #self.view.addAction.triggered.connect(self.addBielever)
+        self.addView.btnAdd.clicked.connect(self.addBeliver)
+        self.addView.btnAddFamily.clicked.connect(self.addFamily)
+        self.addView.familyTableView.contextMenuEvent = lambda e : self.rightClicked(e)
             
-            believer = Believer(
+    def rightClicked(self, event):
+        selectedItems = self.addView.familyTableView.selectedItems()
+        if (len(selectedItems) != 0):
+            idItem = selectedItems[0].text()
+            menu = RoundMenu(parent=self.view)
+            menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered= lambda: self.deleteFamily(selectedItems)))
+
+            self.posCur = QCursor().pos()
+            cur_x = self.posCur.x()
+            cur_y = self.posCur.y()
+            menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
+            
+    def deleteFamily(self, items):
+        self.family.pop(int(items[0].text()))
+        self.setData(self.family)
+        
+    def addBeliver(self):
+        w = self.addView
+        lastname = w.lastnameEdit.lineEdit.text()
+        firstname = w.firstnameEdit.lineEdit.text()
+        address = w.addressEdit.lineEdit.text()
+        region = w.regionEdit.lineEdit.text()
+        diacon = w.diaconEdit.lineEdit.text()
+        birthday = w.birthdayEdit.lineEdit.text()
+        birthplace = w.birthdayEdit.lineEdit.text()
+        nameFather = w.nameFatherEdit.lineEdit.text()
+        nameMother = w.nameMotherEdit.lineEdit.text()
+        dateBaptism = w.baptismDateEdit.lineEdit.text()
+        placeBaptism = w.baptismPlaceEdit.lineEdit.text()
+        dateRecipient = w.recipientDateEdit.lineEdit.text()
+        placeRecipient = w.recipientPlaceEdit.lineEdit.text()
+        numberRecipient = w.recipientNumberEdit.lineEdit.text()
+        phone = w.phoneEdit.lineEdit.text()
+        deptWork = w.deptWorkEdit.lineEdit.text()
+        responsability = w.responsibilityEdit.lineEdit.text()
+        believer = Believer(
                 lastname=lastname,
                 firstname=firstname,
+                pos_family="Loha-mpianakaviana",
                 address=address,
                 region=region,
                 diacon=diacon,
@@ -66,9 +90,75 @@ class BelieverPresenter:
                 dept_work=deptWork,
                 responsibility=responsability
             )
+        
+        self.model.create(believer)
+        allBelievers = self.model.fetch_all_items()
+        lastBeliever : Believer = self.model.fetch_all_items()[len(allBelievers) - 1]
+        for family in self.family:
+            if family.pos_family == "Zanaka":
+                family['id_father'] = lastBeliever.id
+            elif family.pos_family == "Vady":
+                family['id_conjoint'] = lastBeliever.id
+            self.model.create(family)
             
-            self.model.create(believer)
-            self.fetchData(self.model.fetch_all())
+                
+    def addFamily(self):
+        w = AddBelieverDialog(self.view.nParent)
+        if w.exec():
+            lastname = w.lastnameEdit.text(0)
+            firstname = w.firstnameEdit.text(0)
+            posFamily = w.posFamilyCombox.combox.currentText()
+            gender = w.genderCombox.combox.currentText()
+            address = w.addressEdit.text(0)
+            region = w.regionEdit.text(0)
+            diacon = w.diaconEdit.text(0)
+            birthday = w.birthdayEdit.text(0)
+            birthplace = w.birthdayEdit.text(1)
+            '''nameFather = w.nameFatherEdit.text(0)
+            nameMother = w.nameMotherEdit.text(0)'''
+            dateBaptism = w.baptismEdit.text(0)
+            placeBaptism = w.baptismEdit.text(1)
+            dateRecipient = w.recipientEdit.text(0)
+            placeRecipient = w.recipientEdit.text(1)
+            numberRecipient = w.recipientEdit.text(2)
+            phone = w.phoneEdit.text(0)
+            deptWork = w.deptWorkEdit.text(0)
+            responsability = w.responsibilityEdit.text(0)
+            
+            believer = Believer(
+                lastname=lastname,
+                firstname=firstname,
+                gender=gender,
+                pos_family=posFamily,
+                address=address,
+                region=region,
+                diacon=diacon,
+                birthday=birthday,
+                birthplace=birthplace,
+                date_of_baptism=dateBaptism,
+                place_of_baptism=placeBaptism,
+                date_of_recipient=dateRecipient,
+                place_of_recipient=placeRecipient,
+                number_recipient=numberRecipient,
+                phone=phone,
+                dept_work=deptWork,
+                responsibility=responsability
+            )
+            self.family.append(believer)
+            '''["", lastname, firstname, gender, posFamily, f'{birthday} {birthplace}', deptWork, dateBaptism, placeBaptism,
+                 dateRecipient, placeRecipient, numberRecipient, deptWork, responsability]
+            )'''
+            self.setData(self.family)
+            #self.model.create(believer)
+            #self.fetchData(self.model.fetch_all())
+    def setData(self, believers: list[Believer]):
+        data = []
+        for i, believer in enumerate(believers):
+            data.append([str(i), believer.lastname, believer.firstname, believer.gender, believer.pos_family, 
+                         f'{believer.birthday} {believer.birthplace}', believer.dept_work, believer.date_of_baptism, 
+                         believer.place_of_baptism, believer.date_of_recipient, believer.place_of_recipient, 
+                         believer.number_recipient, "", believer.responsibility])
+        self.addView.familyTableView.setData(data)
     
     def fetchData(self, data):
         self.view.progressBar.setVisible(True)
