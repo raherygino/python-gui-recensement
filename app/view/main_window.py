@@ -99,6 +99,7 @@ class MainWindow(FluentWindow):
        
         # add items to navigation interface
         self.initNavigation()
+        
         self.splashScreen.finish()
 
     def connectSignalToSlot(self):

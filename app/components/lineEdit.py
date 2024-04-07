@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QVBoxLayout
-from qfluentwidgets import LineEdit, BodyLabel, ComboBox, CompactSpinBox
+from qfluentwidgets import LineEdit, BodyLabel, ComboBox, CompactSpinBox, DateEdit
 
 
 class LineEditWithLabel(QVBoxLayout):
@@ -7,6 +7,15 @@ class LineEditWithLabel(QVBoxLayout):
         super().__init__(parent)
         self.setSpacing(2)
         self.lineEdit = LineEdit(parent)
+        self.label = BodyLabel(label)
+        self.addWidget(self.label)
+        self.addWidget(self.lineEdit)
+
+class DateEditWithLabel(QVBoxLayout):
+    def __init__(self, label:str, parent=None):
+        super().__init__(parent)
+        self.setSpacing(2)
+        self.lineEdit = DateEdit(parent)
         self.label = BodyLabel(label)
         self.addWidget(self.label)
         self.addWidget(self.lineEdit)

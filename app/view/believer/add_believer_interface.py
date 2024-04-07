@@ -6,13 +6,14 @@ from qfluentwidgets import ComboBox, PrimaryPushButton, CommandBar, FluentIcon, 
     ToolButton, PushButton, RoundMenu, SearchLineEdit, IndeterminateProgressBar, \
     TransparentDropDownPushButton, LineEdit, SmoothScrollArea, PixmapLabel, SubtitleLabel, StrongBodyLabel, \
         CheckBox, BodyLabel
-from ...components import TableView, LineEditWithLabel, ComboxEditWithLabel
+from ...components import TableView, LineEditWithLabel, ComboxEditWithLabel, DateEditWithLabel
 from ...common.config import OptionsConfigItem
 
 class AddBelieverInterface(QWidget):
     
     def __init__(self,  parent=None):
         super().__init__(parent=parent)
+        self.nParent = parent
         self.mainLayout = QVBoxLayout()
         self.scroll_area = SmoothScrollArea()
         self.scroll_area.setStyleSheet("SmoothScrollArea {border: none; background: rgba(255,255,255,0)}")
@@ -56,7 +57,7 @@ class AddBelieverInterface(QWidget):
         
         self.row2 = QHBoxLayout()
         self.diaconEdit = LineEditWithLabel("Diakonina miandraikitra")
-        self.birthdayEdit = LineEditWithLabel("Daty nahaterahana")
+        self.birthdayEdit = DateEditWithLabel("Daty nahaterahana")
         self.birthplaceEdit = LineEditWithLabel("Toerana nahaterahana")
         self.addChild(self.row2, [self.diaconEdit, self.birthdayEdit, self.birthplaceEdit])
         
@@ -66,12 +67,12 @@ class AddBelieverInterface(QWidget):
         self.addChild(self.row3, [self.nameFatherEdit, self.nameMotherEdit])
         
         self.row4 = QHBoxLayout()
-        self.baptismDateEdit = LineEditWithLabel("Daty ny batisa")
+        self.baptismDateEdit = DateEditWithLabel("Daty ny batisa")
         self.baptismPlaceEdit = LineEditWithLabel("Toerana ny batisa")
         self.addChild(self.row4, [self.baptismDateEdit, self.baptismPlaceEdit])
         
         self.row5 = QHBoxLayout()
-        self.recipientDateEdit = LineEditWithLabel("Daty nahampandray")
+        self.recipientDateEdit = DateEditWithLabel("Daty nahampandray")
         self.recipientPlaceEdit = LineEditWithLabel("Toerana nahampandray")
         self.recipientNumberEdit = LineEditWithLabel("Laharana ny mpandray")
         self.addChild(self.row5, [self.recipientDateEdit, self.recipientPlaceEdit, self.recipientNumberEdit])
@@ -96,4 +97,18 @@ class AddBelieverInterface(QWidget):
         self.addChild(self.vBoxlayout, [self.row1, self.row2, self.row3, 
                                         self.row4, self.row5, self.row6, 
                                         self.row7, self.familyTableView])
+        
+    def clearLineEdit(self):
+        for i in range(self.vBoxlayout.count()):
+            widget = self.vBoxlayout.itemAt(i).widget()
+            if widget == None:
+                layout = self.vBoxlayout.itemAt(i)
+                for j in range(layout.count()):
+                    widget = layout.itemAt(j).widget()
+                    if widget == None:
+                        lay = layout.itemAt(j)
+                        for k in range(lay.count()):
+                            name = type(lay.itemAt(k).widget()).__name__
+                            if name == "LineEdit":
+                                lay.itemAt(k).widget().clear()
         

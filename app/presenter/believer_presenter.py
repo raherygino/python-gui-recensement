@@ -3,6 +3,7 @@ from PyQt5.QtGui import QCursor
 from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action
 from ..models import DatabaseWorker, BelieverModel, Believer
 from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, ShowBelieverDialog
+from .menu_presenter import MenuAction
 
 class BelieverPresenter:
     
@@ -33,7 +34,6 @@ class BelieverPresenter:
         self.addView.familyTableView.setHorizontalHeaderLabels(self.labelsFamily)
         
     def __actions(self):
-        #self.view.addAction.triggered.connect(self.addBielever)
         self.addView.btnAdd.clicked.connect(self.addBeliver)
         self.addView.btnAddFamily.clicked.connect(self.addFamily)
         self.addView.familyTableView.contextMenuEvent = lambda e : self.tableFamilyRightClicked(e)
@@ -43,57 +43,25 @@ class BelieverPresenter:
         selectedItems = self.view.tableView.selectedItems()
         if len(selectedItems) != 0:
             itemId = selectedItems[0].text()
-            believer: Believer = self.model.fetch_item_by_id(itemId)
-            row1 = [
-            ["Anarana", believer.lastname],
-            ["Fanampiny", believer.firstname],
-            ["Adiresy", believer.address],
-            ["Faritra", believer.region],
-            ["Diakonina miandraikitra", believer.diacon]
-            ]
-        
-            row2 = [
-            ["Daty sy toerana nahaterahana", f'{believer.birthday} {believer.birthplace}'],
-            ["Anaran'i Reny", believer.name_mother],
-            ["Anaran'i Ray", believer.name_father],
-            ["Anaran'i Reny", believer.name_mother],
-            ["Daty ny batisa", believer.date_of_baptism],
-            ]
-        
-            row3 = [
-            ["Toerana ny batisa", believer.place_of_baptism],
-            ["Daty nahampandray", believer.date_of_recipient],
-            ["Toerana nahampandray", believer.place_of_recipient],
-            ["Laharana ny mpandray", believer.number_recipient],
-            ["Laharan'ny finday", believer.phone],
-            ]
-        
-            row4 = [
-            ["Sampana na/sy sampan'asa", believer.dept_work],
-                ["Andraikitra", believer.responsibility],
-            ]
             
-            allRows =  [row1, row2, row3, row4]
-            dialog = ShowBelieverDialog(self.view)
-            dialog.table.setHorizontalHeaderLabels(self.labelsFamily)
-            
-            for i, row in enumerate(allRows):
-                for j, column in enumerate(row):
-                    dialog.addLabelValue(column[0], column[1], i,j)
-                    
-            data = self.model.fetch_all(id_conjoint=itemId)
-            for value in self.model.fetch_all(id_father=itemId):
-                data.append(value)
-                
-            self.setData(dialog.table, data)
-            dialog.exec()
+            action = MenuAction(self)
+            menu = RoundMenu(parent=self.view)
+            menu.addAction(Action(FluentIcon.FOLDER, 'Jerena', triggered = lambda:action.show(itemId)))
+            menu.addAction(Action(FluentIcon.EDIT, 'Ovaina', triggered = lambda: action.update(itemId)))
+            menu.addSeparator()
+            menu.addAction(Action(FluentIcon.DELETE, 'Fafana', triggered = lambda: action.confirmDelete(itemId)))
+
+            self.posCur = QCursor().pos()
+            cur_x = self.posCur.x()
+            cur_y = self.posCur.y()
+            menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
         
     def tableFamilyRightClicked(self, event):
         selectedItems = self.addView.familyTableView.selectedItems()
         if (len(selectedItems) != 0):
             idItem = selectedItems[0].text()
             menu = RoundMenu(parent=self.view)
-            menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered= lambda: self.deleteFamily(selectedItems)))
+            menu.addAction(Action(FluentIcon.DELETE, 'Fafana', triggered= lambda: self.deleteFamily(selectedItems)))
 
             self.posCur = QCursor().pos()
             cur_x = self.posCur.x()
@@ -112,7 +80,7 @@ class BelieverPresenter:
         region = w.regionEdit.lineEdit.text()
         diacon = w.diaconEdit.lineEdit.text()
         birthday = w.birthdayEdit.lineEdit.text()
-        birthplace = w.birthdayEdit.lineEdit.text()
+        birthplace = w.birthplaceEdit.lineEdit.text()
         nameFather = w.nameFatherEdit.lineEdit.text()
         nameMother = w.nameMotherEdit.lineEdit.text()
         dateBaptism = w.baptismDateEdit.lineEdit.text()
@@ -154,6 +122,8 @@ class BelieverPresenter:
                 family['id_conjoint'] = lastBeliever.id
             self.model.create(family)
         self.fetchData(self.model.fetch_all(**self.query))
+        self.addView.clearLineEdit()
+        self.addView.nParent.stackedWidget.setCurrentWidget(self.view)
                 
     def addFamily(self):
         w = AddBelieverDialog(self.view.nParent)
