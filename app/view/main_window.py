@@ -107,8 +107,8 @@ class MainWindow(FluentWindow):
         signalBus.supportSignal.connect(self.onSupport)
 
     def initNavigation(self):
+        self.addSubInterface(self.listBelieverInterface, FIF.PEOPLE, "Lisitra")
         self.addSubInterface(self.addBelieverInterface, FIF.ADD, "Mampiditra")
-        self.addSubInterface(self.listBelieverInterface, FIF.APPLICATION, "Listra")
         self.navigationInterface.addSeparator()
 
         '''self.addSubInterface(

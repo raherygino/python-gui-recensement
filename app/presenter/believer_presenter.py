@@ -34,6 +34,7 @@ class BelieverPresenter:
         self.addView.familyTableView.setHorizontalHeaderLabels(self.labelsFamily)
         
     def __actions(self):
+        self.view.addAction.triggered.connect(lambda: self.addView.nParent.stackedWidget.setCurrentWidget(self.addView))
         self.addView.btnAdd.clicked.connect(self.addBeliver)
         self.addView.btnAddFamily.clicked.connect(self.addFamily)
         self.addView.familyTableView.contextMenuEvent = lambda e : self.tableFamilyRightClicked(e)
