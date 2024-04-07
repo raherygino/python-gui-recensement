@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout
-from ...components import ComboxEditWithLabel
+from ...components import ComboxEditWithLabel, DateEditWithLabel, LineEditWithLabel
 from qfluentwidgets import MessageBoxBase, SubtitleLabel, LineEdit, PushButton, setTheme, Theme, BodyLabel
 
 class editWithLabel(QVBoxLayout):
@@ -58,9 +58,12 @@ class AddBelieverDialog(MessageBoxBase):
         
         self.row_3 = QHBoxLayout()
         self.diaconEdit = editWithLabel("Diakonina miandraikitra", self, placeholders=["Diakonina miandraikitra"])
-        self.birthdayEdit = editWithLabel("Daty sy toerana nahaterahana", self, placeholders=["Daty", "Toerana"])
+        #self.birthdayEdit = editWithLabel("Daty sy toerana nahaterahana", self, placeholders=["Daty", "Toerana"])
+        self.birthdayEdit = DateEditWithLabel("Daty nahaterahana")
+        self.birthplaceEdit = LineEditWithLabel("Toerana nahaterahana")
         self.row_3.addLayout(self.diaconEdit)
         self.row_3.addLayout(self.birthdayEdit)
+        self.row_3.addLayout(self.birthplaceEdit)
         
         '''self.row_4 = QHBoxLayout()
         self.nameFatherEdit = editWithLabel("Anaran'i Ray", self, placeholders=["Anaran'i Ray"])

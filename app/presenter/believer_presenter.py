@@ -136,8 +136,8 @@ class BelieverPresenter:
             address = w.addressEdit.text(0)
             region = w.regionEdit.text(0)
             diacon = w.diaconEdit.text(0)
-            birthday = w.birthdayEdit.text(0)
-            birthplace = w.birthdayEdit.text(1)
+            birthday = w.birthdayEdit.lineEdit.text()
+            birthplace = w.birthplaceEdit.lineEdit.text()
             '''nameFather = w.nameFatherEdit.text(0)
             nameMother = w.nameMotherEdit.text(0)'''
             dateBaptism = w.baptismEdit.text(0)
