@@ -7,6 +7,7 @@ class Believer(Entity):
     """Believer information """
     id: int = 0
     id_conjoint: int = 0
+    is_leader: int = 0
     lastname: str = ""
     firstname: str = ""
     gender: str = ""

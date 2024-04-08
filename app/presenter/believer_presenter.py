@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QThread, QPoint
 from PyQt5.QtGui import QCursor
-from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action
+from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action, Dialog
 from ..models import DatabaseWorker, BelieverModel, Believer
 from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, ShowBelieverDialog
 from .menu_presenter import MenuAction
@@ -18,7 +18,7 @@ class BelieverPresenter:
         self.addView = addView
         self.model = model
         self.workerThread = None
-        self.query = {'pos_family': 'Loha-mpianakaviana'}
+        self.query = {'is_leader': '1'}
         self.fetchData(model.fetch_all(**self.query))
         self.family = []
         self.idEdit = 0
@@ -78,6 +78,9 @@ class BelieverPresenter:
         if (len(selectedItems) != 0):
             idItem = selectedItems[0].text()
             menu = RoundMenu(parent=self.view)
+            '''if selectedItems[3].text() == "Lahy":
+                menu.addAction(Action(FluentIcon.DELETE, 'Loham-pianakaviana hafa', triggered= lambda: self.deleteFamily(selectedItems)))
+            '''
             menu.addAction(Action(FluentIcon.DELETE, 'Fafana', triggered= lambda: self.deleteFamily(selectedItems)))
 
             self.posCur = QCursor().pos()
@@ -86,8 +89,12 @@ class BelieverPresenter:
             menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
             
     def deleteFamily(self, items):
-        self.family.pop(int(items[0].text()))
-        self.setData(self.addView.familyTableView, self.family)
+        dialog = Dialog("Voulez vous le supprimer vraiment?", "Cette donnée sera perdu. Voulez-vous la supprimer vraiment?", self.addView.nParent)
+        if dialog.exec():
+            if self.idEdit != 0:
+                self.model.delete_item(self.family[int(items[0].text())].id)
+            self.family.pop(int(items[0].text()))
+            self.setData(self.addView.familyTableView, self.family)
         
     def addBeliver(self):
         w = self.addView
@@ -111,7 +118,7 @@ class BelieverPresenter:
         believer = Believer(
                 lastname=lastname,
                 firstname=firstname,
-                pos_family="Loha-mpianakaviana",
+                is_leader=1,
                 address=address,
                 region=region,
                 diacon=diacon,
@@ -144,14 +151,16 @@ class BelieverPresenter:
                 if field.name != "id":
                     obj[field.name] = str(believer[field.name])
             self.model.update_item(self.idEdit, **obj)
-            self.model.delete_with_cond(id_father=self.idEdit)
-            self.model.delete_with_cond(id_conjoint=self.idEdit)
+            
             for family in self.family:
                 if family.pos_family == "Zanaka":
                     family['id_father'] = self.idEdit
                 else:
                     family['id_conjoint'] = self.idEdit
-                self.model.create(family)
+                blv = self.model.fetch_all(id=family.id)
+                if len(blv) == 0:
+                    self.model.create(family)
+                    
             
         self.fetchData(self.model.fetch_all(**self.query))
         self.addView.clearLineEdit()
