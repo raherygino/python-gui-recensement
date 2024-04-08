@@ -1,5 +1,6 @@
+from PyQt5.QtCore import QDate
 from ..models import Believer, BelieverModel
-from ..view import ShowBelieverDialog
+from ..view import ShowBelieverDialog, AddBelieverInterface
 from qfluentwidgets import MessageDialog
 
 class MenuAction:
@@ -55,8 +56,32 @@ class MenuAction:
         self.presenter.setData(dialog.table, data)
         dialog.exec()
         
+    def strToQDate(self, strDate: str):
+        date = strDate.split("/")
+        return QDate(int(date[2]), int(date[1]), int(date[0]))
+        
     def update(self, item):
-        print(item)
+        self.presenter.addView.nParent.stackedWidget.setCurrentWidget(self.presenter.addView)
+        self.presenter.idEdit = int(item)
+        believer : Believer = self.model.fetch_item_by_id(item)
+        view : AddBelieverInterface = self.presenter.addView
+        view.lastnameEdit.lineEdit.setText(believer.lastname)
+        view.firstnameEdit.lineEdit.setText(believer.firstname)
+        view.addressEdit.lineEdit.setText(believer.address)
+        view.regionEdit.lineEdit.setText(believer.region)
+        view.diaconEdit.lineEdit.setText(believer.diacon)
+        view.birthdayEdit.lineEdit.setDate(self.strToQDate(believer.birthday))
+        view.birthplaceEdit.lineEdit.setText(believer.birthplace)
+        view.nameFatherEdit.lineEdit.setText(believer.name_father)
+        view.nameMotherEdit.lineEdit.setText(believer.name_mother)
+        view.baptismDateEdit.lineEdit.setDate(self.strToQDate(believer.date_of_baptism))
+        view.baptismPlaceEdit.lineEdit.setText(believer.place_of_baptism)
+        view.recipientDateEdit.lineEdit.setDate(self.strToQDate(believer.date_of_recipient))
+        view.recipientPlaceEdit.lineEdit.setText(believer.place_of_recipient)
+        view.recipientNumberEdit.lineEdit.setText(believer.number_recipient)
+        view.phoneEdit.lineEdit.setText(believer.phone)
+        view.deptWorkEdit.lineEdit.setText(believer.dept_work)
+        view.responsibilityEdit.lineEdit.setText(believer.responsibility)
         
     def confirmDelete(self, item):
         dialog = MessageDialog('Supprimer', 'Voulez vous le supprimer vraiment?', self.view.nParent)

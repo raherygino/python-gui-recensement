@@ -4,6 +4,7 @@ from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action
 from ..models import DatabaseWorker, BelieverModel, Believer
 from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, ShowBelieverDialog
 from .menu_presenter import MenuAction
+import dataclasses
 
 class BelieverPresenter:
     
@@ -20,6 +21,7 @@ class BelieverPresenter:
         self.query = {'pos_family': 'Loha-mpianakaviana'}
         self.fetchData(model.fetch_all(**self.query))
         self.family = []
+        self.idEdit = 0
         
     def __configView(self):
         self.labels = [
@@ -112,16 +114,22 @@ class BelieverPresenter:
                 dept_work=deptWork,
                 responsibility=responsability
             )
-        
-        self.model.create(believer)
-        allBelievers = self.model.fetch_all_items()
-        lastBeliever : Believer = self.model.fetch_all_items()[len(allBelievers) - 1]
-        for family in self.family:
-            if family.pos_family == "Zanaka":
-                family['id_father'] = lastBeliever.id
-            else:
-                family['id_conjoint'] = lastBeliever.id
-            self.model.create(family)
+        if self.idEdit == 0:
+            self.model.create(believer)
+            allBelievers = self.model.fetch_all_items()
+            lastBeliever : Believer = self.model.fetch_all_items()[len(allBelievers) - 1]
+            for family in self.family:
+                if family.pos_family == "Zanaka":
+                    family['id_father'] = lastBeliever.id
+                else:
+                    family['id_conjoint'] = lastBeliever.id
+                self.model.create(family)
+        else:
+            obj = {}
+            for field in dataclasses.fields(believer):
+                if field.name != "id":
+                    obj[field.name] = str(believer[field.name])
+            self.model.update_item(self.idEdit, **obj)
         self.fetchData(self.model.fetch_all(**self.query))
         self.addView.clearLineEdit()
         self.addView.nParent.stackedWidget.setCurrentWidget(self.view)

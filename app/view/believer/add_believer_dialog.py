@@ -38,7 +38,6 @@ class AddBelieverDialog(MessageBoxBase):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        
         self.titleLabel = SubtitleLabel('Mampiditra', self)
 
         self.row = QHBoxLayout()
