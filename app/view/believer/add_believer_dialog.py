@@ -43,12 +43,13 @@ class AddBelieverDialog(MessageBoxBase):
         self.row = QHBoxLayout()
         self.lastnameEdit = editWithLabel("Anarana", self, placeholders=["Anarana"])
         self.firstnameEdit = editWithLabel("Fanampiny", self, placeholders=["Fanampiny"])
-        self.genderCombox = ComboxEditWithLabel("Lahy / Vavy", ["Lahy", "Vavy"])
         self.posFamilyCombox = ComboxEditWithLabel("Amin'ny finakaviana", ["Zanaka", "Vady"])
+        self.posFamilyCombox.combox.currentTextChanged.connect(self.posFamilyChanged)
+        self.genderCombox = ComboxEditWithLabel("Lahy / Vavy", ["Lahy", "Vavy"])
         self.row.addLayout(self.lastnameEdit)
         self.row.addLayout(self.firstnameEdit)
-        self.row.addLayout(self.genderCombox)
         self.row.addLayout(self.posFamilyCombox)
+        self.row.addLayout(self.genderCombox)
         self.row_2 = QHBoxLayout()
         self.addressEdit = editWithLabel("Adiresy", self, placeholders=["Adiresy"])
         self.regionEdit = editWithLabel("Faritra", self, placeholders=["Faritra"])
@@ -103,4 +104,6 @@ class AddBelieverDialog(MessageBoxBase):
 
         self.widget.setMinimumWidth(650)
 
-        # self.hideYesButton()
+    def posFamilyChanged(self, text):
+        if text == "Vady":
+            self.genderCombox.combox.setCurrentIndex(1)
