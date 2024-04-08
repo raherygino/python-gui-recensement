@@ -39,8 +39,22 @@ class BelieverPresenter:
         self.view.addAction.triggered.connect(lambda: self.addView.nParent.stackedWidget.setCurrentWidget(self.addView))
         self.addView.btnAdd.clicked.connect(self.addBeliver)
         self.addView.btnAddFamily.clicked.connect(self.addFamily)
+        self.addView.btnClear.clicked.connect(self.clear)
         self.addView.familyTableView.contextMenuEvent = lambda e : self.tableFamilyRightClicked(e)
         self.view.tableView.contextMenuEvent = lambda e : self.tableRightClicked(e)
+        self.addView.nParent.stackedWidget.currentChanged.connect(self.stackedOnChange)
+    
+    def stackedOnChange(self, pos):
+        if self.idEdit != 0 and pos != 1:
+            self.addView.clearLineEdit()
+            self.addView.familyTableView.clearContents()
+            self.idEdit = 0
+    
+    def clear(self):
+        self.addView.clearLineEdit()
+        self.addView.nParent.stackedWidget.setCurrentWidget(self.view)
+        self.addView.familyTableView.clearContents()
+        self.idEdit = 0
     
     def tableRightClicked(self, event):
         selectedItems = self.view.tableView.selectedItems()
@@ -73,7 +87,7 @@ class BelieverPresenter:
             
     def deleteFamily(self, items):
         self.family.pop(int(items[0].text()))
-        self.setData(self.family)
+        self.setData(self.addView.familyTableView, self.family)
         
     def addBeliver(self):
         w = self.addView
@@ -130,9 +144,20 @@ class BelieverPresenter:
                 if field.name != "id":
                     obj[field.name] = str(believer[field.name])
             self.model.update_item(self.idEdit, **obj)
+            self.model.delete_with_cond(id_father=self.idEdit)
+            self.model.delete_with_cond(id_conjoint=self.idEdit)
+            for family in self.family:
+                if family.pos_family == "Zanaka":
+                    family['id_father'] = self.idEdit
+                else:
+                    family['id_conjoint'] = self.idEdit
+                self.model.create(family)
+            
         self.fetchData(self.model.fetch_all(**self.query))
         self.addView.clearLineEdit()
+        self.addView.familyTableView.clearContents()
         self.addView.nParent.stackedWidget.setCurrentWidget(self.view)
+        self.idEdit = 0
                 
     def addFamily(self):
         w = AddBelieverDialog(self.view.nParent)

@@ -21,8 +21,12 @@ class AddBelieverInterface(QWidget):
         self.scroll_area.setWidget(self.__contentWidgets())
         self.scroll_area.setWidgetResizable(True)
         self.mainLayout.addWidget(self.scroll_area)
+        self.btnLayout = QHBoxLayout()
         self.btnAdd = PrimaryPushButton("Ajouter", self)
-        self.mainLayout.addWidget(self.btnAdd)
+        self.btnClear = PushButton("Annuler", self)
+        self.btnLayout.addWidget(self.btnAdd)
+        self.btnLayout.addWidget(self.btnClear)
+        self.mainLayout.addLayout(self.btnLayout)
         self.setLayout(self.mainLayout)
         self.setObjectName("addStudentInterface")
         

@@ -83,6 +83,12 @@ class MenuAction:
         view.deptWorkEdit.lineEdit.setText(believer.dept_work)
         view.responsibilityEdit.lineEdit.setText(believer.responsibility)
         
+        data = self.model.fetch_all(id_conjoint=item)
+        for value in self.model.fetch_all(id_father=item):
+            data.append(value)
+        self.presenter.family = data
+        self.presenter.setData(view.familyTableView, self.presenter.family)
+        
     def confirmDelete(self, item):
         dialog = MessageDialog('Supprimer', 'Voulez vous le supprimer vraiment?', self.view.nParent)
         dialog.yesButton.clicked.connect(lambda: self.delete(item))
