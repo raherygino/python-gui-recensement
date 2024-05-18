@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-from qfluentwidgets import BodyLabel, LineEdit, ComboBox, CompactSpinBox, DateEdit
+from qfluentwidgets import BodyLabel, LineEdit, ComboBox, SpinBox, DateEdit
 
-class editWithLabel(QVBoxLayout):
+class EditWithLabel(QVBoxLayout):
     def __init__(self, label:str,parent=None, **kwargs):
         super().__init__(None)
         self.parent = parent
@@ -32,19 +32,15 @@ class editWithLabel(QVBoxLayout):
             self.combox.addItems(self.args.get("combox"))
             self.hBoxLayout.addWidget(self.combox)
             
-        if "spinbox" in self.args.keys():
-            self.compactSpinBox = CompactSpinBox(self.parent)
-            self.hBoxLayout.addWidget(self.compactSpinBox)
+        if "spin" in self.args.keys():
+            self.spin = SpinBox(self.parent)
+            self.hBoxLayout.addWidget(self.spin)
             
         if "date" in self.args.keys():
             self.date = DateEdit(self.parent)
             self.hBoxLayout.addWidget(self.date)
-            
-        self.addLayout(self.hBoxLayout)
         
-    
-    def getValue(self) -> int:
-        return self.compactSpinBox.value()
+        self.addLayout(self.hBoxLayout)
             
     def value(self):
         return self.combox.text()

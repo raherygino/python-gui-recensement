@@ -1,25 +1,30 @@
 from PyQt5.QtCore import QThread, QPoint
 from ..models import DatabaseWorker, BelieverModel, Believer
-from ..view import ListBelieverInterface, AddBelieverDialog
+from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface
 
 class BelieverPresenter:
     
-    def __init__(self, model: BelieverModel, view:ListBelieverInterface ):
-        self.__init_var(model,view)
-        self.setTableHeaderLabels([
-            'ID', 'Anarana', 'Fanampiny','Daty sy toerana nahaterahana', 'Asa', 
-            'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
-            'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday'])
+    def __init__(self, model: BelieverModel, addView: AddBelieverInterface, view:ListBelieverInterface ):
+        self.__init_var(model, addView, view)
+        self.__configView()
         self.__actions()
         
-    def __init_var(self, model: BelieverModel, view: ListBelieverInterface):
+    def __init_var(self, model: BelieverModel, addView: AddBelieverInterface, view: ListBelieverInterface):
         self.view = view
+        self.addView = addView
         self.model = model
         self.workerThread = None
         self.fetchData(model.fetch_all())
         
+    def __configView(self):
+        self.setTableHeaderLabels([
+            'ID', 'Anarana', 'Fanampiny','Daty sy toerana nahaterahana', 'Asa', 
+            'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
+            'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday'])
+        
     def __actions(self):
         self.view.addAction.triggered.connect(self.addBielever)
+        self.addView.btnAddFamily.clicked.connect(self.addBielever)
         
     def addBielever(self):
         w = AddBelieverDialog(self.view.nParent)

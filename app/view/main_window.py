@@ -15,7 +15,7 @@ from ..common.signal_bus import signalBus
 
 from ..models import BelieverModel
 from ..presenter import BelieverPresenter
-from .believer import ListBelieverInterface
+from .believer import ListBelieverInterface, AddBelieverInterface
 
 class Widget(QFrame):
 
@@ -83,6 +83,7 @@ class MainWindow(FluentWindow):
         self.initWindow()
 
         self.listBelieverInterface = ListBelieverInterface(self)
+        self.addBelieverInterface = AddBelieverInterface(self)
         #self.settingInterface = SettingInterface(self)
 
         # enable acrylic effect
@@ -94,7 +95,7 @@ class MainWindow(FluentWindow):
         self.materialPresenter = MaterialPresenter(self.materialsInterface, self.materialModel)
         '''
         self.believerModel = BelieverModel()
-        self.believerPresenter = BelieverPresenter(self.believerModel, self.listBelieverInterface)
+        self.believerPresenter = BelieverPresenter(self.believerModel, self.addBelieverInterface, self.listBelieverInterface)
        
         # add items to navigation interface
         self.initNavigation()
@@ -105,7 +106,8 @@ class MainWindow(FluentWindow):
         signalBus.supportSignal.connect(self.onSupport)
 
     def initNavigation(self):
-        self.addSubInterface(self.listBelieverInterface, FIF.APPLICATION, "Liste")
+        self.addSubInterface(self.addBelieverInterface, FIF.ADD, "Mampiditra")
+        self.addSubInterface(self.listBelieverInterface, FIF.APPLICATION, "Listra")
         self.navigationInterface.addSeparator()
 
         '''self.addSubInterface(
@@ -116,8 +118,8 @@ class MainWindow(FluentWindow):
         self.setMinimumWidth(760)
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
         self.fluentTitleBar = FluentTitleBar(self)
-        self.fluentTitleBar.setIcon(QIcon('app/resource/images/logo_eniap.png'))
-        self.fluentTitleBar.titleLabel.setText('Gestion de comportement')
+        self.fluentTitleBar.setIcon(QIcon('app/resource/images/logo.png'))
+        self.fluentTitleBar.titleLabel.setText('Recensement')
         self.setTitleBar(self.fluentTitleBar)
 
         # create splash screen

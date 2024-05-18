@@ -38,6 +38,7 @@ class AddBelieverDialog(MessageBoxBase):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        
         self.titleLabel = SubtitleLabel('Mampiditra', self)
 
         self.row = QHBoxLayout()
@@ -58,11 +59,11 @@ class AddBelieverDialog(MessageBoxBase):
         self.row_3.addLayout(self.diaconEdit)
         self.row_3.addLayout(self.birthdayEdit)
         
-        self.row_4 = QHBoxLayout()
+        '''self.row_4 = QHBoxLayout()
         self.nameFatherEdit = editWithLabel("Anaran'i Ray", self, placeholders=["Anaran'i Ray"])
         self.nameMotherEdit = editWithLabel("Anaran'i Reny", self, placeholders=["Anaran'i Reny"])
         self.row_4.addLayout(self.nameFatherEdit)
-        self.row_4.addLayout(self.nameMotherEdit)
+        self.row_4.addLayout(self.nameMotherEdit)'''
         
         self.row_5 = QHBoxLayout()
         self.baptismEdit = editWithLabel("Daty sy toerana batisa", self, placeholders=["Daty", "Toerana"])
@@ -86,7 +87,7 @@ class AddBelieverDialog(MessageBoxBase):
         self.viewLayout.addLayout(self.row)
         self.viewLayout.addLayout(self.row_2)
         self.viewLayout.addLayout(self.row_3)
-        self.viewLayout.addLayout(self.row_4)
+        #self.viewLayout.addLayout(self.row_4)
         self.viewLayout.addLayout(self.row_5)
         self.viewLayout.addLayout(self.row_6)
         self.viewLayout.addLayout(self.row_7)
