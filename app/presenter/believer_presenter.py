@@ -1,26 +1,28 @@
-from qfluentwidgets import FluentIcon
-from ..view import BelieverNewDialog
-from ..models import Believer, Model
-class BelieverPresenter:
-    TEXT_NEW = "Ajouter"
+from PyQt5.QtCore import QThread, QPoint
+from ..models import DatabaseWorker, BelieverModel, Believer
+from ..view import ListBelieverInterface, AddBelieverDialog
 
-    def __init__(self, view, model: Model):
+class BelieverPresenter:
+    
+    def __init__(self, model: BelieverModel, view:ListBelieverInterface ):
+        self.__init_var(model,view)
+        self.setTableHeaderLabels([
+            'ID', 'Anarana', 'Fanampiny','Daty sy toerana nahaterahana', 'Asa', 
+            'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
+            'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday'])
+        self.__actions()
+        
+    def __init_var(self, model: BelieverModel, view: ListBelieverInterface):
         self.view = view
         self.model = model
-        self.menuWidget()
-        '''for i in range(80):
-            model.create(Believer(firstname=f"FirstName {i}", lastname=f"LastName {i}"))'''
+        self.workerThread = None
+        self.fetchData(model.fetch_all())
         
-        self.view.populateTable(self.model.fetch_all_items())
-
-    def menuWidget(self):
-        self.view.addButton(FluentIcon.ADD, self.TEXT_NEW)
-        for action in self.view.commandBar.actions():
-            if action.text() == self.TEXT_NEW:
-                action.triggered.connect(lambda: self.showDialogNew())
-
-    def showDialogNew(self):
-        w = BelieverNewDialog(self.view)
+    def __actions(self):
+        self.view.addAction.triggered.connect(self.addBielever)
+        
+    def addBielever(self):
+        w = AddBelieverDialog(self.view.nParent)
         if w.exec():
             lastname = w.lastnameEdit.text(0)
             firstname = w.firstnameEdit.text(0)
@@ -61,4 +63,41 @@ class BelieverPresenter:
             )
             
             self.model.create(believer)
-            self.view.populateTable(self.model.fetch_all_items())
+            self.fetchData(self.model.fetch_all())
+    
+    def fetchData(self, data):
+        self.view.progressBar.setVisible(True)
+        self.actionWorkerThread(data)
+        
+    def setTableHeaderLabels(self, headerLabels: list):
+        self.view.tableView.setHorizontalHeaderLabels(headerLabels)
+        
+    def actionWorkerThread(self, data):
+        if self.workerThread is None or not self.workerThread.isRunning():
+            self.workerThread = QThread()
+            self.worker = DatabaseWorker(data)
+            self.worker.moveToThread(self.workerThread)
+            self.workerThread.started.connect(self.worker.run)
+            self.worker.progress.connect(self.updateProgress)
+            self.worker.result.connect(self.handleResult)
+            self.worker.finished.connect(self.workerThread.quit)
+            self.workerThread.start()
+        else:
+            self.workerThread.quit()
+    
+    def updateProgress(self, progress):
+        self.view.progressBar.setValue(int(progress))
+        
+    def handleResult(self, data:list[Believer]):
+        self.view.progressBar.setVisible(False)
+        self.view.progressBar.setValue(0)
+        self.workerThread.quit()
+        dataList = []
+        for item in data:
+            dataList.append([item.id, item.lastname, item.firstname,f'{item.birthday} ,{item.birthplace}', '', 
+                   item.date_of_baptism,f'{item.date_of_recipient} {item.place_of_recipient}', 
+                   item.number_recipient,item.dept_work, item.responsibility, item.phone])
+        self.view.tableView.setData(dataList)
+        
+    def setTableContextMenu(self, contextMenu):
+        self.view.tableView.contextMenuEvent = lambda event: contextMenu(event)

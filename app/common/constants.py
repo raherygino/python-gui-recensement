@@ -1,0 +1,15 @@
+class LABEL:
+    COMPANY = "Compagnie"
+    GENDER = "Genre"
+    GRADE = "Grade"
+    FIRSTNAME = "Prénom(s)"
+    MATRICULE = "Matricule"
+    LASTNAME = "Nom"
+    SECTION = "Section"
+    OBS = "Observations"
+    MOTIFS = "Motifs"
+    START_DATE = "Dates début"
+    END_DATE = "Dates fin"
+    NB_DAY = "NB jours"
+    
+EMPTY = ""
