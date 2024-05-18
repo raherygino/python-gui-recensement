@@ -36,37 +36,43 @@ class BelieverInterface(QWidget):
         # enable border
         self.tableView.setBorderVisible(True)
         self.tableView.setBorderRadius(8)
-        #self.tableView.resizeColumnsToContents()
+        self.tableView.resizeColumnsToContents()
         self.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers)
         #self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tableView.setWordWrap(False)
-        self.tableView.setRowCount(6)
-        self.tableView.setColumnCount(5)
-        songInfos = [
-            ['Raherinomenjanahary Georginot Armelin', 'aiko', 'かばん', '2004', '5:04'],
-            ['爱你', '王心凌', '爱你', '2004', '3:39'],
-            ['星のない世界', 'aiko', '星のない世界/横顔', '2007', '5:30'],
-            ['横顔', 'aiko', '星のない世界/横顔', '2007', '5:06'],
-            ['秘密', 'aiko', '秘密', '2008', '6:27'],
-            ['シアワセ', 'aiko', '秘密', '2008', '5:25'],
-        ]
-        songInfos += songInfos
-        for i, songInfo in enumerate(songInfos):
-            for j in range(5):
-                self.tableView.setItem(i, j, QTableWidgetItem(songInfo[j]))
+        #self.tableView.setRowCount(6)
+        self.tableView.setColumnCount(11)
 
         self.tableView.verticalHeader().hide()
-        self.tableView.setHorizontalHeaderLabels(['Title', 'Artist', 'Album', 'Year', 'Duration'])
+        header = ['ID', 'Anarana', 'Fanampiny',
+                                                  'Daty sy toerana nahaterahana', 'Asa', 
+                                                  'Daty batisa', 'Daty sy toerana maha mpandray',
+                                                  'Laharana karatra mpandray', 'Sampana sy/na Sampan\'asa',
+                                                  'Andraikitra', 'Laharana finday']
+        self.tableView.setHorizontalHeaderLabels(header)
+        
+        self.header = self.tableView.horizontalHeader()
+        #self.header.setSectionResizeMode(1, QHeaderView.Stretch)
         self.tableView.resizeColumnsToContents()
-        # self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        #self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         # self.tableView.setSortingEnabled(True)
 
         self.setStyleSheet("Demo{background: rgb(255, 255, 255)} ")
         #self.hBoxLayout.setContentsMargins(50, 30, 50, 30)
         self.vBoxLayout.addWidget(self.tableView)
 
-
         self.setObjectName("believerInterface")
+        
+    def populateTable(self, items):
+        self.tableView.setRowCount(0)
+        for row, item in enumerate(items):
+            self.tableView.insertRow(row)
+            obj = [item.id, item.lastname, item.firstname,f'{item.birthday} ,{item.birthplace}', '', 
+                   item.date_of_baptism,f'{item.date_of_recipient} {item.place_of_recipient}', 
+                   item.number_recipient,item.dept_work, item.responsibility, item.phone]
+            for col, value in enumerate(obj):
+                self.tableView.setItem(row, col, QTableWidgetItem(str(value)))
+
 
     def addButton(self, icon, text):
         action = Action(icon, text, self)

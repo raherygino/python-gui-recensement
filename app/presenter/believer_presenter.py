@@ -8,6 +8,10 @@ class BelieverPresenter:
         self.view = view
         self.model = model
         self.menuWidget()
+        '''for i in range(80):
+            model.create(Believer(firstname=f"FirstName {i}", lastname=f"LastName {i}"))'''
+        
+        self.view.populateTable(self.model.fetch_all_items())
 
     def menuWidget(self):
         self.view.addButton(FluentIcon.ADD, self.TEXT_NEW)
@@ -57,3 +61,4 @@ class BelieverPresenter:
             )
             
             self.model.create(believer)
+            self.view.populateTable(self.model.fetch_all_items())
