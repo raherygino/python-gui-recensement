@@ -1,7 +1,8 @@
-from PyQt5.QtCore import QDate
+from PyQt5.QtCore import QDate, QPoint
+from PyQt5.QtGui import QCursor
 from ..models import Believer, BelieverModel
 from ..view import ShowBelieverDialog, AddBelieverInterface
-from qfluentwidgets import MessageDialog
+from qfluentwidgets import MessageDialog, RoundMenu, Action, MenuAnimationType, FluentIcon
 
 class MenuAction:
     
@@ -54,15 +55,42 @@ class MenuAction:
             data.append(value)
                 
         self.presenter.setData(dialog.table, data)
+        dialog.table.contextMenuEvent = lambda e, dialog = dialog, data=data: self.rightClickTable(e, data, dialog)
         dialog.exec()
+        
+    def rightClickTable(self, event, data, dialog):
+        selectedItems = dialog.table.selectedItems()
+        if len(selectedItems) != 0:
+            if selectedItems[3].text() == "Lahy":
+                blv = data[int(selectedItems[0].text())]
+                menu = RoundMenu(parent=self.view)
+                menu.addAction(
+                    Action(
+                        FluentIcon.PEOPLE, 
+                        'Loham-pianakaviana hafa', 
+                        triggered= lambda: self.newLeaderFamily(blv, dialog)))
+            
+                self.posCur = QCursor().pos()
+                cur_x = self.posCur.x()
+                cur_y = self.posCur.y()
+                menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
+                
+    def newLeaderFamily(self, item, dialog):
+        self.update(item.id)
+        self.presenter.isNewLead = True
+        dialog.accept()
         
     def strToQDate(self, strDate: str):
         date = strDate.split("/")
-        return QDate(int(date[2]), int(date[1]), int(date[0]))
+        dateOut = QDate(2000,1,1)
+        if len(date) == 3:
+            dateOut = QDate(int(date[2]), int(date[1]), int(date[0]))
+        return dateOut
         
     def update(self, item):
         self.presenter.addView.nParent.stackedWidget.setCurrentWidget(self.presenter.addView)
         self.presenter.idEdit = int(item)
+        self.presenter.isNewLead = False
         believer : Believer = self.model.fetch_item_by_id(item)
         view : AddBelieverInterface = self.presenter.addView
         view.lastnameEdit.lineEdit.setText(believer.lastname)

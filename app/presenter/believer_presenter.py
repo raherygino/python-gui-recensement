@@ -22,6 +22,7 @@ class BelieverPresenter:
         self.fetchData(model.fetch_all(**self.query))
         self.family = []
         self.idEdit = 0
+        self.isNewLead = False
         
     def __configView(self):
         self.labels = [
@@ -49,12 +50,14 @@ class BelieverPresenter:
             self.addView.clearLineEdit()
             self.addView.familyTableView.clearContents()
             self.idEdit = 0
+            self.isNewLead = False
     
     def clear(self):
         self.addView.clearLineEdit()
         self.addView.nParent.stackedWidget.setCurrentWidget(self.view)
         self.addView.familyTableView.clearContents()
         self.idEdit = 0
+        self.isNewLead = False
     
     def tableRightClicked(self, event):
         selectedItems = self.view.tableView.selectedItems()
@@ -150,6 +153,8 @@ class BelieverPresenter:
             for field in dataclasses.fields(believer):
                 if field.name != "id":
                     obj[field.name] = str(believer[field.name])
+            if self.isNewLead:
+                obj['is_leader'] = "1"
             self.model.update_item(self.idEdit, **obj)
             
             for family in self.family:
@@ -167,6 +172,7 @@ class BelieverPresenter:
         self.addView.familyTableView.clearContents()
         self.addView.nParent.stackedWidget.setCurrentWidget(self.view)
         self.idEdit = 0
+        self.isNewLead = False
                 
     def addFamily(self):
         w = AddBelieverDialog(self.view.nParent)
