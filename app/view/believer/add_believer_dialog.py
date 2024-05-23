@@ -72,12 +72,20 @@ class AddBelieverDialog(MessageBoxBase):
         self.row_4.addLayout(self.nameMotherEdit)'''
         
         self.row_5 = QHBoxLayout()
-        self.baptismEdit = editWithLabel("Daty sy toerana batisa", self, placeholders=["Daty", "Toerana"])
-        self.row_5.addLayout(self.baptismEdit)
+        self.dateBaptismDateEdit = DateEditWithLabel("Daty ny batisa")
+        self.placeBaptismEdit = LineEditWithLabel("Toerana ny batisa")
+        #self.baptismEdit = editWithLabel("Daty sy toerana batisa", self, placeholders=["Daty", "Toerana"])
+        self.row_5.addLayout(self.dateBaptismDateEdit)
+        self.row_5.addLayout(self.placeBaptismEdit)
 
         self.row_6 = QHBoxLayout()
-        self.recipientEdit = editWithLabel("Daty, toerana, laharana mpandray", self, placeholders=["Daty", "Toerana", "Laharana"])
-        self.row_6.addLayout(self.recipientEdit)
+        self.dateRecipientDateEdit = DateEditWithLabel("Daty nahampandray")
+        self.placeRecipientEdit = LineEditWithLabel("Toerana nahampandray")
+        self.numberRecipientEdit = LineEditWithLabel("Laharana ny mpandray")
+        #self.recipientEdit = editWithLabel("Daty, toerana, laharana mpandray", self, placeholders=["Daty", "Toerana", "Laharana"])
+        self.row_6.addLayout(self.dateRecipientDateEdit)
+        self.row_6.addLayout(self.placeRecipientEdit)
+        self.row_6.addLayout(self.numberRecipientEdit)
 
         self.row_7 = QHBoxLayout()
         self.phoneEdit = editWithLabel("Laharan'ny finday", self, placeholders=["Laharan'ny finday"])
@@ -86,7 +94,6 @@ class AddBelieverDialog(MessageBoxBase):
         self.row_7.addLayout(self.phoneEdit)
         self.row_7.addLayout(self.deptWorkEdit)
         self.row_7.addLayout(self.responsibilityEdit)
-
         # add widget to view layout
         self.viewLayout.addWidget(self.titleLabel)
 

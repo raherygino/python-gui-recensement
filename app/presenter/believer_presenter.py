@@ -106,13 +106,13 @@ class BelieverPresenter:
         address = w.addressEdit.lineEdit.text()
         region = w.regionEdit.lineEdit.text()
         diacon = w.diaconEdit.lineEdit.text()
-        birthday = w.birthdayEdit.lineEdit.text()
+        birthday = w.birthdayEdit.text()
         birthplace = w.birthplaceEdit.lineEdit.text()
         nameFather = w.nameFatherEdit.lineEdit.text()
         nameMother = w.nameMotherEdit.lineEdit.text()
-        dateBaptism = w.baptismDateEdit.lineEdit.text()
+        dateBaptism = w.baptismDateEdit.text()
         placeBaptism = w.baptismPlaceEdit.lineEdit.text()
-        dateRecipient = w.recipientDateEdit.lineEdit.text()
+        dateRecipient = w.recipientDateEdit.text()
         placeRecipient = w.recipientPlaceEdit.lineEdit.text()
         numberRecipient = w.recipientNumberEdit.lineEdit.text()
         phone = w.phoneEdit.lineEdit.text()
@@ -179,6 +179,10 @@ class BelieverPresenter:
                 
     def addFamily(self):
         w = AddBelieverDialog(self.view.nParent)
+        adrss = self.addView.addressEdit.lineEdit.text()
+        rgn = self.addView.regionEdit.lineEdit.text()
+        w.addressEdit.lineEdits[0].setText(adrss)
+        w.regionEdit.lineEdits[0].setText(rgn)
         if w.exec():
             lastname = w.lastnameEdit.text(0)
             firstname = w.firstnameEdit.text(0)
@@ -187,15 +191,15 @@ class BelieverPresenter:
             address = w.addressEdit.text(0)
             region = w.regionEdit.text(0)
             diacon = w.diaconEdit.text(0)
-            birthday = w.birthdayEdit.lineEdit.text()
+            birthday = w.birthdayEdit.text()
             birthplace = w.birthplaceEdit.lineEdit.text()
             '''nameFather = w.nameFatherEdit.text(0)
             nameMother = w.nameMotherEdit.text(0)'''
-            dateBaptism = w.baptismEdit.text(0)
-            placeBaptism = w.baptismEdit.text(1)
-            dateRecipient = w.recipientEdit.text(0)
-            placeRecipient = w.recipientEdit.text(1)
-            numberRecipient = w.recipientEdit.text(2)
+            dateBaptism = w.dateBaptismDateEdit.text()
+            placeBaptism = w.placeBaptismEdit.lineEdit.text()
+            dateRecipient = w.dateRecipientDateEdit.text()
+            placeRecipient = w.placeRecipientEdit.lineEdit.text()
+            numberRecipient = w.numberRecipientEdit.lineEdit.text()
             phone = w.phoneEdit.text(0)
             deptWork = w.deptWorkEdit.text(0)
             responsability = w.responsibilityEdit.text(0)
@@ -264,7 +268,7 @@ class BelieverPresenter:
         self.workerThread.quit()
         dataList = []
         for item in data:
-            dataList.append([item.id, item.lastname, item.firstname,f'{item.birthday} ,{item.birthplace}', '', 
+            dataList.append([item.id, item.lastname, item.firstname,f'{item.birthday} {item.birthplace}', '', 
                    item.date_of_baptism,f'{item.date_of_recipient} {item.place_of_recipient}', 
                    item.number_recipient,item.dept_work, item.responsibility, item.phone])
         self.view.tableView.setData(dataList)

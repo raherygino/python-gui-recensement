@@ -175,7 +175,7 @@ class MenuAction:
     def newLeaderFamily(self, item, dialog):
         self.update(item.id)
         self.presenter.isNewLead = True
-        dialog.accept()
+        dialog.hide()
         
     def strToQDate(self, strDate: str):
         date = strDate.split("/")

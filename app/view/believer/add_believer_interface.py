@@ -22,8 +22,9 @@ class AddBelieverInterface(QWidget):
         self.scroll_area.setWidgetResizable(True)
         self.mainLayout.addWidget(self.scroll_area)
         self.btnLayout = QHBoxLayout()
-        self.btnAdd = PrimaryPushButton("Ajouter", self)
-        self.btnClear = PushButton("Annuler", self)
+        self.btnAdd = PrimaryPushButton("Ampidirina", self)
+        self.btnAdd.setEnabled(False)
+        self.btnClear = PushButton("Asorina", self)
         self.btnLayout.addWidget(self.btnAdd)
         self.btnLayout.addWidget(self.btnClear)
         self.mainLayout.addLayout(self.btnLayout)
@@ -54,6 +55,7 @@ class AddBelieverInterface(QWidget):
         self.vBoxlayout.setSpacing(12)
         self.row1 = QHBoxLayout()
         self.lastnameEdit = LineEditWithLabel("Anarana")
+        self.lastnameEdit.lineEdit.textChanged.connect(self.__isValidate)
         self.firstnameEdit = LineEditWithLabel("Fanampiny")
         self.addressEdit = LineEditWithLabel("Adiresy")
         self.regionEdit = LineEditWithLabel("Faritra")
@@ -101,7 +103,13 @@ class AddBelieverInterface(QWidget):
         self.addChild(self.vBoxlayout, [self.row1, self.row2, self.row3, 
                                         self.row4, self.row5, self.row6, 
                                         self.row7, self.familyTableView])
-        
+    
+    def __isValidate(self, text):
+        if len(text) > 3:
+            self.btnAdd.setEnabled(True)
+        else:
+            self.btnAdd.setEnabled(False)
+            
     def clearLineEdit(self):
         for i in range(self.vBoxlayout.count()):
             widget = self.vBoxlayout.itemAt(i).widget()
