@@ -94,7 +94,6 @@ class AddBelieverDialog(MessageBoxBase):
         self.row_7.addLayout(self.phoneEdit)
         self.row_7.addLayout(self.deptWorkEdit)
         self.row_7.addLayout(self.responsibilityEdit)
-
         # add widget to view layout
         self.viewLayout.addWidget(self.titleLabel)
 
