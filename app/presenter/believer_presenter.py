@@ -106,13 +106,13 @@ class BelieverPresenter:
         address = w.addressEdit.lineEdit.text()
         region = w.regionEdit.lineEdit.text()
         diacon = w.diaconEdit.lineEdit.text()
-        birthday = w.birthdayEdit.lineEdit.text()
+        birthday = w.birthdayEdit.text()
         birthplace = w.birthplaceEdit.lineEdit.text()
         nameFather = w.nameFatherEdit.lineEdit.text()
         nameMother = w.nameMotherEdit.lineEdit.text()
-        dateBaptism = w.baptismDateEdit.lineEdit.text()
+        dateBaptism = w.baptismDateEdit.text()
         placeBaptism = w.baptismPlaceEdit.lineEdit.text()
-        dateRecipient = w.recipientDateEdit.lineEdit.text()
+        dateRecipient = w.recipientDateEdit.text()
         placeRecipient = w.recipientPlaceEdit.lineEdit.text()
         numberRecipient = w.recipientNumberEdit.lineEdit.text()
         phone = w.phoneEdit.lineEdit.text()
@@ -264,7 +264,7 @@ class BelieverPresenter:
         self.workerThread.quit()
         dataList = []
         for item in data:
-            dataList.append([item.id, item.lastname, item.firstname,f'{item.birthday} ,{item.birthplace}', '', 
+            dataList.append([item.id, item.lastname, item.firstname,f'{item.birthday} {item.birthplace}', '', 
                    item.date_of_baptism,f'{item.date_of_recipient} {item.place_of_recipient}', 
                    item.number_recipient,item.dept_work, item.responsibility, item.phone])
         self.view.tableView.setData(dataList)
