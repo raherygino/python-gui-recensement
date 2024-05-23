@@ -154,7 +154,10 @@ class BelieverPresenter:
                 if field.name != "id":
                     obj[field.name] = str(believer[field.name])
             if self.isNewLead:
+                oldBeliever = self.model.fetch_item_by_id(str(self.idEdit))
                 obj['is_leader'] = "1"
+                obj['id_father'] = str(oldBeliever.id_father)
+                obj['pos_family'] = str(oldBeliever.pos_family)
             self.model.update_item(self.idEdit, **obj)
             
             for family in self.family:

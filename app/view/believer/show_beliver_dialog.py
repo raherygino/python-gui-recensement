@@ -15,6 +15,7 @@ class ShowBelieverDialog(Dialog):
         self.table = TableView(self)
         self.table.setMinimumHeight(200)
         self.textLayout.addWidget(self.table)
+        self.yesButton.setText('Export')
         
     def addLabelValue(self, label:str, value:str, row:int, column:int):
         self.gridLayout.addLayout(LabelValue(label, value), row, column) 
