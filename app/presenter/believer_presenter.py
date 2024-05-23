@@ -179,6 +179,10 @@ class BelieverPresenter:
                 
     def addFamily(self):
         w = AddBelieverDialog(self.view.nParent)
+        adrss = self.addView.addressEdit.lineEdit.text()
+        rgn = self.addView.regionEdit.lineEdit.text()
+        w.addressEdit.lineEdits[0].setText(adrss)
+        w.regionEdit.lineEdits[0].setText(rgn)
         if w.exec():
             lastname = w.lastnameEdit.text(0)
             firstname = w.firstnameEdit.text(0)
