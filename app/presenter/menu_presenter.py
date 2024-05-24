@@ -188,8 +188,20 @@ class MenuAction:
         self.presenter.addView.nParent.stackedWidget.setCurrentWidget(self.presenter.addView)
         self.presenter.idEdit = int(item)
         self.presenter.isNewLead = False
-        believer : Believer = self.model.fetch_item_by_id(item)
         view : AddBelieverInterface = self.presenter.addView
+        believer : Believer = self.model.fetch_item_by_id(item)
+        idFather = believer.id_father
+        idMother = believer.id_mother
+        if idFather != 0:
+            father : Believer = self.model.fetch_item_by_id(idFather)
+            view.nameFatherEdit.lineEdit.setText(f'{father.lastname} {father.firstname}')
+        else:
+            view.nameFatherEdit.lineEdit.setText(believer.name_father)
+        if idMother != 0:
+            mother : Believer = self.model.fetch_item_by_id(idMother)
+            view.nameMotherEdit.lineEdit.setText(f'{mother.lastname} {mother.firstname}')
+        else:
+            view.nameMotherEdit.lineEdit.setText(believer.name_mother)
         view.lastnameEdit.lineEdit.setText(believer.lastname)
         view.firstnameEdit.lineEdit.setText(believer.firstname)
         view.addressEdit.lineEdit.setText(believer.address)
@@ -197,8 +209,6 @@ class MenuAction:
         view.diaconEdit.lineEdit.setText(believer.diacon)
         view.birthdayEdit.lineEdit.setDate(self.strToQDate(believer.birthday))
         view.birthplaceEdit.lineEdit.setText(believer.birthplace)
-        view.nameFatherEdit.lineEdit.setText(believer.name_father)
-        view.nameMotherEdit.lineEdit.setText(believer.name_mother)
         view.baptismDateEdit.lineEdit.setDate(self.strToQDate(believer.date_of_baptism))
         view.baptismPlaceEdit.lineEdit.setText(believer.place_of_baptism)
         view.recipientDateEdit.lineEdit.setDate(self.strToQDate(believer.date_of_recipient))
