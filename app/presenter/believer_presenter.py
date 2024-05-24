@@ -98,6 +98,14 @@ class BelieverPresenter:
                 self.model.delete_item(self.family[int(items[0].text())].id)
             self.family.pop(int(items[0].text()))
             self.setData(self.addView.familyTableView, self.family)
+            
+    def setIdMother(self, idFather):
+        mothers : list[Believer] = self.model.fetch_all(id_conjoint=idFather)
+        children : list[Believer] = self.model.fetch_all(id_father=idFather)
+        for i, mother in enumerate(mothers):
+            if i == 0:
+                for child in children:
+                    self.model.update_item(child.id, id_mother=str(mother.id))
         
     def addBeliver(self):
         w = self.addView
@@ -148,12 +156,7 @@ class BelieverPresenter:
                 else:
                     family['id_conjoint'] = lastBeliever.id
                 self.model.create(family)
-            mothers : list[Believer] = self.model.fetch_all(id_conjoint=lastBeliever.id)
-            children : list[Believer] = self.model.fetch_all(id_father=lastBeliever.id)
-            for i, mother in enumerate(mothers):
-                if i == 0:
-                    for child in children:
-                        self.model.update_item(child.id, id_mother=str(mother.id))
+            self.setIdMother(lastBeliever.id)
         else:
             obj = {}
             for field in dataclasses.fields(believer):
@@ -174,6 +177,7 @@ class BelieverPresenter:
                 blv = self.model.fetch_all(id=family.id)
                 if len(blv) == 0:
                     self.model.create(family)
+            self.setIdMother(self.idEdit)
                     
             
         self.fetchData(self.model.fetch_all(**self.query))
