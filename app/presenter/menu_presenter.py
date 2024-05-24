@@ -160,17 +160,18 @@ class MenuAction:
         if len(selectedItems) != 0:
             if selectedItems[3].text() == "Lahy":
                 blv = data[int(selectedItems[0].text())]
-                menu = RoundMenu(parent=self.view)
-                menu.addAction(
+                if blv.is_leader == 0:
+                    menu = RoundMenu(parent=self.view)
+                    menu.addAction(
                     Action(
                         FluentIcon.PEOPLE, 
                         'Loham-pianakaviana hafa', 
                         triggered= lambda: self.newLeaderFamily(blv, dialog)))
             
-                self.posCur = QCursor().pos()
-                cur_x = self.posCur.x()
-                cur_y = self.posCur.y()
-                menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
+                    self.posCur = QCursor().pos()
+                    cur_x = self.posCur.x()
+                    cur_y = self.posCur.y()
+                    menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
                 
     def newLeaderFamily(self, item, dialog):
         self.update(item.id)

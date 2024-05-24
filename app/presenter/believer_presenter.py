@@ -26,11 +26,11 @@ class BelieverPresenter:
         
     def __configView(self):
         self.labels = [
-            'ID', 'Anarana', 'Fanampiny','Daty sy toerana nahaterahana', 'Asa', 
+            'ID', 'Anarana', 'Fanampiny','Daty sy toerana nahaterahana',
             'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
             'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday']
         self.labelsFamily = [
-            'ID', 'Anarana', 'Fanampiny','Lahy sa vavy','Amin\'ny fianakaviana', 'Daty sy toerana nahaterahana', 'Asa',
+            'ID', 'Anarana', 'Fanampiny','Lahy sa vavy','Amin\'ny fianakaviana', 'Daty sy toerana nahaterahana',
             'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
             'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday']
         self.setTableHeaderLabels(self.labels)
@@ -244,7 +244,7 @@ class BelieverPresenter:
         data = []
         for i, believer in enumerate(believers):
             data.append([str(i), believer.lastname, believer.firstname, believer.gender, believer.pos_family, 
-                         f'{believer.birthday} {believer.birthplace}', believer.dept_work, believer.date_of_baptism, 
+                         f'{believer.birthday} {believer.birthplace}', believer.date_of_baptism, 
                          believer.place_of_baptism, believer.date_of_recipient, believer.place_of_recipient, 
                          believer.number_recipient, "", believer.responsibility])
         table.setData(data)
@@ -278,7 +278,7 @@ class BelieverPresenter:
         self.workerThread.quit()
         dataList = []
         for item in data:
-            dataList.append([item.id, item.lastname, item.firstname,f'{item.birthday} {item.birthplace}', '', 
+            dataList.append([item.id, item.lastname, item.firstname,f'{item.birthday} {item.birthplace}', 
                    item.date_of_baptism,f'{item.date_of_recipient} {item.place_of_recipient}', 
                    item.number_recipient,item.dept_work, item.responsibility, item.phone])
         self.view.tableView.setData(dataList)
