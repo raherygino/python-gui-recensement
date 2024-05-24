@@ -148,6 +148,12 @@ class BelieverPresenter:
                 else:
                     family['id_conjoint'] = lastBeliever.id
                 self.model.create(family)
+            mothers : list[Believer] = self.model.fetch_all(id_conjoint=lastBeliever.id)
+            children : list[Believer] = self.model.fetch_all(id_father=lastBeliever.id)
+            for i, mother in enumerate(mothers):
+                if i == 0:
+                    for child in children:
+                        self.model.update_item(child.id, id_mother=str(mother.id))
         else:
             obj = {}
             for field in dataclasses.fields(believer):
