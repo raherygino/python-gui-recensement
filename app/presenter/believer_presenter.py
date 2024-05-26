@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QThread, QPoint
 from PyQt5.QtGui import QCursor
 from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action, Dialog
+from ..common import Function
 from ..models import DatabaseWorker, BelieverModel, Believer
 from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, ShowBelieverDialog
 from .menu_presenter import MenuAction
@@ -17,6 +18,7 @@ class BelieverPresenter:
         self.view = view
         self.addView = addView
         self.model = model
+        self.func = Function()
         self.workerThread = None
         self.query = {'is_leader': '1'}
         self.fetchData(model.fetch_all(**self.query))
@@ -49,6 +51,7 @@ class BelieverPresenter:
         if self.idEdit != 0 and pos != 1:
             self.addView.clearLineEdit()
             self.addView.familyTableView.clearContents()
+            self.family.clear()
             self.idEdit = 0
             self.isNewLead = False
     
@@ -77,26 +80,55 @@ class BelieverPresenter:
             menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
         
     def tableFamilyRightClicked(self, event):
-        selectedItems = self.addView.familyTableView.selectedItems()
-        if (len(selectedItems) != 0):
-            idItem = selectedItems[0].text()
-            menu = RoundMenu(parent=self.view)
-            '''if selectedItems[3].text() == "Lahy":
-                menu.addAction(Action(FluentIcon.DELETE, 'Loham-pianakaviana hafa', triggered= lambda: self.deleteFamily(selectedItems)))
-            '''
-            menu.addAction(Action(FluentIcon.DELETE, 'Fafana', triggered= lambda: self.deleteFamily(selectedItems)))
-
-            self.posCur = QCursor().pos()
-            cur_x = self.posCur.x()
-            cur_y = self.posCur.y()
-            menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
+        selectedItems = self.addView.familyTableView.selectedIndexes()
+        for i, item in enumerate(selectedItems):
+            if i == 0:
+                pos = item.row()
+                menu = RoundMenu(parent=self.view)
+                menu.addAction(Action(FluentIcon.EDIT, 'Ovaina', triggered= lambda: self.editFamily(pos)))
+                menu.addAction(Action(FluentIcon.DELETE, 'Fafana', triggered= lambda: self.deleteFamily(pos)))
+                self.posCur = QCursor().pos()
+                cur_x = self.posCur.x()
+                cur_y = self.posCur.y()
+                menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
             
-    def deleteFamily(self, items):
+    def editFamily(self, pos):
+        family:Believer = self.family[pos]
+        dialog = AddBelieverDialog(self.addView.nParent)
+        dialog.lastnameEdit.lineEdits[0].setText(family.lastname)
+        dialog.firstnameEdit.lineEdits[0].setText(family.firstname)
+        dialog.posFamilyCombox.combox.setCurrentIndex(0 if family.pos_family == "Zanaka" else 1)
+        dialog.genderCombox.combox.setCurrentIndex(0 if family.gender == "Lahy" else 1)
+        dialog.addressEdit.lineEdits[0].setText(family.address)
+        dialog.regionEdit.lineEdits[0].setText(family.region)
+        dialog.diaconEdit.lineEdits[0].setText(family.diacon)
+        dialog.birthdayEdit.lineEdit.setDate(self.func.strToQDate(family.birthday))
+        dialog.birthplaceEdit.lineEdit.setText(family.birthplace)
+        dialog.dateBaptismDateEdit.lineEdit.setDate(self.func.strToQDate(family.date_of_baptism))
+        dialog.placeBaptismEdit.lineEdit.setText(family.place_of_baptism)
+        dialog.dateBaptismDateEdit.lineEdit.setDate(self.func.strToQDate(family.date_of_recipient))
+        dialog.placeRecipientEdit.lineEdit.setText(family.place_of_recipient)
+        dialog.numberRecipientEdit.lineEdit.setText(family.number_recipient)
+        dialog.phoneEdit.lineEdits[0].setText(family.phone)
+        dialog.deptWorkEdit.lineEdits[0].setText(family.dept_work)
+        dialog.responsibilityEdit.lineEdits[0].setText(family.responsibility)
+        dialog.yesButton.setText("Ovaina")
+        if dialog.exec():
+            believer = self.getBelieverFromDialog(dialog)
+            believer['id'] = family.id
+            #if believer.id == 0:
+            self.family.pop(pos)
+            self.family.insert(pos, believer)
+            self.setData(self.addView.familyTableView, self.family)
+            print(self.family)
+                
+            
+    def deleteFamily(self, pos):
         dialog = Dialog("Voulez vous le supprimer vraiment?", "Cette donnée sera perdu. Voulez-vous la supprimer vraiment?", self.addView.nParent)
         if dialog.exec():
             if self.idEdit != 0:
-                self.model.delete_item(self.family[int(items[0].text())].id)
-            self.family.pop(int(items[0].text()))
+                self.model.delete_item(self.family[pos].id)
+            self.family.pop(pos)
             self.setData(self.addView.familyTableView, self.family)
             
     def setIdMother(self, idFather):
@@ -177,6 +209,12 @@ class BelieverPresenter:
                 blv = self.model.fetch_all(id=family.id)
                 if len(blv) == 0:
                     self.model.create(family)
+                else:
+                    obj = {}
+                    for field in dataclasses.fields(family):
+                        if field.name != "id":
+                            obj[field.name] = str(family[field.name])
+                    self.model.update_item(family.id, **obj)
             self.setIdMother(self.idEdit)
                     
             
@@ -186,14 +224,8 @@ class BelieverPresenter:
         self.addView.nParent.stackedWidget.setCurrentWidget(self.view)
         self.idEdit = 0
         self.isNewLead = False
-                
-    def addFamily(self):
-        w = AddBelieverDialog(self.view.nParent)
-        adrss = self.addView.addressEdit.lineEdit.text()
-        rgn = self.addView.regionEdit.lineEdit.text()
-        w.addressEdit.lineEdits[0].setText(adrss)
-        w.regionEdit.lineEdits[0].setText(rgn)
-        if w.exec():
+        
+    def getBelieverFromDialog(self, w):
             lastname = w.lastnameEdit.text(0)
             firstname = w.firstnameEdit.text(0)
             posFamily = w.posFamilyCombox.combox.currentText()
@@ -214,7 +246,7 @@ class BelieverPresenter:
             deptWork = w.deptWorkEdit.text(0)
             responsability = w.responsibilityEdit.text(0)
             
-            believer = Believer(
+            return Believer(
                 lastname=lastname,
                 firstname=firstname,
                 gender=gender,
@@ -233,6 +265,16 @@ class BelieverPresenter:
                 dept_work=deptWork,
                 responsibility=responsability
             )
+        
+                
+    def addFamily(self):
+        w = AddBelieverDialog(self.view.nParent)
+        adrss = self.addView.addressEdit.lineEdit.text()
+        rgn = self.addView.regionEdit.lineEdit.text()
+        w.addressEdit.lineEdits[0].setText(adrss)
+        w.regionEdit.lineEdits[0].setText(rgn)
+        if w.exec():
+            believer = self.getBelieverFromDialog(w)
             self.family.append(believer)
             '''["", lastname, firstname, gender, posFamily, f'{birthday} {birthplace}', deptWork, dateBaptism, placeBaptism,
                  dateRecipient, placeRecipient, numberRecipient, deptWork, responsability]
@@ -243,7 +285,7 @@ class BelieverPresenter:
     def setData(self, table, believers: list[Believer]):
         data = []
         for i, believer in enumerate(believers):
-            data.append([str(i), believer.lastname, believer.firstname, believer.gender, believer.pos_family, 
+            data.append([believer.id, believer.lastname, believer.firstname, believer.gender, believer.pos_family, 
                          f'{believer.birthday} {believer.birthplace}', believer.date_of_baptism, 
                          believer.place_of_baptism, believer.date_of_recipient, believer.place_of_recipient, 
                          believer.number_recipient, "", believer.responsibility])
