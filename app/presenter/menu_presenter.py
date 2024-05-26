@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QDate, QPoint
 from PyQt5.QtGui import QCursor
+from PyQt5.QtWidgets import QFileDialog
 from ..models import Believer, BelieverModel
 from ..view import ShowBelieverDialog, AddBelieverInterface
 from qfluentwidgets import MessageDialog, RoundMenu, Action, MenuAnimationType, FluentIcon
@@ -60,99 +61,103 @@ class MenuAction:
         self.presenter.setData(dialog.table, data)
         dialog.table.contextMenuEvent = lambda e, dialog = dialog, data=data: self.rightClickTable(e, data, dialog)
         if dialog.exec():
-            # Create a new Document
-            doc = Document()
-            doc.styles['Normal'].paragraph_format.line_spacing = Pt(12)  # Set line spacing to 20 points (adjust as needed)
+            options = QFileDialog.Options()
+            fileName, _ = QFileDialog.getSaveFileName(self.presenter.addView.nParent,"Export File", "","Word Files (*.docx);;All Files (*)", options=options)
+            if fileName:
+                # Create a new Document
+                doc = Document()
+                doc.styles['Normal'].paragraph_format.line_spacing = Pt(12)  # Set line spacing to 20 points (adjust as needed)
 
-            # Set page orientation to landscape
-            section = doc.sections[0]
-            
-            # Set margins
-            section = doc.sections[0]
-            section.left_margin = Inches(0.2)   # 1 inch margin on the left
-            section.right_margin = Inches(0.2)  # 1 inch margin on the right
-            section.top_margin = Inches(0.2)     # 1 inch margin at the top
-            section.bottom_margin = Inches(0.2)  # 1 inch margin at the bottom
-            
-            new_width, new_height = section.page_height, section.page_width
-            section.orientation = WD_ORIENT.LANDSCAPE
-            section.page_width = new_width
-            section.page_height = new_height
-            # Add a heading
-            doc.add_heading('Loha-mpianakaviana', level=1)
-            # Add some paragraphs
-            '''doc.add_paragraph('This is a sample paragraph.')
-            doc.add_paragraph('This is another paragraph.')
+                # Set page orientation to landscape
+                section = doc.sections[0]
+                
+                # Set margins
+                section = doc.sections[0]
+                section.left_margin = Inches(0.2)   # 1 inch margin on the left
+                section.right_margin = Inches(0.2)  # 1 inch margin on the right
+                section.top_margin = Inches(0.2)     # 1 inch margin at the top
+                section.bottom_margin = Inches(0.2)  # 1 inch margin at the bottom
+                
+                new_width, new_height = section.page_height, section.page_width
+                section.orientation = WD_ORIENT.LANDSCAPE
+                section.page_width = new_width
+                section.page_height = new_height
+                # Add a heading
+                doc.add_heading('Loha-mpianakaviana', level=1)
+                # Add some paragraphs
+                '''doc.add_paragraph('This is a sample paragraph.')
+                doc.add_paragraph('This is another paragraph.')
 
-            # Add a numbered list
-            doc.add_paragraph('Numbered List:', style='List Number')
-            for i in range(1, 4):
-                doc.add_paragraph(f'Item {i}', style='List Number')'''
-            # Data for the table
-            dataBeliever = [
-                [f'Anarana: \n{believer.lastname}', 
-                 f'Fanampiny: \n{believer.firstname}', 
-                 f'Adiresy: \n{believer.address}',
-                 f'Faritra: \n{believer.region}'],
+                # Add a numbered list
+                doc.add_paragraph('Numbered List:', style='List Number')
+                for i in range(1, 4):
+                    doc.add_paragraph(f'Item {i}', style='List Number')'''
+                # Data for the table
+                dataBeliever = [
+                    [f'Anarana: \n{believer.lastname}', 
+                    f'Fanampiny: \n{believer.firstname}', 
+                    f'Adiresy: \n{believer.address}',
+                    f'Faritra: \n{believer.region}'],
+                    
+                    [f'Diakonina miandraikitra: \n{believer.diacon}', 
+                    f'Daty sy toerana nahaterahana: \n{believer.birthday} {believer.birthplace}', 
+                    f'Anaran\'i Ray: \n{believer.name_father}',
+                    f'Anaran\'i Reny: \n{believer.name_mother}'],
+                    
+                    [f'Daty ny batisa: \n{believer.date_of_baptism}', 
+                    f'Toerana ny batisa: \n{believer.birthday}', 
+                    f'Daty nahampandray: \n{believer.date_of_recipient}',
+                    f'Toerana nahampandray: \n{believer.place_of_recipient}'],
+                    
+                    [f'Larahana nahampandray: \n{believer.number_recipient}', 
+                    f'Laharan\'ny finday: \n{believer.phone}', 
+                    f'Sampana na/sy sampan\'asa: \n{believer.dept_work}',
+                    f'Andraikitra: \n{believer.responsibility}'],
+                ]
+                # Add a table
+                table = doc.add_table(rows=len(dataBeliever), cols=len(dataBeliever[0]))
+                for i, row in enumerate(dataBeliever):
+                    for j, value in enumerate(row):
+                        cell = table.cell(i, j)
+                        for k, headline in enumerate(value.split('\n')):
+                            p = cell.add_paragraph()
+                            run = p.add_run(headline)
+                            if k  == 0:
+                                run.bold = True
+                                run.underline = True
+                            
+                # Add a heading 
+                doc.add_heading('Fianakaviana', level=1)
                 
-                [f'Diakonina miandraikitra: \n{believer.diacon}', 
-                 f'Daty sy toerana nahaterahana: \n{believer.birthday} {believer.birthplace}', 
-                 f'Anaran\'i Ray: \n{believer.name_father}',
-                 f'Anaran\'i Reny: \n{believer.name_mother}'],
+                dataFamily = [
+                    ["Anarana","Fanampiny","Lahy sa vavy","Amin'ny fianakaviana",
+                    "Daty sy toerana nahaterahana","Batisa","Daty sy toerana maha mpandray",
+                    "Laharana karatra mpandray","Sampana sy/na Sampan'asa"]
+                ]
+                for blv in data:
+                    blv: Believer = blv
+                    dataFamily.append([
+                        blv.lastname,
+                        blv.firstname,
+                        blv.gender,
+                        blv.pos_family,
+                        f'{blv.birthday} {blv.birthplace}',
+                        f'{blv.date_of_baptism} {blv.place_of_baptism}',
+                        f'{blv.date_of_recipient} {blv.place_of_recipient}',
+                        blv.number_recipient,
+                        blv.dept_work
+                    ])
+                    
+                tablefamily = doc.add_table(rows=len(dataFamily), cols=len(dataFamily[0]))
+                tablefamily.style = 'Table Grid'
                 
-                [f'Daty ny batisa: \n{believer.date_of_baptism}', 
-                 f'Toerana ny batisa: \n{believer.birthday}', 
-                 f'Daty nahampandray: \n{believer.date_of_recipient}',
-                 f'Toerana nahampandray: \n{believer.place_of_recipient}'],
-                
-                [f'Larahana nahampandray: \n{believer.number_recipient}', 
-                 f'Laharan\'ny finday: \n{believer.phone}', 
-                 f'Sampana na/sy sampan\'asa: \n{believer.dept_work}',
-                 f'Andraikitra: \n{believer.responsibility}'],
-            ]
-            # Add a table
-            table = doc.add_table(rows=len(dataBeliever), cols=len(dataBeliever[0]))
-            for i, row in enumerate(dataBeliever):
-                for j, value in enumerate(row):
-                    cell = table.cell(i, j)
-                    for k, headline in enumerate(value.split('\n')):
-                        p = cell.add_paragraph()
-                        run = p.add_run(headline)
-                        if k  == 0:
-                            run.bold = True
-                            run.underline = True
-                        
-            # Add a heading 
-            doc.add_heading('Fianakaviana', level=1)
-            
-            dataFamily = [
-                ["Anarana","Fanampiny","Lahy sa vavy","Amin'ny fianakaviana",
-                 "Daty sy toerana nahaterahana","Batisa","Daty sy toerana maha mpandray",
-                 "Laharana karatra mpandray","Sampana sy/na Sampan'asa"]
-            ]
-            for blv in data:
-                blv: Believer = blv
-                dataFamily.append([
-                    blv.lastname,
-                    blv.firstname,
-                    blv.gender,
-                    blv.pos_family,
-                    f'{blv.birthday} {blv.birthplace}',
-                    f'{blv.date_of_baptism} {blv.place_of_baptism}',
-                    f'{blv.date_of_recipient} {blv.place_of_recipient}',
-                    blv.number_recipient,
-                    blv.dept_work
-                ])
-                
-            tablefamily = doc.add_table(rows=len(dataFamily), cols=len(dataFamily[0]))
-            for i, row in enumerate(dataFamily):
-                for j, value in enumerate(row):
-                    tablefamily.cell(i, j).text = value
+                for i, row in enumerate(dataFamily):
+                    for j, value in enumerate(row):
+                        tablefamily.cell(i, j).text = value
 
-            # Save the document
-            namefile = f"{believer.lastname}.docx"
-            doc.save(namefile)
-            os.startfile(namefile)
+                # Save the document
+                doc.save(fileName)
+                os.startfile(fileName)
 
         
     def rightClickTable(self, event, data, dialog):
