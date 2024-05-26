@@ -18,8 +18,8 @@ class ListBelieverInterface(QWidget):
         self.countLayout = QHBoxLayout()
         self.countLayout.setContentsMargins(0,0,0,0)
         self.countLayout.setAlignment(Qt.AlignRight)
-        self.titleCount = StrongBodyLabel("Nombre")
-        self.valueCount = BodyLabel("1220")
+        self.titleCount = StrongBodyLabel("")
+        self.valueCount = BodyLabel("")
         self.countLayout.addWidget(self.titleCount)
         self.countLayout.addWidget(self.valueCount)        
         self.vBoxLayout.addLayout(self.countLayout)
@@ -51,6 +51,7 @@ class ListBelieverInterface(QWidget):
         setFont(self.commandBar, 14)
         
         self.addAction = Action(FluentIcon.ADD, "Mampiditra", self)
+        self.exportAction = Action(FluentIcon.DOCUMENT, "Avoaka Excel", self)
         '''
         self.addAction = Action(FluentIcon.APPLICATION, "Un matériel", self)
         self.addComp = Action(FluentIcon.LINK, "Options", self)
@@ -68,19 +69,20 @@ class ListBelieverInterface(QWidget):
         self.commandBar.addWidget(self.dropDownButtonAdd)
         '''
         self.commandBar.addAction(self.addAction)
+        self.commandBar.addAction(self.exportAction)
         '''self.commandBar.addAction(self.refreshAction)
         self.commandBar.addAction(self.importAction)
         self.commandBar.addWidget(self.dropDownButtonExp)
         self.commandBar.addSeparator()
         self.commandBar.addAction(self.deleteAction)'''
         
-        self.titleLabel = StrongBodyLabel("Base des données")
+        self.titleLabel = StrongBodyLabel("Listra")
         
-        self.searchLineEdit = SearchLineEdit(self)
+        '''self.searchLineEdit = SearchLineEdit(self)
         self.searchLineEdit.setPlaceholderText("Recherche")
-        self.searchLineEdit.setFixedWidth(200)
+        self.searchLineEdit.setFixedWidth(200)'''
         
         self.hBoxLayout.addWidget(self.commandBar)
         self.hBoxLayout.addWidget(self.titleLabel)
-        self.hBoxLayout.addWidget(self.searchLineEdit)
+        #self.hBoxLayout.addWidget(self.searchLineEdit)
         self.vBoxLayout.addLayout(self.hBoxLayout)

@@ -1,11 +1,13 @@
 from PyQt5.QtCore import QThread, QPoint
 from PyQt5.QtGui import QCursor
+from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action, Dialog
 from ..common import Function
 from ..models import DatabaseWorker, BelieverModel, Believer
 from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, ShowBelieverDialog
 from .menu_presenter import MenuAction
 import dataclasses
+import os
 
 class BelieverPresenter:
     
@@ -40,6 +42,7 @@ class BelieverPresenter:
         
     def __actions(self):
         self.view.addAction.triggered.connect(lambda: self.addView.nParent.stackedWidget.setCurrentWidget(self.addView))
+        self.view.exportAction.triggered.connect(lambda: self.exportExcel())
         self.addView.btnAdd.clicked.connect(self.addBeliver)
         self.addView.btnAddFamily.clicked.connect(self.addFamily)
         self.addView.btnClear.clicked.connect(self.clear)
@@ -124,6 +127,26 @@ class BelieverPresenter:
             self.family.insert(pos, believer)
             self.setData(self.addView.familyTableView, self.family)
             print(self.family)
+    
+    def getHeaderLabels(self, table):
+        header_labels = []
+        for col in range(table.columnCount()):
+            item = table.horizontalHeaderItem(col)
+            if item is not None:
+                header_labels.append(item.text())
+            else:
+                header_labels.append("")
+        return header_labels        
+    
+    def exportExcel(self):
+        #print(self.view.parent.absInterface.tableView)
+        options = QFileDialog.Options()
+        fileName, _ = QFileDialog.getSaveFileName(self.view,"Avoaka",f"{os.path.expanduser('~')}","Excel File (*.xlsx)", options=options)
+        db = self.func.getTableData(self.view.tableView)
+        db.insert(0, self.getHeaderLabels(self.view.tableView))
+        if fileName:
+            self.func.writeExcelFile(fileName, base_de_donnees=db)
+            os.startfile(fileName)
                 
             
     def deleteFamily(self, pos):
