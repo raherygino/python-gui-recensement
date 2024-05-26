@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import QFile, QIODevice, Qt
+from PyQt5.QtCore import QFile, QIODevice, Qt, QDate
 from PyQt5.QtWidgets import QFileDialog
 from ..models.db.database import Database
 from ..models.model.config_model import ConfigModel
@@ -95,6 +95,13 @@ class Function:
         wb.save(namefile)
 
 
+    def strToQDate(self, strDate: str):
+        date = strDate.split("/")
+        dateOut = QDate(1950,1,1)
+        if len(date) == 3:
+            dateOut = QDate(int(date[2]), int(date[1]), int(date[0]))
+        return dateOut
+    
     def deleteFolderEnv(self, name: str):
         folderApp = f'{cfg.get(cfg.downloadFolder)}/{name.replace(" ", "-")}'
         try:
