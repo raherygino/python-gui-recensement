@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from qfluentwidgets import ComboBox, PrimaryPushButton, CommandBar, FluentIcon, Action, \
     ToolButton, PushButton, RoundMenu, SearchLineEdit, IndeterminateProgressBar, \
-    TransparentDropDownPushButton, LineEdit, SmoothScrollArea, PixmapLabel, SubtitleLabel, StrongBodyLabel, \
+    PrimaryToolButton, LineEdit, SmoothScrollArea, PixmapLabel, SubtitleLabel, StrongBodyLabel, \
         CheckBox, BodyLabel
 from ...components import TableView, LineEditWithLabel, ComboxEditWithLabel, DateEditWithLabel
 from ...common.config import OptionsConfigItem
@@ -92,7 +92,7 @@ class AddBelieverInterface(QWidget):
         self.row7 = QHBoxLayout()
         
         self.titleFamily = SubtitleLabel("FIANAKAVIA")
-        self.btnAddFamily = ToolButton(FluentIcon.ADD, self)
+        self.btnAddFamily = PrimaryToolButton(FluentIcon.ADD, self)
         self.familyTableView = TableView(self)
         self.row7.addWidget(self.titleFamily)
         self.row7.addWidget(self.btnAddFamily)
