@@ -60,6 +60,8 @@ class MenuAction:
                 
         self.presenter.setData(dialog.table, data)
         dialog.table.contextMenuEvent = lambda e, dialog = dialog, data=data: self.rightClickTable(e, data, dialog)
+        dialog.yesButton.setText("Avoaka WORD")
+        dialog.cancelButton.setText("Miverina")
         if dialog.exec():
             options = QFileDialog.Options()
             fileName, _ = QFileDialog.getSaveFileName(self.presenter.addView.nParent,"Export File", "","Word Files (*.docx);;All Files (*)", options=options)
@@ -233,9 +235,10 @@ class MenuAction:
             data.append(value)
         self.presenter.family = data
         self.presenter.setData(view.familyTableView, self.presenter.family)
+        self.presenter.addView.btnAdd.setText("Ovaina")
         
     def confirmDelete(self, item):
-        dialog = MessageDialog('Supprimer', 'Voulez vous le supprimer vraiment?', self.view.nParent)
+        dialog = MessageDialog('Fafana', 'Fafana marina ve?', self.view.nParent)
         dialog.yesButton.clicked.connect(lambda: self.delete(item))
         dialog.exec_()
         

@@ -54,6 +54,9 @@ class BelieverPresenter:
             self.family.clear()
             self.idEdit = 0
             self.isNewLead = False
+        if self.idEdit == 0:
+            self.addView.btnAdd.setText("Ampidirina")
+            
     
     def clear(self):
         self.addView.clearLineEdit()

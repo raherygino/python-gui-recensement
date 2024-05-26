@@ -150,12 +150,12 @@ class MainWindow(FluentWindow):
     def closeEvent(self, event):
         
         exitDialog = Dialog(
-            'Quitter', 'Voulez vous quitter vraiment?',
+            'Akatona', 'Akatona marina ve?',
             self
         )
         exitDialog.setTitleBarVisible(False)
-        exitDialog.yesButton.setText('Oui')
-        exitDialog.cancelButton.setText('Non')
+        exitDialog.yesButton.setText('Eny')
+        exitDialog.cancelButton.setText('Tsia')
         if exitDialog.exec():
             event.accept()
         else:
