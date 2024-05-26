@@ -1,3 +1,3 @@
-from .model.believer_model import BelieverModel
-from .model.base_model import Model
-from .entity.believer import Believer
+from .entity import *
+from .model import *
+from .db.database_worker import DatabaseWorker

@@ -1,4 +1,4 @@
-from ..entity.believer import Believer
+from ..entity import Believer
 from .base_model import Model
 
 class BelieverModel(Model):

@@ -1,13 +1,17 @@
-    # coding:utf-8
+ # coding:utf-8
 from .base_entity import Entity
 from dataclasses import dataclass
 
 @dataclass
 class Believer(Entity):
-    """Environement information """
+    """Believer information """
     id: int = 0
+    id_conjoint: int = 0
+    is_leader: int = 0
     lastname: str = ""
     firstname: str = ""
+    gender: str = ""
+    pos_family: str = ""
     address: str = ""
     region: str = ""
     diacon: str = ""

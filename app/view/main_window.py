@@ -1,98 +1,138 @@
 # coding: utf-8
-from PyQt5.QtCore import QUrl, QSize, Qt
+from PyQt5.QtCore import QUrl, QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QIcon, QDesktopServices
-from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QVBoxLayout
 
-from qfluentwidgets import (NavigationAvatarWidget, NavigationItemPosition, MessageBox, FluentWindow,
-                            SplashScreen)
+from qfluentwidgets import ( NavigationItemPosition, FluentWindow, FluentStyleSheet,
+                            SplashScreen, TitleLabel, Dialog, BodyLabel)
 from qfluentwidgets import FluentIcon as FIF
 
-from .home.gallery_interface import GalleryInterface
-from .home.home_interface import HomeInterface
-from ..view import BelieverInterface
-from .utils.setting_interface import SettingInterface
+from qframelesswindow import TitleBar
+#from .setting_interface import SettingInterface
 from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
-from ..common.icon import Icon
 from ..common.signal_bus import signalBus
-from ..common.translator import Translator
-from ..common import resource
+
+
 from ..models import BelieverModel
 from ..presenter import BelieverPresenter
+from .believer import ListBelieverInterface, AddBelieverInterface
 
 class Widget(QFrame):
 
     def __init__(self, text: str, parent=None):
         super().__init__(parent=parent)
-        self.label = QLabel(text, self)
+        self.label = TitleLabel(text, self)
         self.label.setAlignment(Qt.AlignCenter)
         self.hBoxLayout = QHBoxLayout(self)
         self.hBoxLayout.addWidget(self.label, 1, Qt.AlignCenter)
         self.setObjectName(text.replace(' ', '-'))
 
+class FluentTitleBar(TitleBar):
+    """ Fluent title bar"""
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setFixedHeight(48)
+        self.hBoxLayout.removeWidget(self.minBtn)
+        self.hBoxLayout.removeWidget(self.maxBtn)
+        self.hBoxLayout.removeWidget(self.closeBtn)
+
+        # add window icon
+        self.iconLabel = QLabel(self)
+        self.iconLabel.setFixedSize(18, 18)
+        self.hBoxLayout.insertWidget(0, self.iconLabel, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        self.window().windowIconChanged.connect(self.setIcon)
+
+        # add title label
+        self.titleLabel = QLabel(self)
+        self.subtitleLabel = BodyLabel(self)
+        self.hBoxLayout.insertWidget(1, self.titleLabel, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        self.hBoxLayout.insertWidget(2, self.subtitleLabel, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        self.titleLabel.setObjectName('titleLabel')
+        self.subtitleLabel.setObjectName('subtitleLabel')
+        self.window().windowTitleChanged.connect(self.setTitle)
+
+        self.vBoxLayout = QVBoxLayout()
+        self.buttonLayout = QHBoxLayout()
+        self.buttonLayout.setSpacing(0)
+        self.buttonLayout.setContentsMargins(0, 0, 0, 0)
+        self.buttonLayout.setAlignment(Qt.AlignTop)
+        self.buttonLayout.addWidget(self.minBtn)
+        self.buttonLayout.addWidget(self.maxBtn)
+        self.buttonLayout.addWidget(self.closeBtn)
+        self.vBoxLayout.addLayout(self.buttonLayout)
+        self.vBoxLayout.addStretch(1)
+        self.hBoxLayout.addLayout(self.vBoxLayout, 0)
+
+        FluentStyleSheet.FLUENT_WINDOW.apply(self)
+
+    def setTitle(self, title):
+        self.titleLabel.setText(title)
+        self.titleLabel.adjustSize()
+
+    def setIcon(self, icon):
+        self.iconLabel.setPixmap(QIcon(icon).pixmap(18, 18))
+        
 class MainWindow(FluentWindow):
+    
+    currentPromotion = pyqtSignal(int)
+    refresh = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
         self.initWindow()
 
-        # create sub interface
-        self.homeInterface = HomeInterface(self)
-        self.believerInterface = BelieverInterface()
-        self.settingInterface = SettingInterface(self)
-
-        believerModel = BelieverModel()
-        believerPresenter = BelieverPresenter(self.believerInterface, believerModel)
+        self.listBelieverInterface = ListBelieverInterface(self)
+        self.addBelieverInterface = AddBelieverInterface(self)
+        #self.settingInterface = SettingInterface(self)
 
         # enable acrylic effect
         self.navigationInterface.setAcrylicEnabled(True)
-
         self.connectSignalToSlot()
 
+        
+        '''self.materialModel = MaterialModel()
+        self.materialPresenter = MaterialPresenter(self.materialsInterface, self.materialModel)
+        '''
+        self.believerModel = BelieverModel()
+        self.believerPresenter = BelieverPresenter(self.believerModel, self.addBelieverInterface, self.listBelieverInterface)
+       
         # add items to navigation interface
         self.initNavigation()
+        
         self.splashScreen.finish()
 
     def connectSignalToSlot(self):
         signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)
-        signalBus.switchToSampleCard.connect(self.switchToSample)
         signalBus.supportSignal.connect(self.onSupport)
 
     def initNavigation(self):
-        # add navigation items
-        t = Translator()
-        self.addSubInterface(self.homeInterface, FIF.HOME, self.tr('Home'))
-        self.addSubInterface(self.believerInterface, Icon.GRID, t.icons)
+        self.addSubInterface(self.listBelieverInterface, FIF.PEOPLE, "Lisitra")
+        self.addSubInterface(self.addBelieverInterface, FIF.ADD, "Mampiditra")
+        self.navigationInterface.addSeparator()
 
-        # add custom widget to bottom
-        self.navigationInterface.addItem(
-            routeKey='price',
-            icon=Icon.PRICE,
-            text=t.price,
-            onClick=self.onSupport,
-            selectable=False,
-            tooltip=t.price,
-            position=NavigationItemPosition.BOTTOM
-        )
-        self.addSubInterface(
-            self.settingInterface, FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
+        '''self.addSubInterface(
+            self.settingInterface, FIF.SETTING, 'Paramètres', NavigationItemPosition.BOTTOM)'''
 
     def initWindow(self):
         self.resize(960, 780)
         self.setMinimumWidth(760)
-        self.setWindowIcon(QIcon(':/gallery/images/logo.png'))
-        self.setWindowTitle('PyQt-Fluent-Widgets')
-
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
+        self.fluentTitleBar = FluentTitleBar(self)
+        self.fluentTitleBar.setIcon(QIcon('app/resource/images/logo.png'))
+        self.fluentTitleBar.titleLabel.setText('Recensement')
+        self.setTitleBar(self.fluentTitleBar)
 
         # create splash screen
         self.splashScreen = SplashScreen(self.windowIcon(), self)
-        self.splashScreen.setIconSize(QSize(106, 106))
+        self.splashScreen.setIcon(QIcon('app/resource/images/logo_eniap.png'))
+        self.splashScreen.setIconSize(QSize(240, 240))
         self.splashScreen.raise_()
-
+        
         desktop = QApplication.desktop().availableGeometry()
         w, h = desktop.width(), desktop.height()
         self.move(w//2 - self.width()//2, h//2 - self.height()//2)
-        self.show()
+        self.showMaximized()
         QApplication.processEvents()
 
     def onSupport(self):
@@ -106,11 +146,17 @@ class MainWindow(FluentWindow):
         super().resizeEvent(e)
         if hasattr(self, 'splashScreen'):
             self.splashScreen.resize(self.size())
-
-    def switchToSample(self, routeKey, index):
-        """ switch to sample """
-        interfaces = self.findChildren(GalleryInterface)
-        for w in interfaces:
-            if w.objectName() == routeKey:
-                self.stackedWidget.setCurrentWidget(w, False)
-                w.scrollToCard(index)
+    
+    def closeEvent(self, event):
+        
+        exitDialog = Dialog(
+            'Quitter', 'Voulez vous quitter vraiment?',
+            self
+        )
+        exitDialog.setTitleBarVisible(False)
+        exitDialog.yesButton.setText('Oui')
+        exitDialog.cancelButton.setText('Non')
+        if exitDialog.exec():
+            event.accept()
+        else:
+            event.ignore()
