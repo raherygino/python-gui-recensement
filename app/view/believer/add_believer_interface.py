@@ -50,7 +50,7 @@ class AddBelieverInterface(QWidget):
                 
     def __content(self):
         
-        self.titleLFamily = SubtitleLabel("LOHA-MPIANAKAVIA")
+        self.titleLFamily = SubtitleLabel("LOHA-MPIANAKAVIANA")
         self.vBoxlayout.addWidget(self.titleLFamily)
         self.vBoxlayout.setSpacing(12)
         self.row1 = QHBoxLayout()
@@ -91,7 +91,7 @@ class AddBelieverInterface(QWidget):
         
         self.row7 = QHBoxLayout()
         
-        self.titleFamily = SubtitleLabel("FIANAKAVIA")
+        self.titleFamily = SubtitleLabel("FIANAKAVIANA")
         self.btnAddFamily = PrimaryToolButton(FluentIcon.ADD, self)
         self.familyTableView = TableView(self)
         self.row7.addWidget(self.titleFamily)
