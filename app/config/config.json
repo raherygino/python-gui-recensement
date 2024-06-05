@@ -1,0 +1,21 @@
+{
+    "Material": {
+        "AcrylicBlurRadius": 12
+    },
+    "Update": {
+        "CheckUpdateAtStartUp": true
+    },
+    "Folders": {
+        "Download": "E:/app/download",
+        "LocalMusic": []
+    },
+    "MainWindow": {
+        "DpiScale": "Auto",
+        "Language": "Auto",
+        "MicaEnabled": false
+    },
+    "QFluentWidgets": {
+        "ThemeColor": "#ffaa2158",
+        "ThemeMode": "Dark"
+    }
+}
