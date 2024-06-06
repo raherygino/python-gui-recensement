@@ -11,7 +11,7 @@ class HomeInterface(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.vBoxLayout = QVBoxLayout()
-        self.banner = QPixmap('app/resource/images/header1.png')
+        #self.banner = QPixmap('app/resource/images/header1.png')
         self.vBoxLayout.setSpacing(0)
         self.vBoxLayout.setContentsMargins(30, 20, 0, 0)
         self.setLayout(self.vBoxLayout)
@@ -71,6 +71,6 @@ class HomeInterface(QWidget):
         painter.fillPath(path, QBrush(gradient))
 
         # draw banner image
-        pixmap = self.banner.scaled(
+        '''pixmap = self.banner.scaled(
             self.size(), transformMode=Qt.SmoothTransformation)
-        painter.fillPath(path, QBrush(pixmap))
+        painter.fillPath(path, QBrush(pixmap))'''

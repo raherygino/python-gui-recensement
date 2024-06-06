@@ -4,3 +4,4 @@ from .student import Student
 from .mouvement import Mouvement
 from .comportement import Comportement
 from .type_comportement import TypeComportement
+from  .subject import Subject

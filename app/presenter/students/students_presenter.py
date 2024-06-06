@@ -5,11 +5,12 @@ from qfluentwidgets import RoundMenu, Action, FluentIcon, MessageBox, MenuAnimat
 from ...view.students.students_interface import StudentsInterface
 from ...view.home.dialog.new_comp_dialog import NewComportementDialog
 from ...view.students.new_student_dialog import NewStudentDialog
-from ...models import StudentModel, MouvementModel, TypeComportementModel, ComportementModel, Student, Comportement
+from ...view.home.dialog.new_subject_dialog import NewSubjectDialog
+from ...models import StudentModel, MouvementModel, TypeComportementModel, ComportementModel, Student, Comportement, SubjectModel, Subject
 from .db_presenter import StudentDbPresenter
 from .abs_presenter import StudentAbsPresenter
 from .day_presenter import StudentDayPresenter
-from ...common import Function
+from ...common import Function, Utils
 import os
 
 class StudentsPresenter:
@@ -17,11 +18,13 @@ class StudentsPresenter:
     def __init__(self, view:StudentsInterface, model:StudentModel):
         self.view = view
         self.model = model
+        self.modelSubject = SubjectModel()
         self.modelMove = MouvementModel()
         self.typeCompModel = TypeComportementModel()
         self.compModel = ComportementModel()
         self.func = Function()
         self.timer = QTimer()
+        self.utils = Utils()
         self.__init_presenter()
         self.__actions()
         
@@ -37,7 +40,8 @@ class StudentsPresenter:
         self.view.exportAction.triggered.connect(lambda : self.exportData())
         self.view.exportActionCsv.triggered.connect(lambda: self.exportCsv())
         self.view.nParent.currentPromotion.connect(lambda currentId : self.setPromotionId(currentId))
-        self.view.addComp.triggered.connect(lambda: self.addComp())
+        self.view.addSubject.triggered.connect(lambda: self.showDialogSubject())
+        #self.view.addComp.triggered.connect(lambda: self.addComp())
         self.view.addAction.triggered.connect(lambda: self.addStudent())
         self.view.searchLineEdit.textChanged.connect(self.onSearch)
         self.view.searchLineEdit.returnPressed.connect(self.search)
@@ -76,6 +80,47 @@ class StudentsPresenter:
             section=matricule[1],
             number=matricule[2:4]
         )
+        
+    def showDialogSubject(self):
+        dialog = NewSubjectDialog(self.view)
+        dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
+        dialog.exec()
+    
+    def getTableDialogData(self, dialog):
+        table = dialog.table
+        row_count = table.rowCount()
+        column_count = table.columnCount()
+
+        table_data = []
+        for row in range(row_count):
+            row_data = []
+            for column in range(column_count):
+                item = table.item(row, column)
+                if item is not None:
+                    row_data.append(item.text())
+            if len(row_data) != 0:
+                table_data.append(row_data)
+                
+        abrv = []
+        isDuplicate = False
+        for item in table_data:
+            abrv.append(item[0])
+            if self.is_duplicate(item[0], abrv):
+                isDuplicate = True
+        
+        if isDuplicate:
+            self.utils.infoBarError("Erreur", "Une matière est reproduite en double.", dialog)
+        else:
+            if len(table_data) == 0:
+                self.utils.infoBarError("Vide!", "Vous n'avez ajouté aucune matière!", dialog)
+            else:
+                for item in table_data:
+                    self.modelSubject.create(Subject(promotion_id=self.promotionId, abrv=item[0], title=item[0]))
+                dialog.close()
+                self.utils.infoBarSuccess("Ajouté", "Matières ajoutés avec succès", self.view)
+                
+    def is_duplicate(self, item, lst):
+        return lst.count(item) > 1
         
     def createComp(self, dialog: NewComportementDialog, dataCombox):
         name = dialog.nameLineEdit.text()

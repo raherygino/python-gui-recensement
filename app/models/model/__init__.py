@@ -4,3 +4,4 @@ from .prom_model import PromotionModel
 from .move_model import MouvementModel
 from .comp_model import ComportementModel
 from .type_comp_model import TypeComportementModel
+from .subject_model import  SubjectModel

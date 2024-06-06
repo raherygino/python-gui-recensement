@@ -10,7 +10,7 @@ class TableView(QTableWidget):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setWordWrap(False)
-        self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        #self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.header = self.horizontalHeader()
         self.verticalHeader().hide()
         self.setSelectionBehavior(QAbstractItemView.SelectRows)

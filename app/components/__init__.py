@@ -4,3 +4,4 @@ from .line_edit import EditWithLabel
 from .combox import ComboBoxWithLabel
 from .teaching_tip import *
 from .filter_flyout_view import FilterFlyoutView
+from .lineEdit import *
