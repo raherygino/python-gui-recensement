@@ -3,8 +3,7 @@ from PyQt5.QtCore import QPoint
 from qfluentwidgets import RoundMenu, Action, FluentIcon, MenuAnimationType
 from .base_student_presenter import BaseStudentPresenter
 from ...common.constants import *
-from ...models import Mouvement, Student
-from ..menu_action_presenter import MenuAction
+from ...models import Student
 
 class StudentAbsPresenter(BaseStudentPresenter):
     
@@ -27,7 +26,7 @@ class StudentAbsPresenter(BaseStudentPresenter):
         headerLen = int(len(self.headerLabel)-1)
         rowSelected = int(len(self.view.tableView.selectedItems())/headerLen)
         selectedItems = self.view.tableView.selectedItems()
-        if (len(selectedItems) != 0):
+        '''if (len(selectedItems) != 0):
             matricule = selectedItems[0].text()
             obs = selectedItems[7].text()
             motif = selectedItems[8].text()
@@ -66,18 +65,19 @@ class StudentAbsPresenter(BaseStudentPresenter):
             self.posCur = QCursor().pos()
             cur_x = self.posCur.x()
             cur_y = self.posCur.y()
-            menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
+            menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)'''
     
                 
     def setPromotionId(self, promotionId):
         self.promotionId = promotionId
         self.query = {"promotion_id":promotionId}
-        self.defaultData = self.modelMove.fetch_all(**self.query)
-        self.fetchData(self.defaultData)
+        #self.defaultData = self.modelMove.fetch_all(**self.query)
+        #self.fetchData(self.defaultData)
         
     def refresh(self, val):
-        if "mouvement" in val:
-            self.fetchData(self.modelMove.fetch_all(**self.query))
+        pass
+        '''if "mouvement" in val:
+            self.fetchData(self.modelMove.fetch_all(**self.query))'''
         
     def fetchData(self, data):
         self.intColFilter()
@@ -85,9 +85,9 @@ class StudentAbsPresenter(BaseStudentPresenter):
         self.actionWorkerThread(data)
         self.workerThread.start()
 
-    def handleResult(self, data:list[Mouvement]):
+    def handleResult(self, data:list):
         self.view.progressBar.setVisible(False)
-        listData = []
+        '''listData = []
         listData.clear()
         for move in data:
             student: Student = eval(move.student)
@@ -100,4 +100,4 @@ class StudentAbsPresenter(BaseStudentPresenter):
         self.view.tableView.setData(listData)
         self.view.progressBar.setValue(0)
         self.workerThread.quit()
-        self.view.parent.valueCount.setText(str(len(data)))
+        self.view.parent.valueCount.setText(str(len(data)))'''

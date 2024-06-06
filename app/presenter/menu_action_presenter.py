@@ -16,7 +16,7 @@ class MenuAction:
         self.presenter = presenter
         self.view = presenter.view
         self.model:StudentModel = self.presenter.model
-        self.modelMove = self.presenter.modelMove
+        #self.modelMove = self.presenter.modelMove
         self.ids = []
         self.func = Function()
         self.timer = QTimer()

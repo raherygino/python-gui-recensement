@@ -3,10 +3,10 @@ from PyQt5.QtGui import QCursor
 from qfluentwidgets import Action, RoundMenu, MenuAnimationType, FluentIcon
 
 from ...view.students.tab.db_student_tab import DatabaseStudentTab
-from ...models import StudentModel, DatabaseWorker, MouvementModel
+from ...models import StudentModel, DatabaseWorker
 from ...components import PopupTeachingTip, TeachingTipTailPosition, FilterFlyoutView
 from ...common.constants import *
-from ..menu_action_presenter import MenuAction
+#from ..menu_action_presenter import MenuAction
 
 class BaseStudentPresenter:
     
@@ -20,9 +20,11 @@ class BaseStudentPresenter:
     def __init_needly_var(self, view, parent):
         self.view:DatabaseStudentTab = view
         self.model:StudentModel = parent.model
-        self.modelMove:MouvementModel = parent.modelMove
+        
+        '''self.modelMove:MouvementModel = parent.modelMove
         self.typeCompModel = parent.typeCompModel
-        self.compModel = parent.compModel
+        self.compModel = parent.compModel'''
+        
         self.mainView = self.view.parent.nParent
         self.parent = parent
         self.labels = [
@@ -68,8 +70,8 @@ class BaseStudentPresenter:
         self.sectionStudents = self.fetchDataGroup(self.model, key="section", label=LABEL.SECTION)
         self.levelStudents = self.fetchDataGroup(self.model, key="level")
         self.genderStudents = self.fetchDataGroup(self.model, key="gender")
-        self.motifsMove = self.fetchDataGroup(self.modelMove, key="motif")
-        self.obsMove = self.fetchDataGroup(self.modelMove, key="subType")
+        #self.motifsMove = self.fetchDataGroup(self.modelMove, key="motif")
+        #self.obsMove = self.fetchDataGroup(self.modelMove, key="subType")
         self.day = list(map(str, self.fetchDataGroup(self.model, key="day")))
         
     def fetchData(self, data):
@@ -90,8 +92,8 @@ class BaseStudentPresenter:
         selectedItems = self.view.tableView.selectedItems()
         if (len(selectedItems) != 0):
             matricule_item = self.view.tableView.selectedItems()[0].text()
-            action = MenuAction(self)
-            menu = RoundMenu(parent=self.view)
+            #action = MenuAction(self)
+            '''menu = RoundMenu(parent=self.view)
             menu.addAction(Action(FluentIcon.FOLDER, 'Voir', triggered = lambda:action.show(matricule_item)))
             menu.addAction(Action(FluentIcon.EDIT, 'Modifier', triggered = lambda: action.update(matricule_item)))
             menu.addSeparator()
@@ -104,7 +106,7 @@ class BaseStudentPresenter:
             self.posCur = QCursor().pos()
             cur_x = self.posCur.x()
             cur_y = self.posCur.y()
-            menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
+            menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)'''
         
     def updateProgress(self, progress):
         self.view.progressBar.setValue(int(progress))
@@ -181,8 +183,8 @@ class BaseStudentPresenter:
     def getDataFilter(self,key:str, view:FilterFlyoutView):
         self.query[key] = view.getDataFilter(self.popupFilter)
         model = self.model
-        if self.view.parent.stackedWidget.currentIndex() == 1:
-            model = self.modelMove
+        '''if self.view.parent.stackedWidget.currentIndex() == 1:
+            model = self.modelMove'''
         if key == "company" or key == "section":
             self.query[key] = [val[0] for val in view.getDataFilter(self.popupFilter)]
         self.defaultData = model.fetch_all(**self.query)
