@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from qfluentwidgets import SegmentedWidget, TransparentDropDownPushButton, Action,\
     CommandBar, RoundMenu, FluentIcon, setFont, StrongBodyLabel , SearchLineEdit,\
     BodyLabel
-from .tab import DatabaseStudentTab, AbsenceStudentTab, DayStudentTab
+from .tab import DatabaseStudentTab, EipTab, EapTab
 from ...common import Function
 
 class StudentsInterface(QWidget):
@@ -20,13 +20,13 @@ class StudentsInterface(QWidget):
         self.hBoxLayout = QHBoxLayout()
 
         self.dbInterface = DatabaseStudentTab(self)
-        self.absInterface = AbsenceStudentTab(self)
-        self.dayInterface = DayStudentTab(self)
+        self.eipInterface = EipTab(self)
+        self.eapInterface = EapTab(self)
 
         # add items to pivot
         self.addSubInterface(self.dbInterface, 'dbInterface', 'Base des données')
-        self.addSubInterface(self.absInterface, 'absInterface', 'Grille d\'absence')
-        self.addSubInterface(self.dayInterface, 'dayInterface', 'Total Nb Jours')
+        self.addSubInterface(self.eipInterface, 'eipInterface', 'Eleves Inspecteurs')
+        self.addSubInterface(self.eapInterface, 'eapInterface', 'Eleves Agents')
 
         self.__initCommandBar()
         self.vBoxLayout.addWidget(self.stackedWidget)

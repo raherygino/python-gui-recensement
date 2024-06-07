@@ -8,8 +8,8 @@ from ...view.students.new_student_dialog import NewStudentDialog
 from ...view.home.dialog.new_subject_dialog import NewSubjectDialog
 from ...models import StudentModel, Student,SubjectModel, Subject
 from .db_presenter import StudentDbPresenter
-from .abs_presenter import StudentAbsPresenter
-from .day_presenter import StudentDayPresenter
+from .eap_presenter import EapPresenter
+from .eip_presenter import EipPresenter
 from ...common import Function, Utils
 import os
 
@@ -19,9 +19,6 @@ class StudentsPresenter:
         self.view = view
         self.model = model
         self.modelSubject = SubjectModel()
-        '''self.modelMove = MouvementModel()
-        self.typeCompModel = TypeComportementModel()
-        self.compModel = ComportementModel()'''
         self.func = Function()
         self.timer = QTimer()
         self.utils = Utils()
@@ -30,8 +27,8 @@ class StudentsPresenter:
         
     def __init_presenter(self):
         self.dbPresenter = StudentDbPresenter(self)
-        self.absPresenter = StudentAbsPresenter(self)
-        self.dayPresenter = StudentDayPresenter(self)
+        self.eipPresenter = EapPresenter(self)
+        self.eapPresenter = EipPresenter(self)
         
     def __actions(self):
         self.view.refreshAction.triggered.connect(lambda: self.view.nParent.currentPromotion.emit(self.promotionId))
