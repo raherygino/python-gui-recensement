@@ -2,15 +2,15 @@ from PyQt5.QtCore import QTimer, QPoint
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import RoundMenu, Action, FluentIcon, MessageBox, MenuAnimationType
-from ...view.students.students_interface import StudentsInterface
-from ...view.home.dialog.new_comp_dialog import NewComportementDialog
-from ...view.students.new_student_dialog import NewStudentDialog
-from ...view.home.dialog.new_subject_dialog import NewSubjectDialog
+
+from ...common import Function, Utils
+from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
 from ...models import StudentModel, Student,SubjectModel, Subject
+
 from .db_presenter import StudentDbPresenter
 from .eap_presenter import EapPresenter
 from .eip_presenter import EipPresenter
-from ...common import Function, Utils
+
 import os
 
 class StudentsPresenter:
@@ -119,7 +119,7 @@ class StudentsPresenter:
     def is_duplicate(self, item, lst):
         return lst.count(item) > 1
         
-    def createComp(self, dialog: NewComportementDialog, dataCombox):
+    def createComp(self, dialog, dataCombox):
         name = dialog.nameLineEdit.text()
         abr = dialog.abrLineEdit.text()
         ''''comp = Comportement(
@@ -137,7 +137,7 @@ class StudentsPresenter:
             self.func.errorSuccess("Nom existe déjà", "Le nom que vous avez choisi existe déjà", self.view)'''
             
     def addComp(self):
-        dialog = NewComportementDialog(self.view)
+        dialog = NewSubjectDialog(self.view)
         ''''typeComp = self.typeCompModel.fetch_items_by_id(0)
         dataCombox = []
         for val in typeComp:

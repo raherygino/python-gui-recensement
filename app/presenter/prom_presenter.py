@@ -1,6 +1,6 @@
 from qfluentwidgets import FluentIcon, RoundMenu, Action, MenuAnimationType, Dialog
 from .new_prom_presenter import NewPromotionPresenter
-from ..models.model.prom_model import PromotionModel
+from ..models import PromotionModel
 from ..components.link_card2 import LinkCard
 from ..common.functions import Function
 

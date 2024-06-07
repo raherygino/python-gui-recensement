@@ -1,2 +1,3 @@
 from .new_prom_presenter import NewPromotionPresenter
 from .prom_presenter import PromotionPresenter
+from .students import *
