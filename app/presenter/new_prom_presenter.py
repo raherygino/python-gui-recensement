@@ -17,16 +17,16 @@ class NewPromotionPresenter:
         if len(kwargs) != 0:
             isUpdate = True
             promotion = kwargs.get("promotion")
-            dialog.nameLineEdit.setText(promotion.name)
-            dialog.rankLineEdit.setText(promotion.rank)
-            dialog.logoLineEdit.setText(promotion.logo)
-            dialog.yearLineEdit.setText(promotion.years)
+            dialog.nameLineEdit.lineEdit.setText(promotion.name)
+            dialog.rankLineEdit.spinbox.setValue(int(promotion.rank))
+            dialog.logoLineEdit.lineEdit.setText(promotion.logo)
+            dialog.yearLineEdit.lineEdit.setText(promotion.years)
             dialog.yesButton.setText("Mettre à jour")
         if dialog.exec():
-            name = dialog.nameLineEdit.text()
-            rank = dialog.rankLineEdit.text()
-            logo = dialog.logoLineEdit.text()
-            years = dialog.yearLineEdit.text()
+            name = dialog.nameLineEdit.lineEdit.text()
+            rank = dialog.rankLineEdit.spinbox.text()
+            logo = dialog.logoLineEdit.lineEdit.text()
+            years = dialog.yearLineEdit.lineEdit.text()
             nwLogo = logo
             if isUpdate:
                 if promotion.logo != logo:

@@ -32,8 +32,8 @@ class PromotionPresenter:
                 logo = promotion.logo
             card = LinkCard(
                 logo, 
-                promotion.rank, 
-                promotion.name, 
+                f'{promotion.rank}ème Promotion', 
+                f'{promotion.name} {promotion.years}', 
                 self.view)
             card.contextMenuEvent = lambda event, promotion=promotion: self.menuCard(event, promotion)
             card.mouseDoubleClickEvent = lambda event, promotion=promotion: self.showPromotion(event, promotion)            
