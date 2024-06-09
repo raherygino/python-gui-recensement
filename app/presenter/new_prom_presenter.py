@@ -1,8 +1,6 @@
-from qfluentwidgets import FluentIcon
-from ..view.home.dialog.new_prom_dialog import NewPromotionDialog
-from ..models.model.prom_model import PromotionModel
-from ..models.entity.promotion import Promotion
-from ..common.functions import Function
+from ..view import NewPromotionDialog
+from ..models import PromotionModel, Promotion
+from ..common import Function
 
 class NewPromotionPresenter:
 

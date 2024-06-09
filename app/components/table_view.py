@@ -13,9 +13,12 @@ class TableView(QTableWidget):
         #self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.header = self.horizontalHeader()
         self.verticalHeader().hide()
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        #self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setContentsMargins(0,0,0,0)
         self.setQss(cfg.get(cfg.theme))
+        
+    def test(self, value):
+        print(value)
     
     def setQss(self, newTheme: str):
         theme = newTheme.lower()

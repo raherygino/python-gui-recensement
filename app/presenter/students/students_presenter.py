@@ -2,15 +2,15 @@ from PyQt5.QtCore import QTimer, QPoint
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import RoundMenu, Action, FluentIcon, MessageBox, MenuAnimationType
-from ...view.students.students_interface import StudentsInterface
-from ...view.home.dialog.new_comp_dialog import NewComportementDialog
-from ...view.students.new_student_dialog import NewStudentDialog
-from ...view.home.dialog.new_subject_dialog import NewSubjectDialog
-from ...models import StudentModel, MouvementModel, TypeComportementModel, ComportementModel, Student, Comportement, SubjectModel, Subject
-from .db_presenter import StudentDbPresenter
-from .abs_presenter import StudentAbsPresenter
-from .day_presenter import StudentDayPresenter
+
 from ...common import Function, Utils
+from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
+from ...models import StudentModel, Student,SubjectModel, Subject
+
+from .db_presenter import StudentDbPresenter
+from .eap_presenter import EapPresenter
+from .eip_presenter import EipPresenter
+
 import os
 
 class StudentsPresenter:
@@ -19,9 +19,6 @@ class StudentsPresenter:
         self.view = view
         self.model = model
         self.modelSubject = SubjectModel()
-        self.modelMove = MouvementModel()
-        self.typeCompModel = TypeComportementModel()
-        self.compModel = ComportementModel()
         self.func = Function()
         self.timer = QTimer()
         self.utils = Utils()
@@ -30,8 +27,8 @@ class StudentsPresenter:
         
     def __init_presenter(self):
         self.dbPresenter = StudentDbPresenter(self)
-        self.absPresenter = StudentAbsPresenter(self)
-        self.dayPresenter = StudentDayPresenter(self)
+        self.eipPresenter = EapPresenter(self)
+        self.eapPresenter = EipPresenter(self)
         
     def __actions(self):
         self.view.refreshAction.triggered.connect(lambda: self.view.nParent.currentPromotion.emit(self.promotionId))
@@ -122,10 +119,10 @@ class StudentsPresenter:
     def is_duplicate(self, item, lst):
         return lst.count(item) > 1
         
-    def createComp(self, dialog: NewComportementDialog, dataCombox):
+    def createComp(self, dialog, dataCombox):
         name = dialog.nameLineEdit.text()
         abr = dialog.abrLineEdit.text()
-        comp = Comportement(
+        ''''comp = Comportement(
                 promotion_id=self.promotionId,
                 name=name,
                 abrv=abr,
@@ -137,11 +134,11 @@ class StudentsPresenter:
             dialog.abrLineEdit.setText("")
             self.func.toastSuccess("Ajout avec succès", "", self.view)
         else:
-            self.func.errorSuccess("Nom existe déjà", "Le nom que vous avez choisi existe déjà", self.view)
+            self.func.errorSuccess("Nom existe déjà", "Le nom que vous avez choisi existe déjà", self.view)'''
             
     def addComp(self):
-        dialog = NewComportementDialog(self.view)
-        typeComp = self.typeCompModel.fetch_items_by_id(0)
+        dialog = NewSubjectDialog(self.view)
+        ''''typeComp = self.typeCompModel.fetch_items_by_id(0)
         dataCombox = []
         for val in typeComp:
             dataCombox.append(val.name)
@@ -149,16 +146,16 @@ class StudentsPresenter:
         self.refreshCompTable(dialog.table)
         dialog.btnAdd.clicked.connect(lambda: self.createComp(dialog, dataCombox))
         dialog.yesButton.setText("Ok")
-        dialog.cancelButton.setVisible(False)
+        dialog.cancelButton.setVisible(False)'''
         dialog.exec()
     
     def refreshCompTable(self, table):
         ids = []
         data = []
-        for comp in self.compModel.fetch_items_by_id(self.promotionId):
+        '''for comp in self.compModel.fetch_items_by_id(self.promotionId):
             data.append([comp.name, comp.comp_type])
             ids.append(comp.id)
-        table.setData(data)
+        table.setData(data)'''
         table.contextMenuEvent = lambda  event, table = table, ids=ids : self.rightClickCompTable(event,table, ids)
         
     def rightClickCompTable(self, event, table, ids):
@@ -174,7 +171,7 @@ class StudentsPresenter:
     def deleteMove(self, id, table):
         dialog = MessageBox('Supprimer', "Voulez vous le supprimer?", self.view)
         if dialog.exec():
-            self.compModel.delete_item(id)
+            #self.compModel.delete_item(id)
             self.refreshCompTable(table)
         
     def onSearch(self, text):
@@ -198,11 +195,11 @@ class StudentsPresenter:
                 data = self.dbPresenter.defaultData
             self.dbPresenter.fetchData(data)
             
-        elif currentTab == 1:
+        '''elif currentTab == 1:
             data = self.modelMove.search_query(query, matricule=text, student=text)
             if len(text) < 3:
                 data = self.absPresenter.defaultData
-            self.absPresenter.fetchData(data)
+            self.absPresenter.fetchData(data)'''
         
         self.timer.stop()
     
@@ -295,5 +292,5 @@ class StudentsPresenter:
         elif currentTab == 1:
             dialog = MessageBox('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
-                self.modelMove.delete_by(promotion_id = self.promotionId)
+                #self.modelMove.delete_by(promotion_id = self.promotionId)
                 self.view.nParent.refresh.emit(["mouvement"])
