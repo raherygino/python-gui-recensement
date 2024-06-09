@@ -80,6 +80,12 @@ class StudentsPresenter:
         
     def showDialogSubject(self):
         dialog = NewSubjectDialog(self.view)
+        subjects:list[Subject] = self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
+        allSbjcts = []
+        for subject in subjects:
+            allSbjcts.append([subject.abrv, subject.title, subject.coef])
+        dialog.table.setRowCount(len(subjects))
+        dialog.table.setData(allSbjcts)
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
         dialog.exec()
     
@@ -112,9 +118,15 @@ class StudentsPresenter:
                 self.utils.infoBarError("Vide!", "Vous n'avez ajouté aucune matière!", dialog)
             else:
                 for item in table_data:
-                    self.modelSubject.create(Subject(promotion_id=self.promotionId, abrv=item[0], title=item[0]))
+                    self.modelSubject.create(Subject(promotion_id=self.promotionId, abrv=item[0], title=item[1], coef=item[2], level=self.getLevel()))
                 dialog.close()
                 self.utils.infoBarSuccess("Ajouté", "Matières ajoutés avec succès", self.view)
+                
+    def getLevel(self) -> str:
+        level = "EIP"
+        if self.view.stackedWidget.currentIndex() == 2:
+            level = "EAP"
+        return level
                 
     def is_duplicate(self, item, lst):
         return lst.count(item) > 1
