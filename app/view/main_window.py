@@ -109,6 +109,8 @@ class MainWindow(FluentWindow):
        
         self.addSubInterface(
             self.settingInterface, FluentIcon.SETTING, 'Paramètres', NavigationItemPosition.BOTTOM)
+        
+        self.navigationInterface.setVisible(False)
 
     def initWindow(self):
         self.resize(960, 780)
