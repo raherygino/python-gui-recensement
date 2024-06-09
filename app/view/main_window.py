@@ -106,7 +106,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.homeInterface, FluentIcon.HOME, 'Accueil')
         self.addSubInterface(self.studentsInterface, FluentIcon.PEOPLE, "Elèves")
         self.navigationInterface.addSeparator()
-
+       
         self.addSubInterface(
             self.settingInterface, FluentIcon.SETTING, 'Paramètres', NavigationItemPosition.BOTTOM)
 
