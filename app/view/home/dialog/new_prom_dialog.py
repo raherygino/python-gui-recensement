@@ -1,5 +1,6 @@
 from qfluentwidgets import MessageBoxBase, SubtitleLabel, LineEdit
-from ....common.functions import Function
+from ....common import Function
+from ....components import SpinBoxEditWithLabel
 
 class NewPromotionDialog(MessageBoxBase):
     """ Custom message box """
@@ -9,10 +10,8 @@ class NewPromotionDialog(MessageBoxBase):
         self.func = Function()
         self.titleLabel = SubtitleLabel('Promotion', self)
         
-        self.rankLineEdit = LineEdit(self)
-        self.rankLineEdit.setPlaceholderText('Rang | Exemple: 29ème Promotion')
-        self.rankLineEdit.setClearButtonEnabled(True)
-        self.rankLineEdit.textChanged.connect(self.__onChangeName)
+        self.rankLineEdit = SpinBoxEditWithLabel("Rang")
+        self.rankLineEdit.spinbox.textChanged.connect(self.__onChangeName)
         
         self.nameLineEdit = LineEdit(self)
         self.nameLineEdit.setPlaceholderText('Nom de la promotion')
@@ -27,11 +26,12 @@ class NewPromotionDialog(MessageBoxBase):
         
         self.yearLineEdit = LineEdit(self)
         self.yearLineEdit.setPlaceholderText('Année')
+        self.yearLineEdit.setInputMask("9999-9999")
         self.yearLineEdit.setClearButtonEnabled(True)
         
         # add widget to view layout
         self.viewLayout.addWidget(self.titleLabel)
-        self.viewLayout.addWidget(self.rankLineEdit)
+        self.viewLayout.addLayout(self.rankLineEdit)
         self.viewLayout.addWidget(self.nameLineEdit)
         self.viewLayout.addWidget(self.logoLineEdit)
         self.viewLayout.addWidget(self.yearLineEdit)
@@ -44,7 +44,7 @@ class NewPromotionDialog(MessageBoxBase):
 
         # self.hideYesButton()
     def __onChangeName(self, text):
-        if text != "":
+        if text != "" and int(text) != 0:
             self.yesButton.setEnabled(True)
         else:
             self.yesButton.setEnabled(False)
