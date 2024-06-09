@@ -46,8 +46,9 @@ class PromotionPresenter:
         self.mainView.switchTo(studentsInterface)
         self.mainView.fluentTitleBar.subtitleLabel.setText(f'| {promotion.name if promotion.name != "" else promotion.rank}')
         
-    def setCurrentPromotion(self, id:int):
-        self.currentPromotion = id
+    def setCurrentPromotion(self, idProm:int):
+        self.currentPromotion = idProm
+        self.mainView.navigationInterface.setVisible(idProm != 0)
         
     def menuCard(self, event, promotion):
         menu = RoundMenu(self.view)
