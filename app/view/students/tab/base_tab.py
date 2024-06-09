@@ -15,6 +15,7 @@ class StudentTab(QWidget):
         self.progressBar = ProgressBar(self)
         self.progressBar.setVisible(False)
         self.tableView = TableView(self)
-        
+        self.tableView.isIncrement = True
+        self.tableView.setColumnNoEditable(0,7)
         self.vBoxLayout.addWidget(self.progressBar)
         self.vBoxLayout.addWidget(self.tableView)

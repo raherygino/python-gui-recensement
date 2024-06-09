@@ -1,6 +1,6 @@
 from typing import Iterable
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
-from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from ..common.config import cfg
 import darkdetect
@@ -16,6 +16,8 @@ class TableView(QTableWidget):
         #self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setContentsMargins(0,0,0,0)
         self.setQss(cfg.get(cfg.theme))
+        self.colNoEditable = []
+        self.isIncrement = False
         
     def test(self, value):
         print(value)
@@ -38,6 +40,17 @@ class TableView(QTableWidget):
         for row, item in enumerate(items):
             self.insertRow(row)
             for col, value in enumerate(item):
-                self.setItem(row, col, QTableWidgetItem(str(value)))
+                widgetItem = QTableWidgetItem(str(value))
+                self.setItem(row, col, widgetItem)
+                if self.isIncrement:
+                    cols = self.colNoEditable
+                    if col in range(cols[0], cols[1]):
+                        widgetItem.setFlags(widgetItem.flags() & ~Qt.ItemIsEditable)
+                else :
+                    if col in self.colNoEditable:
+                        widgetItem.setFlags(widgetItem.flags() & ~Qt.ItemIsEditable)
                 
         self.resizeColumnsToContents()
+        
+    def setColumnNoEditable(self, *args):
+        self.colNoEditable = list(args)
