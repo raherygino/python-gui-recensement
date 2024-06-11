@@ -20,14 +20,14 @@ class TableView(QTableWidget):
         self.isIncrement = False
         
     @pyqtSlot(QTableWidgetItem)
-    def validateInput(self, col, item):
+    def validateInput(self, col, item, default = "0"):
         if item.column() == col:  # Assuming the column where you want to enforce integer input is column 1
             text = item.text()
             try:
                 value = int(text)
             except ValueError:
                 # If the input is not a valid integer, set it to 0 or whatever default value you prefer
-                item.setText("0")
+                item.setText(default)
             else:
                 # If the input is a valid integer, set it to the validated integer
                 item.setText(str(value))
