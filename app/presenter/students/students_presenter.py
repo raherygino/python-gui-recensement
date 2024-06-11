@@ -84,6 +84,7 @@ class StudentsPresenter:
         allSbjcts = []
         for subject in subjects:
             allSbjcts.append([subject.abrv, subject.title, subject.coef])
+        dialog.count.spinbox.setValue(len(subjects))
         dialog.table.setRowCount(len(subjects))
         dialog.table.setData(allSbjcts)
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
@@ -93,16 +94,19 @@ class StudentsPresenter:
         table = dialog.table
         row_count = table.rowCount()
         column_count = table.columnCount()
-
+        
         table_data = []
+        table_data_invalid = []
         for row in range(row_count):
             row_data = []
             for column in range(column_count):
                 item = table.item(row, column)
                 if item is not None:
                     row_data.append(item.text())
-            if len(row_data) != 0:
+            if len(row_data) == column_count:
                 table_data.append(row_data)
+            else:
+                table_data_invalid.append(row_data)
                 
         abrv = []
         isDuplicate = False
@@ -117,10 +121,18 @@ class StudentsPresenter:
             if len(table_data) == 0:
                 self.utils.infoBarError("Vide!", "Vous n'avez ajouté aucune matière!", dialog)
             else:
-                for item in table_data:
-                    self.modelSubject.create(Subject(promotion_id=self.promotionId, abrv=item[0], title=item[1], coef=item[2], level=self.getLevel()))
-                dialog.close()
-                self.utils.infoBarSuccess("Ajouté", "Matières ajoutés avec succès", self.view)
+                if len(table_data_invalid) != 0:
+                    self.utils.infoBarError("Error!", "Toutes les colonne est obligatoire", dialog)
+                else:
+                    for item in table_data:
+                        kwargs = {
+                            "promotion_id":self.promotionId, 
+                            "abrv":item[0]
+                        }
+                    
+                        self.modelSubject.create(Subject(promotion_id=self.promotionId, abrv=item[0], title=item[1], coef=item[2], level=self.getLevel()))
+                    dialog.close()
+                    self.utils.infoBarSuccess("Ajouté", "Matières ajoutés avec succès", self.view)
                 
     def getLevel(self) -> str:
         level = "EIP"
