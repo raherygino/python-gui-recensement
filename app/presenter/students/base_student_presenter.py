@@ -1,12 +1,10 @@
 from PyQt5.QtCore import QPoint, QThread
 from PyQt5.QtGui import QCursor 
-from qfluentwidgets import Action, RoundMenu, MenuAnimationType, FluentIcon
 
-from ...view.students.tab.db_student_tab import DatabaseStudentTab
-from ...models import StudentModel, DatabaseWorker
+from ...view import DatabaseStudentTab
+from ...models import StudentModel, DatabaseWorker, SubjectModel
 from ...components import PopupTeachingTip, TeachingTipTailPosition, FilterFlyoutView
 from ...common.constants import *
-#from ..menu_action_presenter import MenuAction
 
 class BaseStudentPresenter:
     
@@ -20,10 +18,7 @@ class BaseStudentPresenter:
     def __init_needly_var(self, view, parent):
         self.view:DatabaseStudentTab = view
         self.model:StudentModel = parent.model
-        
-        '''self.modelMove:MouvementModel = parent.modelMove
-        self.typeCompModel = parent.typeCompModel
-        self.compModel = parent.compModel'''
+        self.subectModal = SubjectModel()
         
         self.mainView = self.view.parent.nParent
         self.parent = parent
@@ -64,6 +59,12 @@ class BaseStudentPresenter:
         self.query = {"promotion_id":promotionId}
         self.defaultData = self.model.fetch_all(**self.query)
         self.fetchData(self.defaultData)
+    
+    def setLabelIntoTable(self,promotionId, level):
+        labels = self.labels
+        for subject in self.subectModal.fetch_all(promotion_id=promotionId, level=level):
+            labels.append(subject.abrv)
+        self.view.tableView.setHorizontalHeaderLabels(labels)
         
     def intColFilter(self):
         self.companyStudents = self.fetchDataGroup(self.model, key="company", label=LABEL.COMPANY)

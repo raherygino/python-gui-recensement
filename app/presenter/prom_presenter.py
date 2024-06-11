@@ -1,6 +1,6 @@
 from qfluentwidgets import FluentIcon, RoundMenu, Action, MenuAnimationType, Dialog
 from .new_prom_presenter import NewPromotionPresenter
-from ..models.model.prom_model import PromotionModel
+from ..models import PromotionModel
 from ..components.link_card2 import LinkCard
 from ..common.functions import Function
 
@@ -32,8 +32,8 @@ class PromotionPresenter:
                 logo = promotion.logo
             card = LinkCard(
                 logo, 
-                promotion.rank, 
-                promotion.name, 
+                f'{promotion.rank}ème Promotion', 
+                f'{promotion.name} {promotion.years}', 
                 self.view)
             card.contextMenuEvent = lambda event, promotion=promotion: self.menuCard(event, promotion)
             card.mouseDoubleClickEvent = lambda event, promotion=promotion: self.showPromotion(event, promotion)            
@@ -46,8 +46,9 @@ class PromotionPresenter:
         self.mainView.switchTo(studentsInterface)
         self.mainView.fluentTitleBar.subtitleLabel.setText(f'| {promotion.name if promotion.name != "" else promotion.rank}')
         
-    def setCurrentPromotion(self, id:int):
-        self.currentPromotion = id
+    def setCurrentPromotion(self, idProm:int):
+        self.currentPromotion = idProm
+        self.mainView.navigationInterface.setVisible(idProm != 0)
         
     def menuCard(self, event, promotion):
         menu = RoundMenu(self.view)

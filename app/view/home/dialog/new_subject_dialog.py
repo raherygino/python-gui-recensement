@@ -18,9 +18,9 @@ class NewSubjectDialog(Dialog):
         self.count.spinbox.textChanged.connect(self.__countChange)
         
         self.table = TableView(self)
-        self.table.setHorizontalHeaderLabels(["Abréviation", "Title"])
+        self.table.setHorizontalHeaderLabels(["ID",  "Abréviation", "Rubrique", "Coeff"])
         self.table.setRowCount(1)
-        self.table.setColumnCount(2)
+        self.table.setColumnCount(4)
         self.table.setMinimumHeight(300)
         
         self.yesBtn = PrimaryPushButton("Ok")
@@ -41,6 +41,8 @@ class NewSubjectDialog(Dialog):
 
     def __countChange(self, value):
         self.table.setRowCount(int(value))
+        print(self.table.item(1,0))
+        self.table.setColNoEditable(0)
 
     def yesBtnClicked(self):
         self.close()

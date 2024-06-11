@@ -2,15 +2,15 @@ from PyQt5.QtCore import QTimer, QPoint
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import RoundMenu, Action, FluentIcon, MessageBox, MenuAnimationType
-from ...view.students.students_interface import StudentsInterface
-from ...view.home.dialog.new_comp_dialog import NewComportementDialog
-from ...view.students.new_student_dialog import NewStudentDialog
-from ...view.home.dialog.new_subject_dialog import NewSubjectDialog
-from ...models import StudentModel, Student,SubjectModel, Subject
-from .db_presenter import StudentDbPresenter
-from .abs_presenter import StudentAbsPresenter
-from .day_presenter import StudentDayPresenter
+
 from ...common import Function, Utils
+from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
+from ...models import StudentModel, Student,SubjectModel, Subject
+
+from .db_presenter import StudentDbPresenter
+from .eap_presenter import EapPresenter
+from .eip_presenter import EipPresenter
+
 import os
 
 class StudentsPresenter:
@@ -19,9 +19,6 @@ class StudentsPresenter:
         self.view = view
         self.model = model
         self.modelSubject = SubjectModel()
-        '''self.modelMove = MouvementModel()
-        self.typeCompModel = TypeComportementModel()
-        self.compModel = ComportementModel()'''
         self.func = Function()
         self.timer = QTimer()
         self.utils = Utils()
@@ -30,8 +27,8 @@ class StudentsPresenter:
         
     def __init_presenter(self):
         self.dbPresenter = StudentDbPresenter(self)
-        self.absPresenter = StudentAbsPresenter(self)
-        self.dayPresenter = StudentDayPresenter(self)
+        self.eipPresenter = EapPresenter(self)
+        self.eapPresenter = EipPresenter(self)
         
     def __actions(self):
         self.view.refreshAction.triggered.connect(lambda: self.view.nParent.currentPromotion.emit(self.promotionId))
@@ -83,6 +80,15 @@ class StudentsPresenter:
         
     def showDialogSubject(self):
         dialog = NewSubjectDialog(self.view)
+        subjects:list[Subject] = self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
+        allSbjcts = []
+        for subject in subjects:
+            allSbjcts.append([subject.id, subject.abrv, subject.title, subject.coef])
+        dialog.count.spinbox.setValue(len(subjects))
+        dialog.table.setRowCount(len(subjects))
+        dialog.table.itemChanged.connect(lambda item: dialog.table.validateInput(3, item))
+        dialog.table.setData(allSbjcts)
+        dialog.table.setColNoEditable(0)
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
         dialog.exec()
     
@@ -90,16 +96,59 @@ class StudentsPresenter:
         table = dialog.table
         row_count = table.rowCount()
         column_count = table.columnCount()
-
-        table_data = []
+        table_data:list[Subject] = []
         for row in range(row_count):
             row_data = []
             for column in range(column_count):
                 item = table.item(row, column)
                 if item is not None:
                     row_data.append(item.text())
-            if len(row_data) != 0:
+                else:
+                    row_data.append("")
+            subject = Subject(
+                        id=0, 
+                        promotion_id=self.promotionId, 
+                        abrv=row_data[1], 
+                        title=row_data[2], 
+                        coef=row_data[3] if row_data[3] != "" else 1,  
+                        level=self.getLevel())
+            table_data.append(subject)
+        isValid = True
+        message = ""
+        
+        for subject in table_data:
+            if not subject.abrv:
+                message = "Une matière doit avoir une abréviation"
+                isValid = False
+            if not subject.title:
+                message = "Une matière doit avoir un titre"
+                isValid = False
+                
+        if isValid:
+            for item in table_data:
+                self.modelSubject.create(item)
+        else:
+            self.utils.infoBarError("Erreur", message, dialog)
+            
+        
+        
+    def getTableDialogData2(self, dialog):
+        table = dialog.table
+        row_count = table.rowCount()
+        column_count = table.columnCount()
+        
+        table_data = []
+        table_data_invalid = []
+        for row in range(row_count):
+            row_data = []
+            for column in range(column_count):
+                item = table.item(row, column)
+                if item is not None:
+                    row_data.append(item.text())
+            if len(row_data) == column_count:
                 table_data.append(row_data)
+            else:
+                table_data_invalid.append(row_data)
                 
         abrv = []
         isDuplicate = False
@@ -114,15 +163,29 @@ class StudentsPresenter:
             if len(table_data) == 0:
                 self.utils.infoBarError("Vide!", "Vous n'avez ajouté aucune matière!", dialog)
             else:
-                for item in table_data:
-                    self.modelSubject.create(Subject(promotion_id=self.promotionId, abrv=item[0], title=item[0]))
-                dialog.close()
-                self.utils.infoBarSuccess("Ajouté", "Matières ajoutés avec succès", self.view)
+                if len(table_data_invalid) != 0:
+                    self.utils.infoBarError("Error!", "Toutes les colonne est obligatoire", dialog)
+                else:
+                    for item in table_data:
+                        kwargs = {
+                            "promotion_id":self.promotionId, 
+                            "abrv":item[0]
+                        }
+                    
+                        self.modelSubject.create(Subject(promotion_id=self.promotionId, abrv=item[0], title=item[1], coef=item[2], level=self.getLevel()))
+                    dialog.close()
+                    self.utils.infoBarSuccess("Ajouté", "Matières ajoutés avec succès", self.view)
+                
+    def getLevel(self) -> str:
+        level = "EIP"
+        if self.view.stackedWidget.currentIndex() == 2:
+            level = "EAP"
+        return level
                 
     def is_duplicate(self, item, lst):
         return lst.count(item) > 1
         
-    def createComp(self, dialog: NewComportementDialog, dataCombox):
+    def createComp(self, dialog, dataCombox):
         name = dialog.nameLineEdit.text()
         abr = dialog.abrLineEdit.text()
         ''''comp = Comportement(
@@ -140,7 +203,7 @@ class StudentsPresenter:
             self.func.errorSuccess("Nom existe déjà", "Le nom que vous avez choisi existe déjà", self.view)'''
             
     def addComp(self):
-        dialog = NewComportementDialog(self.view)
+        dialog = NewSubjectDialog(self.view)
         ''''typeComp = self.typeCompModel.fetch_items_by_id(0)
         dataCombox = []
         for val in typeComp:

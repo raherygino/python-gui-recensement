@@ -3,20 +3,15 @@ from PyQt5.QtCore import QUrl, QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QIcon, QDesktopServices
 from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QVBoxLayout
 
-from qfluentwidgets import ( NavigationItemPosition, FluentWindow, FluentStyleSheet,
-                            SplashScreen, TitleLabel, Dialog, BodyLabel)
-from qfluentwidgets import FluentIcon as FIF
-
+from qfluentwidgets import NavigationItemPosition, FluentWindow, FluentStyleSheet, \
+                           SplashScreen, TitleLabel, Dialog, BodyLabel, FluentIcon
 from qframelesswindow import TitleBar
 from .setting_interface import SettingInterface
 from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
 from ..common.signal_bus import signalBus
-from .home.home_interface import HomeInterface
-from ..models.model.prom_model import PromotionModel
-from ..presenter.prom_presenter import PromotionPresenter
-from ..presenter.students.students_presenter import StudentsPresenter
-from ..models import StudentModel
-from .students.students_interface import StudentsInterface
+from ..models import PromotionModel, StudentModel
+from . import HomeInterface, StudentsInterface
+from ..presenter import PromotionPresenter, StudentsPresenter
 
 class Widget(QFrame):
 
@@ -108,12 +103,14 @@ class MainWindow(FluentWindow):
 
     def initNavigation(self):
         # add navigation items
-        self.addSubInterface(self.homeInterface, FIF.HOME, 'Accueil')
-        self.addSubInterface(self.studentsInterface, FIF.PEOPLE, "Elèves")
+        self.addSubInterface(self.homeInterface, FluentIcon.HOME, 'Accueil')
+        self.addSubInterface(self.studentsInterface, FluentIcon.PEOPLE, "Elèves")
         self.navigationInterface.addSeparator()
-
+       
         self.addSubInterface(
-            self.settingInterface, FIF.SETTING, 'Paramètres', NavigationItemPosition.BOTTOM)
+            self.settingInterface, FluentIcon.SETTING, 'Paramètres', NavigationItemPosition.BOTTOM)
+        
+        self.navigationInterface.setVisible(False)
 
     def initWindow(self):
         self.resize(960, 780)
