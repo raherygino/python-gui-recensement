@@ -22,6 +22,7 @@ class NewSubjectDialog(Dialog):
         self.table.setRowCount(1)
         self.table.setColumnCount(4)
         self.table.setMinimumHeight(300)
+        self.table.itemChanged.connect(lambda item: self.table.validateInput(3, item, "1"))
         
         self.yesBtn = PrimaryPushButton("Ok")
         #self.yesBtn.clicked.connect(self.yesBtnClicked)
@@ -41,7 +42,6 @@ class NewSubjectDialog(Dialog):
 
     def __countChange(self, value):
         self.table.setRowCount(int(value))
-        print(self.table.item(1,0))
         self.table.setColNoEditable(0)
 
     def yesBtnClicked(self):
