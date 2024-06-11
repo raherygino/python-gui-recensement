@@ -1,6 +1,6 @@
 from typing import Iterable
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtGui import QColor
 from ..common.config import cfg
 import darkdetect
@@ -19,8 +19,18 @@ class TableView(QTableWidget):
         self.colNoEditable = []
         self.isIncrement = False
         
-    def test(self, value):
-        print(value)
+    @pyqtSlot(QTableWidgetItem)
+    def validateInput(self, col, item):
+        if item.column() == col:  # Assuming the column where you want to enforce integer input is column 1
+            text = item.text()
+            try:
+                value = int(text)
+            except ValueError:
+                # If the input is not a valid integer, set it to 0 or whatever default value you prefer
+                item.setText("0")
+            else:
+                # If the input is a valid integer, set it to the validated integer
+                item.setText(str(value))
     
     def setQss(self, newTheme: str):
         theme = newTheme.lower()
@@ -54,3 +64,17 @@ class TableView(QTableWidget):
         
     def setColumnNoEditable(self, *args):
         self.colNoEditable = list(args)
+        
+    def setColNoEditable(self, *args):
+        colNoEditable = list(args)
+        for row in range(self.rowCount()):
+            for column in range(self.columnCount()):
+                item = self.item(row, column)
+                if item is None:
+                    item = QTableWidgetItem()
+                    self.setItem(row, column, item)
+                # Set editable or not based on the content (for demonstration purposes)
+                if column in colNoEditable:
+                    if item is not None:
+                        item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+                        #item.setFlags(item.flags() | Qt.ItemIsEditable)

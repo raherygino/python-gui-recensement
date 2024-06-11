@@ -83,14 +83,56 @@ class StudentsPresenter:
         subjects:list[Subject] = self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
         allSbjcts = []
         for subject in subjects:
-            allSbjcts.append([subject.abrv, subject.title, subject.coef])
+            allSbjcts.append([subject.id, subject.abrv, subject.title, subject.coef])
         dialog.count.spinbox.setValue(len(subjects))
         dialog.table.setRowCount(len(subjects))
+        dialog.table.itemChanged.connect(lambda item: dialog.table.validateInput(3, item))
         dialog.table.setData(allSbjcts)
+        dialog.table.setColNoEditable(0)
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
         dialog.exec()
     
     def getTableDialogData(self, dialog):
+        table = dialog.table
+        row_count = table.rowCount()
+        column_count = table.columnCount()
+        table_data:list[Subject] = []
+        for row in range(row_count):
+            row_data = []
+            for column in range(column_count):
+                item = table.item(row, column)
+                if item is not None:
+                    row_data.append(item.text())
+                else:
+                    row_data.append("")
+            subject = Subject(
+                        id=0, 
+                        promotion_id=self.promotionId, 
+                        abrv=row_data[1], 
+                        title=row_data[2], 
+                        coef=row_data[3] if row_data[3] != "" else 1,  
+                        level=self.getLevel())
+            table_data.append(subject)
+        isValid = True
+        message = ""
+        
+        for subject in table_data:
+            if not subject.abrv:
+                message = "Une matière doit avoir une abréviation"
+                isValid = False
+            if not subject.title:
+                message = "Une matière doit avoir un titre"
+                isValid = False
+                
+        if isValid:
+            for item in table_data:
+                self.modelSubject.create(item)
+        else:
+            self.utils.infoBarError("Erreur", message, dialog)
+            
+        
+        
+    def getTableDialogData2(self, dialog):
         table = dialog.table
         row_count = table.rowCount()
         column_count = table.columnCount()
