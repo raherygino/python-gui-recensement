@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QPoint, QThread
 from PyQt5.QtGui import QCursor 
+from PyQt5.QtWidgets import QTableWidgetItem
 
 from ...view import DatabaseStudentTab
 from ...models import StudentModel, DatabaseWorker, SubjectModel
@@ -62,9 +63,19 @@ class BaseStudentPresenter:
     
     def setLabelIntoTable(self,promotionId, level):
         labels = self.labels
-        for subject in self.subectModal.fetch_all(promotion_id=promotionId, level=level):
-            labels.append(subject.abrv)
+        labels.extend([subject.abrv for subject in self.subectModal.fetch_all(promotion_id=promotionId, level=level)])
+        data = self.view.tableView.getData()
+        self.view.tableView.clear()
+        self.view.tableView.clearContents()
+        self.view.tableView.setRowCount(0)
+        #self.view.tableView.clear()
+        self.view.tableView.setColumnCount(len(labels))
         self.view.tableView.setHorizontalHeaderLabels(labels)
+        #self.view.tableView.setData(data)
+        ''''for subject in self.subectModal.fetch_all(promotion_id=promotionId, level=level):
+            column_count = self.view.tableView.columnCount()
+            self.view.tableView.insertColumn(column_count)  # Insert a new column at the end
+            self.view.tableView.setHorizontalHeaderItem(column_count, QTableWidgetItem(subject.abrv))'''
         
     def intColFilter(self):
         self.companyStudents = self.fetchDataGroup(self.model, key="company", label=LABEL.COMPANY)

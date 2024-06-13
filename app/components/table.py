@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor
 from ..common.config import cfg
 import darkdetect
 
-class TableView(QTableWidget):
+class QTable(QTableWidget):
     
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
@@ -40,10 +40,10 @@ class TableView(QTableWidget):
         with open(f'app/resource/{theme}.qss', encoding='utf-8') as f:
             self.setStyleSheet(f.read().replace("#327bcc", themeColor))
     
-    def setHorizontalHeaderLabels(self, labels: Iterable[str | None]) -> None:
+    '''def setHorizontalHeaderLabels(self, labels: Iterable[str | None]) -> None:
         self.setColumnCount(len(labels))
         self.header.setSectionResizeMode(len(labels) - 1, QHeaderView.Stretch)
-        return super().setHorizontalHeaderLabels(labels)
+        return super().setHorizontalHeaderLabels(labels)'''
         
     def setData(self, items):
         self.setRowCount(0)
@@ -60,7 +60,7 @@ class TableView(QTableWidget):
                     if col in self.colNoEditable:
                         widgetItem.setFlags(widgetItem.flags() & ~Qt.ItemIsEditable)
                 
-        #self.resizeColumnsToContents()
+        self.resizeColumnsToContents()
         
     def setColumnNoEditable(self, *args):
         self.colNoEditable = list(args)

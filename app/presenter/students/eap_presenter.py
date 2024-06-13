@@ -9,4 +9,6 @@ class EapPresenter(BaseStudentPresenter):
         self.setLabelIntoTable(promotionId, level="EAP")
         return super().setPromotionId(promotionId)
     
+    
+    
         

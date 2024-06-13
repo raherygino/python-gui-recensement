@@ -1,8 +1,8 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget
 from qfluentwidgets import ProgressBar
-from ....components import TableView, QTable
+from ....components import TableWidget
 
-class StudentTab(QWidget):
+class BaseTab(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -14,7 +14,7 @@ class StudentTab(QWidget):
     def __initTableView(self, parent):
         self.progressBar = ProgressBar(self)
         self.progressBar.setVisible(False)
-        self.tableView = QTable(self)
+        self.tableView = TableWidget(self)
         '''self.tableView.isIncrement = True
         self.tableView.setColumnNoEditable(0,7)'''
         self.vBoxLayout.addWidget(self.progressBar)

@@ -1,6 +1,6 @@
-from .base_tab import StudentTab
+from .base import BaseTab
 
-class EipTab(StudentTab):
+class EipTab(BaseTab):
     
     def __init__(self, parent=None):
         super().__init__(parent=parent)

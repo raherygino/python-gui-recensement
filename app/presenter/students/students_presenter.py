@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, pyqtSignal
 from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import MessageBox
 
@@ -21,6 +21,7 @@ class StudentsPresenter:
         self.func = Function()
         self.timer = QTimer()
         self.utils = Utils()
+        
         self.__init_presenter()
         self.__actions()
         
@@ -114,6 +115,12 @@ class StudentsPresenter:
                 isValid = False
                 
         if isValid:
+            subjInDb = [item.id  for item in self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())]
+            subjInDial = [int(item.id)  for item in table_data]
+            subjDeleted = [item for item in subjInDb if item not in subjInDial]
+            for subj in subjDeleted:
+                self.modelSubject.delete_item(subj)
+
             for item in table_data:
                 sub = {
                     "abrv":  item.abrv,
@@ -125,31 +132,10 @@ class StudentsPresenter:
                 else:
                     self.modelSubject.update_item(item.id, **sub)
             dialog.close()
-            self.utils.infoBarSuccess("Ajouté", "Matières ajoutés avec succès", self.view)
+            self.utils.infoBarSuccess("Mise à jour", "Mis à jour avec succés", self.view)
+            self.view.nParent.subjectRefresh.emit(self.getLevel())
         else:
             self.utils.infoBarError("Erreur", message, dialog)
-    
-    def getTableDialogDataOld(self, dialog):
-        table = dialog.table
-        row_count = table.rowCount()
-        column_count = table.columnCount()
-        table_data:list[Subject] = []
-        for row in range(row_count):
-            row_data = []
-            for column in range(column_count):
-                item = table.item(row, column)
-                if item is not None:
-                    row_data.append(item.text())
-                else:
-                    row_data.append("")
-            subject = Subject(
-                        id=0, 
-                        promotion_id=self.promotionId, 
-                        abrv=row_data[1], 
-                        title=row_data[2], 
-                        coef=row_data[3] if row_data[3] != "" else 1,  
-                        level=self.getLevel())
-            table_data.append(subject)
             
     def getLevel(self) -> str:
         level = "EIP"
