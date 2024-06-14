@@ -1,7 +1,9 @@
 from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtCore import QPoint
+from PyQt5.QtGui import QCursor
 
-from qfluentwidgets import Dialog, SubtitleLabel, LineEdit, ComboBox, PrimaryPushButton, PushButton, FluentIcon
-from ....common.functions import Function
+from qfluentwidgets import Dialog, Action, RoundMenu, MenuAnimationType, \
+     PrimaryPushButton, PushButton, FluentIcon
 from ....components.table_view import TableView
 from ....components import SpinBoxEditWithLabel
 
@@ -18,13 +20,14 @@ class NewSubjectDialog(Dialog):
         self.count.spinbox.textChanged.connect(self.__countChange)
         
         self.table = TableView(self)
-        self.table.setHorizontalHeaderLabels(["Abréviation", "Title"])
+        self.table.contextMenuEvent = lambda event: self.contextMenu(event)
+        self.table.setHorizontalHeaderLabels(["ID",  "Abréviation", "Rubrique", "Coeff"])
         self.table.setRowCount(1)
-        self.table.setColumnCount(2)
+        self.table.setColumnCount(4)
         self.table.setMinimumHeight(300)
+        self.table.itemChanged.connect(lambda item: self.table.validateInput(3, item, "1"))
         
         self.yesBtn = PrimaryPushButton("Ok")
-        #self.yesBtn.clicked.connect(self.yesBtnClicked)
         self.cancelBtn = PushButton("Annuler")
         self.cancelBtn.clicked.connect(self.yesBtnClicked)
         
@@ -38,9 +41,25 @@ class NewSubjectDialog(Dialog):
         self.buttonLayout.addWidget(self.cancelBtn)
         
         self.setFixedWidth(450)
+        
+    def contextMenu(self, event):
+        item = self.table.selectedItems()[0]
+        menu = RoundMenu(parent=self)
+        menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered = lambda:self.deleteSubject(item.row())))
+        self.posCur = QCursor().pos()
+        cur_x = self.posCur.x()
+        cur_y = self.posCur.y()
+        menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
+        
+    def deleteSubject(self, row):
+        dialog = Dialog("Supprimer?", "Voulez vous supprimer vraiment?", self)
+        dialog.setTitleBarVisible(False)
+        if dialog.exec():
+            self.table.removeRow(row)
 
     def __countChange(self, value):
         self.table.setRowCount(int(value))
+        self.table.setColNoEditable(0)
 
     def yesBtnClicked(self):
         self.close()

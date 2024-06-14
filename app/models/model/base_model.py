@@ -1,7 +1,8 @@
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from datetime import datetime
 from ..db.database import Database
 from ..entity.base_entity import Entity
 import dataclasses
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
 import sqlite3
 
 class WorkerThread(QThread):
@@ -12,6 +13,7 @@ class WorkerThread(QThread):
         super(WorkerThread, self).__init__(parent)
         self.conn = conn
         self.sql = sql
+        
 
     def run(self):
         # Connect to SQLite database
@@ -41,7 +43,11 @@ class Model:
         self.conn = self.database.connect()
         self.entity = entity
         self.create_table()
-
+        
+    def current_date(self) -> str:
+        current_date_and_time = datetime.now()
+        return current_date_and_time.strftime('%Y-%m-%d %H:%M:%S')
+    
     def create_table(self):
         cursor = self.conn.cursor()
         query = f"CREATE TABLE IF NOT EXISTS {self.TABLE}("
@@ -284,10 +290,15 @@ class Model:
         return listItems[0] if len(listItems) != 0 else None
 
     def create(self, entity: Entity):
+        created_at = self.current_date()
         fieldsEntity = dataclasses.fields(entity)
         qm = ','.join([f'?' for field in fieldsEntity[1:]])
         values = [f'{entity.get(field.name)}' for field in fieldsEntity[1:]]
         fields = ','.join([f'{field.name}' for field in fieldsEntity[1:]])
+        qm += ',?, ?'
+        fields += ',created_at, updated_at'
+        values.append(created_at)
+        values.append(created_at)
         sql = f"INSERT INTO {self.TABLE}({fields}) VALUES ({qm})"
         cursor = self.conn.cursor()
         cursor.execute(sql, values)
@@ -305,6 +316,7 @@ class Model:
         self.conn.commit()
 
     def update_item(self, item_id, **fields):
+        updated_at = self.current_date()
         cursor = self.conn.cursor()
         id_col = dataclasses.fields(self.entity)[0].name
         
@@ -315,6 +327,7 @@ class Model:
                 sql += f" {key} = \"{fields.get(key).replace("\"", "")}\" "
             else:
                 sql += f", {key} = \"{fields.get(key).replace("\"", "")}\" "
+            sql+= f", updated_at = '{updated_at}'"
         sql += f"WHERE {id_col}={item_id}"
         cursor.execute(sql)
         self.conn.commit()

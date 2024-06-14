@@ -73,6 +73,7 @@ class MainWindow(FluentWindow):
     
     currentPromotion = pyqtSignal(int)
     refresh = pyqtSignal(list)
+    subjectRefresh = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()

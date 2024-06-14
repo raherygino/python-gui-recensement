@@ -9,3 +9,5 @@ class Subject(Entity):
     promotion_id: int = 0
     title: str = ""
     abrv: str = ""
+    coef: int = 1
+    level: str = ""

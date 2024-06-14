@@ -62,24 +62,21 @@ class StudentsInterface(QWidget):
         self.commandBar.setButtonTight(True)
         setFont(self.commandBar, 14)
         
-        self.addAction = Action(FluentIcon.PEOPLE, "Elève", self)
+        self.addAction = Action(FluentIcon.ADD, "Ajouter un(e) Elève", self)
         self.addSubject = Action(FluentIcon.DICTIONARY, "Matière", self)
-        #self.addComp = Action(FluentIcon.DICTIONARY, "Comportement", self)
-        self.dropDownButtonAdd = self.createDropDownButton('Ajouter', 
-                                                        FluentIcon.ADD,[self.addAction, self.addSubject], self)
-        
-        self.refreshAction = Action(FluentIcon.SYNC, "Actualiser", self)
+        self.addSubject.setEnabled(False)
         self.importAction = Action(FluentIcon.FOLDER_ADD, "Importer", self)
+        self.refreshAction = Action(FluentIcon.SYNC, "Actualiser", self)
         self.exportActionCsv = Action(FluentIcon.QUICK_NOTE, "CSV", self)
         self.exportAction = Action(FluentIcon.DOCUMENT, "Excel", self)
         self.dropDownButtonExp = self.createDropDownButton('Exporter', 
                                                         FluentIcon.SHARE,[self.exportAction, self.exportActionCsv], self)
         self.deleteAction = Action(FluentIcon.DELETE, "Supprimer tous", self)   
         
-        self.commandBar.addWidget(self.dropDownButtonAdd)
-
-        self.commandBar.addAction(self.refreshAction)
+        self.commandBar.addAction(self.addAction)
+        self.commandBar.addAction(self.addSubject)
         self.commandBar.addAction(self.importAction)
+        self.commandBar.addAction(self.refreshAction)
         self.commandBar.addWidget(self.dropDownButtonExp)
         self.commandBar.addSeparator()
         self.commandBar.addAction(self.deleteAction)
@@ -109,3 +106,5 @@ class StudentsInterface(QWidget):
         self.titleLabel.setText(self.pivot.currentItem().text())
         self.pivot.setCurrentItem(widget.objectName())
         self.valueCount.setText(str(len(self.func.getTableData(widget.tableView))))
+        self.addSubject.setEnabled(index != 0)
+            

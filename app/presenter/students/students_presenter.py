@@ -1,7 +1,6 @@
-from PyQt5.QtCore import QTimer, QPoint
-from PyQt5.QtGui import QCursor
+from PyQt5.QtCore import QTimer, pyqtSignal
 from PyQt5.QtWidgets import QFileDialog
-from qfluentwidgets import RoundMenu, Action, FluentIcon, MessageBox, MenuAnimationType
+from qfluentwidgets import MessageBox
 
 from ...common import Function, Utils
 from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
@@ -22,6 +21,7 @@ class StudentsPresenter:
         self.func = Function()
         self.timer = QTimer()
         self.utils = Utils()
+        
         self.__init_presenter()
         self.__actions()
         
@@ -38,7 +38,6 @@ class StudentsPresenter:
         self.view.exportActionCsv.triggered.connect(lambda: self.exportCsv())
         self.view.nParent.currentPromotion.connect(lambda currentId : self.setPromotionId(currentId))
         self.view.addSubject.triggered.connect(lambda: self.showDialogSubject())
-        #self.view.addComp.triggered.connect(lambda: self.addComp())
         self.view.addAction.triggered.connect(lambda: self.addStudent())
         self.view.searchLineEdit.textChanged.connect(self.onSearch)
         self.view.searchLineEdit.returnPressed.connect(self.search)
@@ -75,104 +74,77 @@ class StudentsPresenter:
             matricule=matricule,
             company=matricule[0],
             section=matricule[1],
-            number=matricule[2:4]
-        )
+            number=matricule[2:4])
         
     def showDialogSubject(self):
         dialog = NewSubjectDialog(self.view)
+        subjects:list[Subject] = self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
+        allSbjcts = []
+        for subject in subjects:
+            allSbjcts.append([subject.id, subject.abrv, subject.title, subject.coef])
+        dialog.count.spinbox.setValue(len(subjects))
+        dialog.table.setRowCount(len(subjects))
+        dialog.table.setData(allSbjcts)
+        dialog.table.setColNoEditable(0)
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
         dialog.exec()
-    
-    def getTableDialogData(self, dialog):
-        table = dialog.table
-        row_count = table.rowCount()
-        column_count = table.columnCount()
-
-        table_data = []
-        for row in range(row_count):
-            row_data = []
-            for column in range(column_count):
-                item = table.item(row, column)
-                if item is not None:
-                    row_data.append(item.text())
-            if len(row_data) != 0:
-                table_data.append(row_data)
-                
-        abrv = []
-        isDuplicate = False
-        for item in table_data:
-            abrv.append(item[0])
-            if self.is_duplicate(item[0], abrv):
-                isDuplicate = True
         
-        if isDuplicate:
-            self.utils.infoBarError("Erreur", "Une matière est reproduite en double.", dialog)
+    def getTableDialogData(self, dialog):
+        data = dialog.table.getData()
+        dataSubject = []
+        for item in data:
+            subject = Subject(
+                id=item[0] if item[0] != "" else 0, 
+                promotion_id=self.promotionId, 
+                abrv=item[1], 
+                title=item[2], 
+                coef=item[3] if item[3] != "" else 1,  
+                level=self.getLevel())
+            dataSubject.append(subject)
+        self.create(dataSubject, dialog)
+            
+    def create(self, table_data, dialog):
+        isValid = True
+        message = ""
+        for subject in table_data:
+            if not subject.abrv:
+                message = "Une matière doit avoir une abréviation"
+                isValid = False
+            if not subject.title:
+                message = "Une matière doit avoir un titre"
+                isValid = False
+                
+        if isValid:
+            subjInDb = [item.id  for item in self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())]
+            subjInDial = [int(item.id)  for item in table_data]
+            subjDeleted = [item for item in subjInDb if item not in subjInDial]
+            for subj in subjDeleted:
+                self.modelSubject.delete_item(subj)
+
+            for item in table_data:
+                sub = {
+                    "abrv":  item.abrv,
+                    "title": item.title,
+                    "coef":  item.coef 
+                }
+                if item.id == 0:
+                    self.modelSubject.create(item)
+                else:
+                    self.modelSubject.update_item(item.id, **sub)
+            dialog.close()
+            self.utils.infoBarSuccess("Mise à jour", "Mis à jour avec succés", self.view)
+            self.view.nParent.subjectRefresh.emit(self.getLevel())
         else:
-            if len(table_data) == 0:
-                self.utils.infoBarError("Vide!", "Vous n'avez ajouté aucune matière!", dialog)
-            else:
-                for item in table_data:
-                    self.modelSubject.create(Subject(promotion_id=self.promotionId, abrv=item[0], title=item[0]))
-                dialog.close()
-                self.utils.infoBarSuccess("Ajouté", "Matières ajoutés avec succès", self.view)
+            self.utils.infoBarError("Erreur", message, dialog)
+            
+    def getLevel(self) -> str:
+        level = "EIP"
+        if self.view.stackedWidget.currentIndex() == 2:
+            level = "EAP"
+        return level
                 
     def is_duplicate(self, item, lst):
         return lst.count(item) > 1
-        
-    def createComp(self, dialog, dataCombox):
-        name = dialog.nameLineEdit.text()
-        abr = dialog.abrLineEdit.text()
-        ''''comp = Comportement(
-                promotion_id=self.promotionId,
-                name=name,
-                abrv=abr,
-                comp_type=dataCombox[dialog.typeCombox.currentIndex()])
-        if self.compModel.check(comp, "name") == 0:
-            self.compModel.create(comp)
-            self.refreshCompTable(dialog.table)
-            dialog.nameLineEdit.setText("")
-            dialog.abrLineEdit.setText("")
-            self.func.toastSuccess("Ajout avec succès", "", self.view)
-        else:
-            self.func.errorSuccess("Nom existe déjà", "Le nom que vous avez choisi existe déjà", self.view)'''
-            
-    def addComp(self):
-        dialog = NewSubjectDialog(self.view)
-        ''''typeComp = self.typeCompModel.fetch_items_by_id(0)
-        dataCombox = []
-        for val in typeComp:
-            dataCombox.append(val.name)
-        dialog.typeCombox.addItems(dataCombox)
-        self.refreshCompTable(dialog.table)
-        dialog.btnAdd.clicked.connect(lambda: self.createComp(dialog, dataCombox))
-        dialog.yesButton.setText("Ok")
-        dialog.cancelButton.setVisible(False)'''
-        dialog.exec()
-    
-    def refreshCompTable(self, table):
-        ids = []
-        data = []
-        '''for comp in self.compModel.fetch_items_by_id(self.promotionId):
-            data.append([comp.name, comp.comp_type])
-            ids.append(comp.id)
-        table.setData(data)'''
-        table.contextMenuEvent = lambda  event, table = table, ids=ids : self.rightClickCompTable(event,table, ids)
-        
-    def rightClickCompTable(self, event, table, ids):
-        
-            menu = RoundMenu(parent=self.view)
-            menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered=lambda:self.deleteMove(ids[table.currentRow()], table)))
-            self.posCur = QCursor().pos()
-            cur_x = self.posCur.x()
-            cur_y = self.posCur.y()
-
-            menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
-            
-    def deleteMove(self, id, table):
-        dialog = MessageBox('Supprimer', "Voulez vous le supprimer?", self.view)
-        if dialog.exec():
-            #self.compModel.delete_item(id)
-            self.refreshCompTable(table)
         
     def onSearch(self, text):
         currentTab = self.view.stackedWidget.currentIndex()
@@ -195,12 +167,6 @@ class StudentsPresenter:
                 data = self.dbPresenter.defaultData
             self.dbPresenter.fetchData(data)
             
-        '''elif currentTab == 1:
-            data = self.modelMove.search_query(query, matricule=text, student=text)
-            if len(text) < 3:
-                data = self.absPresenter.defaultData
-            self.absPresenter.fetchData(data)'''
-        
         self.timer.stop()
     
     def getHeaderLabels(self, table):

@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor
 from ..common.config import cfg
 import darkdetect
 
-class TableView(QTableWidget):
+class QTable(QTableWidget):
     
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
@@ -19,11 +19,6 @@ class TableView(QTableWidget):
         self.colNoEditable = []
         self.isIncrement = False
         
-    def setHorizontalHeaderLabels(self, labels: Iterable[str | None]) -> None:
-        self.setColumnCount(len(labels))
-        #self.header.setSectionResizeMode(len(labels) - 1, QHeaderView.Stretch)
-        return super().setHorizontalHeaderLabels(labels)
-    
     @pyqtSlot(QTableWidgetItem)
     def validateInput(self, col, item, default = "0"):
         if item.column() == col:  # Assuming the column where you want to enforce integer input is column 1
@@ -44,6 +39,11 @@ class TableView(QTableWidget):
             theme = "light" if darkdetect.isLight() else "dark"
         with open(f'app/resource/{theme}.qss', encoding='utf-8') as f:
             self.setStyleSheet(f.read().replace("#327bcc", themeColor))
+    
+    '''def setHorizontalHeaderLabels(self, labels: Iterable[str | None]) -> None:
+        self.setColumnCount(len(labels))
+        self.header.setSectionResizeMode(len(labels) - 1, QHeaderView.Stretch)
+        return super().setHorizontalHeaderLabels(labels)'''
         
     def setData(self, items):
         self.setRowCount(0)

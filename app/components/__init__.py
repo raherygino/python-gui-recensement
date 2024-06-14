@@ -1,4 +1,6 @@
 from .table_view import TableView
+from .table_widget import TableWidget
+from .table import QTable
 from .dialog.dialog import Dialog
 from .line_edit import EditWithLabel
 from .combox import ComboBoxWithLabel
