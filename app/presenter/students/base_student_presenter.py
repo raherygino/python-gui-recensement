@@ -61,9 +61,10 @@ class BaseStudentPresenter:
         self.fetchData(self.defaultData)
     
     def setLabelIntoTable(self,promotionId, level):
-        labels = self.labels
-        for subject in self.subectModal.fetch_all(promotion_id=promotionId, level=level):
-            labels.append(subject.abrv)
+        subjects = self.subectModal.fetch_all(promotion_id=promotionId, level=level)
+        labels = []
+        labels.extend(self.labels)
+        labels.extend([subject.abrv for subject in subjects])
         self.view.tableView.setHorizontalHeaderLabels(labels)
         
     def intColFilter(self):

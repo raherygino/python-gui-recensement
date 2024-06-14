@@ -4,12 +4,13 @@ class EipPresenter(BaseStudentPresenter):
     
     def __init__(self, parent):
         super().__init__(parent.view.eipInterface, parent) 
+        self.mainView.subjectRefresh.connect(lambda level: self.setLabelIntoTable(self.promotionId, level))
         
     def fetchData(self, data):
         return super().fetchData(self.model.fetch_all(level="EIP"))
     
     def setPromotionId(self, promotionId):
-        #self.setLabelIntoTable(promotionId, level="EIP")
+        self.setLabelIntoTable(promotionId, level="EIP")
         return super().setPromotionId(promotionId)
     
     def handleResult(self, data: list):
