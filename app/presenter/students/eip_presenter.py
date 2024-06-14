@@ -39,7 +39,12 @@ class EipPresenter(BaseStudentPresenter):
             value = item.text()
             studentId = self.findStudentIdByMatricule(int(matricule))
             subjectId = self.findSubjectIdByAbrv(abrv)
-            self.modelMark.prepareCreate(Marks(promotion_id=self.promotionId, student_id=studentId, subject_id=subjectId, value=int(value)))
+            mark = Marks(promotion_id=self.promotionId, student_id=studentId, subject_id=subjectId, value=int(value))
+            marks = self.modelMark.fetch_all(student_id=studentId, subject_id=subjectId)
+            if len(marks) == 0:
+                self.modelMark.prepareCreate(mark)
+            else:
+                self.modelMark.update_item(marks[0].id, value=str(mark.value))
             #print(f'value of {studentId} {subjectId}: {value}')
             self.modelMark.commit()
             
