@@ -50,7 +50,7 @@ class TableView(QTableWidget):
         for row, item in enumerate(items):
             self.insertRow(row)
             for col, value in enumerate(item):
-                widgetItem = QTableWidgetItem(str(value))
+                widgetItem = QTableWidgetItem(str(value) if value != None else "")
                 self.setItem(row, col, widgetItem)
                 if self.isIncrement:
                     cols = self.colNoEditable

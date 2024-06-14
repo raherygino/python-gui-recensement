@@ -1,13 +1,48 @@
 from .base_student_presenter import BaseStudentPresenter
+from ...models import Marks
+from ...common.constants import LABEL
 
 class EipPresenter(BaseStudentPresenter):
     
     def __init__(self, parent):
         super().__init__(parent.view.eipInterface, parent) 
+        self.labels = [LABEL.MATRICULE, LABEL.GRADE,LABEL.LASTNAME,LABEL.FIRSTNAME, LABEL.GENDER]
         self.mainView.subjectRefresh.connect(lambda level: self.setLabelIntoTable(self.promotionId, level))
+        self.subjects = []
+        #self.view.tableView.currentItemChanged.
         
     def fetchData(self, data):
-        return super().fetchData(self.model.fetch_all(level="EIP"))
+        self.subjects = self.modelSubject.fetch_all(promotion_id=self.promotionId, level="EIP")
+        data = self.model.fetchNote(self.promotionId, self.subjects)
+        self.view.tableView.setData(data)
+        self.view.tableView.itemChanged.connect(self.itemChanged)
+        #return super().fetchData(list(data))
+        
+    def findSubjectIdByAbrv(self, abrv:str):
+        subjectId = 0
+        for subject in self.subjects:
+            if subject.abrv == abrv:
+                subjectId = subject.id
+        return subjectId
+            
+    def findStudentIdByMatricule(self, matricule:int):
+        studentId = 0
+        for student in self.defaultData:
+            if student.matricule == matricule:
+                studentId = student.id
+        return studentId
+         
+    def itemChanged(self, item):
+        if item.column() > 4:
+            matricule = self.view.tableView.item(item.row(), 0).text()
+            abrv = self.view.tableView.horizontalHeaderItem(item.column()).text()
+            value = item.text()
+            studentId = self.findStudentIdByMatricule(int(matricule))
+            subjectId = self.findSubjectIdByAbrv(abrv)
+            self.modelMark.prepareCreate(Marks(promotion_id=self.promotionId, student_id=studentId, subject_id=subjectId, value=int(value)))
+            #print(f'value of {studentId} {subjectId}: {value}')
+            self.modelMark.commit()
+            
     
     def setPromotionId(self, promotionId):
         self.setLabelIntoTable(promotionId, level="EIP")

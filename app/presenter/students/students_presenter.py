@@ -4,7 +4,7 @@ from qfluentwidgets import MessageBox
 
 from ...common import Function, Utils
 from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
-from ...models import StudentModel, Student,SubjectModel, Subject
+from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel, Marks
 
 from .db_presenter import StudentDbPresenter
 from .eap_presenter import EapPresenter
@@ -18,6 +18,7 @@ class StudentsPresenter:
         self.view = view
         self.model = model
         self.modelSubject = SubjectModel()
+        self.modelMark = MarkModel()
         self.func = Function()
         self.timer = QTimer()
         self.utils = Utils()

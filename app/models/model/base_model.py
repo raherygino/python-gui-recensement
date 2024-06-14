@@ -43,6 +43,7 @@ class Model:
         self.conn = self.database.connect()
         self.entity = entity
         self.create_table()
+        self.prepareToCreate = []
         
     def current_date(self) -> str:
         current_date_and_time = datetime.now()
@@ -60,7 +61,7 @@ class Model:
                 if (field.name == "id"):
                     fieldType = "INTEGER PRIMARY KEY"
                 else:
-                    fieldType = "INTEGER"
+                    fieldType = "INTEGER NOT NULL"
             query += f"{field.name} {fieldType}, "
 
         query += "updated_at DATETIME, created_at DATETIME)"
@@ -183,7 +184,6 @@ class Model:
         sql = f'SELECT * FROM {self.TABLE} WHERE '
         condition = ' OR '.join([f'{key} LIKE "%{kwargs.get(key).replace("\"", "")}%"' for key in kwargs.keys()])
         sql += condition
-        print(sql)
         cursor = self.conn.cursor()
         cursor.execute(sql)
         data = cursor.fetchall()
@@ -303,6 +303,28 @@ class Model:
         cursor = self.conn.cursor()
         cursor.execute(sql, values)
         self.conn.commit()
+
+    def prepareCreate(self, entity: Entity):
+        created_at = self.current_date()
+        fieldsEntity = dataclasses.fields(entity)
+        qm = ','.join([f'?' for field in fieldsEntity[1:]])
+        values = [f'{entity.get(field.name)}' for field in fieldsEntity[1:]]
+        fields = ','.join([f'{field.name}' for field in fieldsEntity[1:]])
+        qm += ',?, ?'
+        fields += ',created_at, updated_at'
+        values.append(created_at)
+        values.append(created_at)
+        sql = f"INSERT INTO {self.TABLE}({fields}) VALUES ({qm})"
+        '''cursor = self.conn.cursor()
+        cursor.execute(sql, values)'''
+        self.prepareToCreate.append([sql, values])
+    
+    def commit(self):
+        for item in self.prepareToCreate:
+            cursor = self.conn.cursor()
+            cursor.execute(item[0], item[1])
+        self.conn.commit()
+        self.prepareToCreate.clear()
     
     def create_multiple(self, listData: list):
         cursor = self.conn.cursor()
