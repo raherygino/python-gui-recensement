@@ -19,6 +19,11 @@ class TableView(QTableWidget):
         self.colNoEditable = []
         self.isIncrement = False
         
+    def setHorizontalHeaderLabels(self, labels: Iterable[str | None]) -> None:
+        self.setColumnCount(len(labels))
+        #self.header.setSectionResizeMode(len(labels) - 1, QHeaderView.Stretch)
+        return super().setHorizontalHeaderLabels(labels)
+    
     @pyqtSlot(QTableWidgetItem)
     def validateInput(self, col, item, default = "0"):
         if item.column() == col:  # Assuming the column where you want to enforce integer input is column 1
@@ -39,11 +44,6 @@ class TableView(QTableWidget):
             theme = "light" if darkdetect.isLight() else "dark"
         with open(f'app/resource/{theme}.qss', encoding='utf-8') as f:
             self.setStyleSheet(f.read().replace("#327bcc", themeColor))
-    
-    def setHorizontalHeaderLabels(self, labels: Iterable[str | None]) -> None:
-        self.setColumnCount(len(labels))
-        self.header.setSectionResizeMode(len(labels) - 1, QHeaderView.Stretch)
-        return super().setHorizontalHeaderLabels(labels)
         
     def setData(self, items):
         self.setRowCount(0)
@@ -60,7 +60,7 @@ class TableView(QTableWidget):
                     if col in self.colNoEditable:
                         widgetItem.setFlags(widgetItem.flags() & ~Qt.ItemIsEditable)
                 
-        #self.resizeColumnsToContents()
+        self.resizeColumnsToContents()
         
     def setColumnNoEditable(self, *args):
         self.colNoEditable = list(args)
