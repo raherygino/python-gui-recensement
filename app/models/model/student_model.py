@@ -9,8 +9,8 @@ class StudentModel(Model):
     def fetchNote(self, promotionId, items: list[Subject]):
         #sql = ",".join([str(item.abrv) for item in items])
         sql =  f'SELECT {self.TABLE}.matricule, {self.TABLE}.level, {self.TABLE}.lastname,' 
-        sql += f'{self.TABLE}.firstname, {self.TABLE}.gender,'
-        sql += ",".join([self.markValue(item) for item in items])
+        sql += f'{self.TABLE}.firstname, {self.TABLE}.gender '
+        sql += f",{",".join([self.markValue(item) for item in items])}" if len(items) != 0 else ''
         sql += f' FROM {self.TABLE} WHERE {self.TABLE}.promotion_id = {promotionId}'
         cursor = self.conn.cursor()
         cursor.execute(sql)
