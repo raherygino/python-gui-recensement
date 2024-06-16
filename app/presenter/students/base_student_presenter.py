@@ -2,7 +2,7 @@ from PyQt5.QtCore import QPoint, QThread
 from PyQt5.QtGui import QCursor 
 
 from ...view import DatabaseStudentTab
-from ...models import StudentModel, DatabaseWorker, SubjectModel
+from ...models import StudentModel, DatabaseWorker, SubjectModel, MarkModel
 from ...components import PopupTeachingTip, TeachingTipTailPosition, FilterFlyoutView
 from ...common.constants import *
 
@@ -18,7 +18,8 @@ class BaseStudentPresenter:
     def __init_needly_var(self, view, parent):
         self.view:DatabaseStudentTab = view
         self.model:StudentModel = parent.model
-        self.subectModal = SubjectModel()
+        self.modelSubject = parent.modelSubject
+        self.modelMark = MarkModel()
         
         self.mainView = self.view.parent.nParent
         self.parent = parent
@@ -61,10 +62,11 @@ class BaseStudentPresenter:
         self.fetchData(self.defaultData)
     
     def setLabelIntoTable(self,promotionId, level):
-        subjects = self.subectModal.fetch_all(promotion_id=promotionId, level=level)
+        subjects = self.modelSubject.fetch_all(promotion_id=promotionId, level=level)
         labels = []
         labels.extend(self.labels)
         labels.extend([subject.abrv for subject in subjects])
+        labels.extend([f'{subject.abrv}\nx coeff' for subject in subjects])
         self.view.tableView.setHorizontalHeaderLabels(labels)
         
     def intColFilter(self):

@@ -50,7 +50,7 @@ class TableView(QTableWidget):
         for row, item in enumerate(items):
             self.insertRow(row)
             for col, value in enumerate(item):
-                widgetItem = QTableWidgetItem(str(value))
+                widgetItem = QTableWidgetItem(str(value) if value != None else "")
                 self.setItem(row, col, widgetItem)
                 if self.isIncrement:
                     cols = self.colNoEditable
@@ -61,9 +61,21 @@ class TableView(QTableWidget):
                         widgetItem.setFlags(widgetItem.flags() & ~Qt.ItemIsEditable)
                 
         self.resizeColumnsToContents()
+        '''item = self.item(1, 1)
+        if item != None:
+            item.setBackground(QColor(240, 240, 240))'''
         
     def setColumnNoEditable(self, *args):
         self.colNoEditable = list(args)
+        
+    def setColumnBackground(self, columns, rgb):
+        for row in range(self.rowCount()):
+            for column in range(self.columnCount()):
+                if column in columns:
+                    item = self.item(row, column)
+                    if item != None:
+                        item.background()
+                        item.setBackground(QColor(240, 240, 240)) 
         
     def setColNoEditable(self, *args):
         colNoEditable = list(args)
