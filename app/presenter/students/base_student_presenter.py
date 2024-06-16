@@ -66,7 +66,7 @@ class BaseStudentPresenter:
         labels = []
         labels.extend(self.labels)
         labels.extend([subject.abrv for subject in subjects])
-        labels.extend([f'{subject.abrv}\ncoef' for subject in subjects])
+        labels.extend([f'{subject.abrv}\nx coeff' for subject in subjects])
         self.view.tableView.setHorizontalHeaderLabels(labels)
         
     def intColFilter(self):

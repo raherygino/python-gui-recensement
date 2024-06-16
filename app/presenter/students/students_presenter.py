@@ -28,8 +28,8 @@ class StudentsPresenter:
         
     def __init_presenter(self):
         self.dbPresenter = StudentDbPresenter(self)
-        self.eipPresenter = EapPresenter(self)
-        self.eapPresenter = EipPresenter(self)
+        self.eipPresenter = EipPresenter(self)
+        self.eapPresenter = EapPresenter(self)
         
     def __actions(self):
         self.view.refreshAction.triggered.connect(lambda: self.view.nParent.currentPromotion.emit(self.promotionId))
