@@ -168,3 +168,10 @@ class Function:
             duration=2000,
             parent=parent
         )
+
+    def isFloat(self, value):
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False

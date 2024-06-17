@@ -68,6 +68,14 @@ class TableView(QTableWidget):
     def setColumnNoEditable(self, *args):
         self.colNoEditable = list(args)
         
+    def disableEdit(self, *args):
+        for i in range(self.rowCount()):
+            ar = list(args)
+            for col in range(ar[0], ar[1]):
+                item = self.item(i, col)
+                if item != None:
+                    item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+        
     def setColumnBackground(self, columns, rgb):
         for row in range(self.rowCount()):
             for column in range(self.columnCount()):

@@ -66,7 +66,7 @@ class BaseStudentPresenter:
         labels = []
         labels.extend(self.labels)
         labels.extend([subject.abrv for subject in subjects])
-        labels.extend([f'{subject.abrv}\nx coeff' for subject in subjects])
+        labels.extend([f'{subject.abrv}\n/{subject.coef*20}' for subject in subjects])
         labels.extend(['TOTAL','MOYENNE', 'RANG'])
         self.view.tableView.setHorizontalHeaderLabels(labels)
         
