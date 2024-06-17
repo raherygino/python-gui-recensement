@@ -67,6 +67,7 @@ class BaseStudentPresenter:
         labels.extend(self.labels)
         labels.extend([subject.abrv for subject in subjects])
         labels.extend([f'{subject.abrv}\nx coeff' for subject in subjects])
+        labels.extend(['TOTAL','MOYENNE', 'RANG'])
         self.view.tableView.setHorizontalHeaderLabels(labels)
         
     def intColFilter(self):

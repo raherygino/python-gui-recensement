@@ -10,6 +10,7 @@ class EipPresenter(BaseStudentPresenter):
         super().__init__(parent.view.eipInterface, parent) 
         self.labels = [LABEL.MATRICULE, LABEL.GRADE,LABEL.LASTNAME,LABEL.FIRSTNAME, LABEL.GENDER]
         self.mainView.subjectRefresh.connect(lambda level: self.setLabelIntoTable(self.promotionId, level))
+        self.view.tableView.itemChanged.connect(self.itemChanged)
         self.subjects = []
         self.data = []
         self.timer = QTimer()
@@ -17,6 +18,7 @@ class EipPresenter(BaseStudentPresenter):
         self.timer.timeout.connect(self.fetchAll)
         
     def fetchData(self, data):
+        self.view.progressBar.setVisible(True)
         self.timer.start()
         
     def fetchAll(self):
@@ -40,10 +42,15 @@ class EipPresenter(BaseStudentPresenter):
         return studentId
          
     def itemChanged(self, item):
-        if item.column() > 4:
+        value = item.text()
+        if item.column() > 4 and value != "":
+            value = float(value)
+            value = str("{:.2f}".format(value))
+            vls = value.split('.')
+            value = vls[0] if vls[1] == "00" else value
+            item.setText(str(value))
             matricule = self.view.tableView.item(item.row(), 0).text()
             abrv = self.view.tableView.horizontalHeaderItem(item.column()).text()
-            value = item.text()
             studentId = self.findStudentIdByMatricule(int(matricule))
             subjectId = self.findSubjectIdByAbrv(abrv)
             mark = Marks(promotion_id=self.promotionId, student_id=studentId, subject_id=subjectId, value=value)
@@ -60,8 +67,13 @@ class EipPresenter(BaseStudentPresenter):
     
     def handleResult(self, data: list):
         self.view.progressBar.setVisible(False)
-        self.view.tableView.setData(data)
+        listData = []
+        lenSub = len(self.subjects)
+        for item in data:
+            nItem  = list(item)
+            listData.append(nItem)
+        self.view.tableView.setData(listData)
         self.view.progressBar.setValue(0)
         self.workerThread.quit()
-        self.view.parent.valueCount.setText(str(len(data)))
+        self.view.parent.valueCount.setText(str(len(listData)))
         

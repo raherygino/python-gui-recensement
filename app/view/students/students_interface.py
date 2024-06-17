@@ -67,17 +67,17 @@ class StudentsInterface(QWidget):
         self.addSubject.setEnabled(False)
         self.importAction = Action(FluentIcon.FOLDER_ADD, "Importer", self)
         self.refreshAction = Action(FluentIcon.SYNC, "Actualiser", self)
-        self.exportActionCsv = Action(FluentIcon.QUICK_NOTE, "CSV", self)
-        self.exportAction = Action(FluentIcon.DOCUMENT, "Excel", self)
-        self.dropDownButtonExp = self.createDropDownButton('Exporter', 
-                                                        FluentIcon.SHARE,[self.exportAction, self.exportActionCsv], self)
+        self.exportActionCsv = Action(FluentIcon.QUICK_NOTE, "Exporter CSV", self)
+        self.exportAction = Action(FluentIcon.DOCUMENT, "Exporter Excel", self)
+        self.dropDownButtonMenu = self.createDropDownButton('Menu', FluentIcon.MENU,[self.addAction, self.addSubject, self.importAction, self.exportActionCsv, self.exportAction], self)
         self.deleteAction = Action(FluentIcon.DELETE, "Supprimer tous", self)   
         
-        self.commandBar.addAction(self.addAction)
+        '''self.commandBar.addAction(self.addAction)
         self.commandBar.addAction(self.addSubject)
-        self.commandBar.addAction(self.importAction)
+        self.commandBar.addAction(self.importAction)'''
+        self.commandBar.addWidget(self.dropDownButtonMenu)
         self.commandBar.addAction(self.refreshAction)
-        self.commandBar.addWidget(self.dropDownButtonExp)
+        #self.commandBar.addWidget(self.dropDownButtonExp)
         self.commandBar.addSeparator()
         self.commandBar.addAction(self.deleteAction)
         
