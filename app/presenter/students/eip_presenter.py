@@ -12,6 +12,7 @@ class EipPresenter(BaseStudentPresenter):
         self.func = Function()
         self.labels = [LABEL.MATRICULE, LABEL.GRADE,LABEL.LASTNAME,LABEL.FIRSTNAME, LABEL.GENDER]
         self.mainView.subjectRefresh.connect(lambda level: self.setLabelIntoTable(self.promotionId, level))
+        self.table = self.view.tableView
         self.view.tableView.itemChanged.connect(self.itemChanged)
         self.subjects = []
         self.data = []
@@ -60,8 +61,16 @@ class EipPresenter(BaseStudentPresenter):
                     pos = item.column() - len(self.labels)
                     result = float(item.text()) * self.subjects[pos].coef
                     nItem = self.view.tableView.item(item.row(),col)
-                    if nItem != None:
-                        nItem.setText(self.strToFloat(result))
+                    nItem.setText(self.strToFloat(result))
+                    allMarks = []
+                    nMaxCol = maxCol + len(self.subjects)
+                    for i in range(maxCol, nMaxCol):
+                        itemValue = self.table.item(item.row(), i).text()
+                        if itemValue == "":
+                            allMarks.append(0)
+                        else:
+                            allMarks.append(float(itemValue))
+                    self.table.item(item.row(), nMaxCol).setText(self.strToFloat(sum(allMarks)))
                         
                     mark = self.markFromItem(item)
                     marks = self.modelMark.fetch_all(student_id=mark.student_id, subject_id=mark.subject_id)
