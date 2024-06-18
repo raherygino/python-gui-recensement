@@ -53,14 +53,24 @@ class EipPresenter(BaseStudentPresenter):
             old = self.strToFloat(self.data[item.row()][item.column()])
             new = self.strToFloat(item.text())
             if old != new:
-                mark = self.markFromItem(item)
-                marks = self.modelMark.fetch_all(student_id=mark.student_id, subject_id=mark.subject_id)
-                if len(marks) == 0:
-                    if mark.value != "":
-                        self.modelMark.prepareCreate(mark)
-                else:
-                    self.modelMark.update_item(marks[0].id, value=str(mark.value))
-                self.modelMark.commit()
+                self.data[item.row()][item.column()] = new
+                maxCol = len(self.labels)+len(self.subjects)
+                if item.column() < maxCol:
+                    col = item.column()+len(self.subjects)
+                    pos = item.column() - len(self.labels)
+                    result = float(item.text()) * self.subjects[pos].coef
+                    nItem = self.view.tableView.item(item.row(),col)
+                    if nItem != None:
+                        nItem.setText(self.strToFloat(result))
+                        
+                    mark = self.markFromItem(item)
+                    marks = self.modelMark.fetch_all(student_id=mark.student_id, subject_id=mark.subject_id)
+                    if len(marks) == 0:
+                        if mark.value != "":
+                            self.modelMark.prepareCreate(mark)
+                    else:
+                        self.modelMark.update_item(marks[0].id, value=str(mark.value))
+                    self.modelMark.commit()
             else:
                 item.setText(self.strToFloat(item.text()))
                 
@@ -78,7 +88,7 @@ class EipPresenter(BaseStudentPresenter):
         
     def markFromItem(self, item):
         value = self.strToFloat(item.text())
-        item.setText(str(value))
+        #item.setText(str(value))
         
         matricule = self.view.tableView.item(item.row(), 0).text()
         abrv = self.view.tableView.horizontalHeaderItem(item.column()).text()
