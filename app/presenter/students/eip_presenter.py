@@ -50,52 +50,71 @@ class EipPresenter(BaseStudentPresenter):
         return studentId
             
     def itemChanged(self, item):
-        if item.column() > 4 and item.text() != "":
+        maxCol = len(self.labels)+len(self.subjects)
+        if item.column() > 4 and item.column() < maxCol:
             old = self.strToFloat(self.data[item.row()][item.column()])
             new = self.strToFloat(item.text())
             if old != new:
                 self.data[item.row()][item.column()] = new
-                maxCol = len(self.labels)+len(self.subjects)
-                if item.column() < maxCol:
-                    col = item.column()+len(self.subjects)
-                    pos = item.column() - len(self.labels)
-                    result = float(item.text()) * self.subjects[pos].coef
-                    nItem = self.view.tableView.item(item.row(),col)
-                    nItem.setText(self.strToFloat(result))
-                    allMarks = []
-                    nMaxCol = maxCol + len(self.subjects)
-                    for i in range(maxCol, nMaxCol):
-                        itemValue = self.table.item(item.row(), i).text()
-                        if itemValue == "":
-                            allMarks.append(0)
-                        else:
-                            allMarks.append(float(itemValue))
+                self.calculateCoef(item)
+                mark = self.markFromItem(item)
+                marks = self.modelMark.fetch_all(student_id=mark.student_id, subject_id=mark.subject_id)
+                if len(marks) == 0:
+                    if mark.value != "":
+                        self.modelMark.prepareCreate(mark)
+                else:
+                    self.modelMark.update_item(marks[0].id, value=str(mark.value))
+                self.modelMark.commit()
+                self.table.resizeColumnToContents(item.column())
+            else:
+                item.setText(self.strToFloat(item.text()))
+            
+    def calculateCoef(self, item):
+        maxCol = len(self.labels)+len(self.subjects)
+        if item.column() > 4 and item.column() < maxCol:
+            col = item.column()+len(self.subjects)
+            pos = item.column() - len(self.labels)
+            result = float(item.text() if item.text() != "" else 0) * self.subjects[pos].coef
+            nItem = self.view.tableView.item(item.row(),col)
+            if nItem != None:
+                nItem.setText(self.strToFloat(result if item.text() != "" else item.text()))
+            self.calculateItemAVG(item)
+        
+    def calculateAVG(self):
+        maxCol = len(self.labels)+len(self.subjects)
+        nMaxCol = maxCol + len(self.subjects)
+        for i, value in enumerate(self.data):
+            allMarks = []
+            for j in range(maxCol, nMaxCol):
+                nValue = self.data[i][j]
+                allMarks.append(0 if nValue == "" else float(nValue))
+            totalMarks = sum(allMarks)
+            totalCoef = sum([int(sub.coef) for sub in self.subjects])
+            avg = totalMarks/totalCoef
+            if totalMarks != 0:
+                self.table.item(i, nMaxCol).setText(self.strToFloat(sum(allMarks)))
+                self.table.item(i, nMaxCol+1).setText(self.strToFloat(avg))
+            
+    def calculateItemAVG(self, item):
+        maxCol = len(self.labels)+len(self.subjects)
+        if item.column() > 4 and item.column() < maxCol:
+            allMarks = []
+            nMaxCol = maxCol + len(self.subjects)
+            for i in range(maxCol, nMaxCol):
+                nItem = self.table.item(item.row(), i)
+                if nItem != None:
+                    itemValue = nItem.text()
+                    allMarks.append(0 if itemValue == "" else float(itemValue))
                     totalMarks = sum(allMarks)
                     totalCoef = sum([int(sub.coef) for sub in self.subjects])
                     avg = totalMarks/totalCoef
                     self.table.item(item.row(), nMaxCol).setText(self.strToFloat(sum(allMarks)))
                     self.table.item(item.row(), nMaxCol+1).setText(self.strToFloat(avg))
-                        
-                    mark = self.markFromItem(item)
-                    marks = self.modelMark.fetch_all(student_id=mark.student_id, subject_id=mark.subject_id)
-                    if len(marks) == 0:
-                        if mark.value != "":
-                            self.modelMark.prepareCreate(mark)
-                    else:
-                        self.modelMark.update_item(marks[0].id, value=str(mark.value))
-                    self.modelMark.commit()
-            else:
-                item.setText(self.strToFloat(item.text()))
-            self.table.resizeColumnToContents(item.column())
-                
             
     def strToFloat(self, string:str):
         value = string
         if self.func.isFloat(value):
-            value = float(value)
-            value = str("{:.2f}".format(value))
-            '''vls = value.split('.')
-            value = vls[0] if vls[1] == "00" else value'''
+            value = str("{:.2f}".format(float(value)))
         else:
             value = ""
         return value
@@ -122,6 +141,7 @@ class EipPresenter(BaseStudentPresenter):
             nItem  = list(item)
             listData.append(nItem)
         self.view.tableView.setData(listData)
+        self.calculateAVG()
         self.view.tableView.isIncrement = True
         sPos = len(self.labels) + lenSub
         
