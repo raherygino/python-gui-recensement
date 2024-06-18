@@ -16,7 +16,25 @@ class StudentModel(Model):
         sql += f" FROM ({self.fetchNoteSQL(promotionId, items)})"
         cursor = self.conn.cursor()
         cursor.execute(sql)
-        return cursor.fetchall()
+        all = cursor.fetchall()
+        '''newResult = []
+        for item in all:
+            item = list(item)
+            nItem = []
+            for i in range(len(items)+5, (len(items)*2)+5):
+                if item[i] == None:
+                    nItem.append(0)
+                else:
+                    nItem.append(item[i])
+                #nItem.append(item[i])
+            item[len(item)-2] = sum(nItem)
+            #newResult.append(tuple(item))
+            total = item[len(item)-2]
+            if total != None:
+                item[len(item)-1] = total / sumCoef
+            newResult.append(tuple(item))
+        #print(newResult[0])'''
+        return all
         #return []
     
     def fetchNoteSQL(self, promotionId, items: list[Subject]) -> str:

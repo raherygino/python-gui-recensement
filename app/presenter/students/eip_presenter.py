@@ -70,7 +70,11 @@ class EipPresenter(BaseStudentPresenter):
                             allMarks.append(0)
                         else:
                             allMarks.append(float(itemValue))
+                    totalMarks = sum(allMarks)
+                    totalCoef = sum([int(sub.coef) for sub in self.subjects])
+                    avg = totalMarks/totalCoef
                     self.table.item(item.row(), nMaxCol).setText(self.strToFloat(sum(allMarks)))
+                    self.table.item(item.row(), nMaxCol+1).setText(self.strToFloat(avg))
                         
                     mark = self.markFromItem(item)
                     marks = self.modelMark.fetch_all(student_id=mark.student_id, subject_id=mark.subject_id)
@@ -82,6 +86,7 @@ class EipPresenter(BaseStudentPresenter):
                     self.modelMark.commit()
             else:
                 item.setText(self.strToFloat(item.text()))
+            self.table.resizeColumnToContents(item.column())
                 
             
     def strToFloat(self, string:str):
@@ -89,15 +94,15 @@ class EipPresenter(BaseStudentPresenter):
         if self.func.isFloat(value):
             value = float(value)
             value = str("{:.2f}".format(value))
-            vls = value.split('.')
-            value = vls[0] if vls[1] == "00" else value
+            '''vls = value.split('.')
+            value = vls[0] if vls[1] == "00" else value'''
         else:
             value = ""
         return value
         
     def markFromItem(self, item):
         value = self.strToFloat(item.text())
-        #item.setText(str(value))
+        item.setText(str(value))
         
         matricule = self.view.tableView.item(item.row(), 0).text()
         abrv = self.view.tableView.horizontalHeaderItem(item.column()).text()
