@@ -147,20 +147,6 @@ class EipPresenter(BaseStudentPresenter):
             if itemAvg != None:
                 itemVal = str(sorted_list.index(nAvg) + 1)
                 itemAvg.setText(itemVal.zfill(len(str(len(self.data)))))
-                
-        
-        
-    def formatNumber2(self, value:int, max:int):
-        valueFormatted = ""
-        if value  < 10:
-            valueFormatted = f"000{value}"
-        elif value < 100 and value > 9:
-            valueFormatted = f"00{value}"
-        elif value < 1000 and value > 99:
-            valueFormatted = f"0{value}"
-        else:
-            valueFormatted = f"{value}"
-        return valueFormatted
             
     def handleResult(self, data: list):
         self.view.progressBar.setVisible(False)
