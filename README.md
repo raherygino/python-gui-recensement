@@ -13,6 +13,12 @@
 - Search in student in Grades tab
 - Debug: refresh action
 - Refresh table after add or remove subjects
-- Export Excel all Grades
+- Export/Import Excel all Grades
+- Export/Import All Data in database
 - Merge lastname and firstname in one column
 - Remove column level
+- Delete many subjects
+- function delete key 
+- Show grades with coeff only in Table
+- Show Moyenne only in Table
+- Show Rank only in Table
