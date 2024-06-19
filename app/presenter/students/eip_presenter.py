@@ -1,9 +1,8 @@
+from PyQt5.QtCore import QTimer
 from .base_student_presenter import BaseStudentPresenter
 from ...models import Marks
 from ...common.constants import LABEL
 from ...common import Function
-from PyQt5.QtGui import QColor
-from PyQt5.QtCore import Qt, QTimer
 
 class EipPresenter(BaseStudentPresenter):
     
@@ -13,10 +12,10 @@ class EipPresenter(BaseStudentPresenter):
         self.labels = [LABEL.MATRICULE, LABEL.GRADE,LABEL.LASTNAME,LABEL.FIRSTNAME, LABEL.GENDER]
         self.mainView.subjectRefresh.connect(lambda level: self.setLabelIntoTable(self.promotionId, level))
         self.table = self.view.tableView
-        self.view.tableView.itemChanged.connect(self.itemChanged)
+        self.table.setSortingEnabled(True)
+        self.table.itemChanged.connect(self.itemChanged)
         self.subjects = []
         self.data = []
-        self.avg = []
         self.timer = QTimer()
         self.timer.setInterval(500)
         self.timer.timeout.connect(self.fetchAll)
@@ -27,7 +26,7 @@ class EipPresenter(BaseStudentPresenter):
         
     def fetchAll(self):
         self.subjects = self.modelSubject.fetch_all(promotion_id=self.promotionId, level="EIP")
-        data = self.model.fetchNote(self.promotionId, self.subjects)
+        data = self.model.fetchNote(self.promotionId, self.subjects, "EIP")
         for item in data:
             new_row = []
             for it in item:
@@ -146,8 +145,23 @@ class EipPresenter(BaseStudentPresenter):
         for i, nAvg in enumerate(avgs):
             itemAvg = self.table.item(i, posAvg + 1)
             if itemAvg != None:
-                itemAvg.setText(str(sorted_list.index(nAvg) + 1))
+                itemVal = str(sorted_list.index(nAvg) + 1)
+                itemAvg.setText(itemVal.zfill(len(str(len(self.data)))))
+                
         
+        
+    def formatNumber2(self, value:int, max:int):
+        valueFormatted = ""
+        if value  < 10:
+            valueFormatted = f"000{value}"
+        elif value < 100 and value > 9:
+            valueFormatted = f"00{value}"
+        elif value < 1000 and value > 99:
+            valueFormatted = f"0{value}"
+        else:
+            valueFormatted = f"{value}"
+        return valueFormatted
+            
     def handleResult(self, data: list):
         self.view.progressBar.setVisible(False)
         listData = []
