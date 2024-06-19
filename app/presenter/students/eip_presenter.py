@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt, QTimer
 class EipPresenter(BaseStudentPresenter):
     
     def __init__(self, parent):
-        super().__init__(parent.view.eipInterface, parent) 
+        super().__init__(parent.view.eipInterface, parent)
         self.func = Function()
         self.labels = [LABEL.MATRICULE, LABEL.GRADE,LABEL.LASTNAME,LABEL.FIRSTNAME, LABEL.GENDER]
         self.mainView.subjectRefresh.connect(lambda level: self.setLabelIntoTable(self.promotionId, level))
@@ -16,6 +16,7 @@ class EipPresenter(BaseStudentPresenter):
         self.view.tableView.itemChanged.connect(self.itemChanged)
         self.subjects = []
         self.data = []
+        self.avg = []
         self.timer = QTimer()
         self.timer.setInterval(500)
         self.timer.timeout.connect(self.fetchAll)
@@ -66,6 +67,7 @@ class EipPresenter(BaseStudentPresenter):
                     self.modelMark.update_item(marks[0].id, value=str(mark.value))
                 self.modelMark.commit()
                 self.table.resizeColumnToContents(item.column())
+                self.calculateRank()
             else:
                 item.setText(self.strToFloat(item.text()))
             
@@ -133,6 +135,19 @@ class EipPresenter(BaseStudentPresenter):
         self.setLabelIntoTable(promotionId, level="EIP")
         return super().setPromotionId(promotionId)
     
+    def calculateRank(self):
+        lenSub = len(self.subjects)
+        sPos = len(self.labels) + lenSub
+        posAvg = sPos+lenSub+1
+        avgs = []
+        for avg in self.table.getData():
+            avgs.append(float(avg[posAvg] if avg[posAvg] != '' else 0))
+        sorted_list = sorted(avgs, reverse=True)
+        for i, nAvg in enumerate(avgs):
+            itemAvg = self.table.item(i, posAvg + 1)
+            if itemAvg != None:
+                itemAvg.setText(str(sorted_list.index(nAvg) + 1))
+        
     def handleResult(self, data: list):
         self.view.progressBar.setVisible(False)
         listData = []
@@ -144,7 +159,7 @@ class EipPresenter(BaseStudentPresenter):
         self.calculateAVG()
         self.view.tableView.isIncrement = True
         sPos = len(self.labels) + lenSub
-        
+        self.calculateRank()
         self.view.tableView.disableEdit(sPos, self.view.tableView.columnCount())
         self.view.progressBar.setValue(0)
         self.workerThread.quit()
