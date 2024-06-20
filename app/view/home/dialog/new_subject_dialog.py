@@ -1,20 +1,29 @@
 from PyQt5.QtWidgets import QHBoxLayout
-from PyQt5.QtCore import QPoint
+from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QCursor
 
 from qfluentwidgets import Dialog, Action, RoundMenu, MenuAnimationType, \
-     PrimaryPushButton, PushButton, FluentIcon
+     PrimaryPushButton, PushButton, FluentIcon, SubtitleLabel, ToolButton
 from ....components.table_view import TableView
 from ....components import SpinBoxEditWithLabel
 
 class NewSubjectDialog(Dialog):
 
     def __init__(self, parent=None):
-        super().__init__("Matières", "", parent)
+        super().__init__("", "", parent)
         self.setTitleBarVisible(False)
+        self.titleLabel.setVisible(False)
         self.contentLabel.setVisible(False)
-        
         self.row = QHBoxLayout()
+        self.btnGroup = QHBoxLayout()
+        self.title = SubtitleLabel("Matières")
+        self.btnImport = ToolButton(FluentIcon.DOWNLOAD)
+        self.btnExport= ToolButton(FluentIcon.SHARE)
+        self.row.addWidget(self.title, 0, Qt.AlignLeft)
+        self.btnGroup.addWidget(self.btnImport)
+        self.btnGroup.addWidget(self.btnExport)
+        self.btnGroup.setAlignment(Qt.AlignRight)
+        self.row.addLayout(self.btnGroup)
         self.count = SpinBoxEditWithLabel("Nombre de matières")
         self.count.spinbox.setValue(1)
         self.count.spinbox.textChanged.connect(self.__countChange)
@@ -30,7 +39,7 @@ class NewSubjectDialog(Dialog):
         self.yesBtn = PrimaryPushButton("Ok")
         self.cancelBtn = PushButton("Annuler")
         self.cancelBtn.clicked.connect(self.yesBtnClicked)
-        
+        self.textLayout.addLayout(self.row)
         self.textLayout.addLayout(self.count)
         self.textLayout.addWidget(self.table)
         
