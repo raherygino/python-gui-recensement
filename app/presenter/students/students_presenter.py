@@ -107,12 +107,16 @@ class StudentsPresenter:
     def create(self, table_data, dialog):
         isValid = True
         message = ""
+        abrv = [subject.abrv for subject in table_data]
         for subject in table_data:
             if not subject.abrv:
                 message = "Une matière doit avoir une abréviation"
                 isValid = False
             if not subject.title:
                 message = "Une matière doit avoir un titre"
+                isValid = False
+            if abrv.count(subject.abrv) > 1:
+                message = "Une matière doit être répéter plusieurs fois"
                 isValid = False
                 
         if isValid:

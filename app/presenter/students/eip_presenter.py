@@ -26,8 +26,8 @@ class EipPresenter(BaseStudentPresenter):
     
     def refreshSubject(self, level):
         if level == "EIP":
-            self.setLabelIntoTable(self.promotionId, level)
-            self.fetchAll()
+            self.data.clear()
+            self.setPromotionId(self.promotionId)
         
     def fetchAll(self):
         self.subjects = self.modelSubject.fetch_all(promotion_id=self.promotionId, level="EIP")
@@ -96,7 +96,7 @@ class EipPresenter(BaseStudentPresenter):
                 allMarks.append(0 if nValue == "" else float(nValue))
             totalMarks = sum(allMarks)
             totalCoef = sum([int(sub.coef) for sub in self.subjects])
-            avg = totalMarks/totalCoef
+            avg = totalMarks/totalCoef if totalCoef > 0 else 0
             if totalMarks != 0:
                 totalItem = self.table.item(i, nMaxCol)
                 avgItem = self.table.item(i, nMaxCol+1)
@@ -117,7 +117,7 @@ class EipPresenter(BaseStudentPresenter):
                     allMarks.append(0 if itemValue == "" else float(itemValue))
                     totalMarks = sum(allMarks)
                     totalCoef = sum([int(sub.coef) for sub in self.subjects])
-                    avg = totalMarks/totalCoef
+                    avg = totalMarks/totalCoef if totalCoef > 0 else 0
                     self.table.item(item.row(), nMaxCol).setText(self.strToFloat(sum(allMarks)))
                     self.table.item(item.row(), nMaxCol+1).setText(self.strToFloat(avg))
             
