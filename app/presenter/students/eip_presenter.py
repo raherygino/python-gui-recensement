@@ -10,7 +10,7 @@ class EipPresenter(BaseStudentPresenter):
         super().__init__(parent.view.eipInterface, parent)
         self.func = Function()
         self.labels = [LABEL.MATRICULE, LABEL.GRADE,LABEL.LASTNAME,LABEL.FIRSTNAME, LABEL.GENDER]
-        self.mainView.subjectRefresh.connect(lambda level: self.setLabelIntoTable(self.promotionId, level))
+        self.mainView.subjectRefresh.connect(self.refreshSubject)
         self.table = self.view.tableView
         self.table.setSortingEnabled(True)
         self.table.itemChanged.connect(self.itemChanged)
@@ -23,6 +23,11 @@ class EipPresenter(BaseStudentPresenter):
     def fetchData(self, data):
         self.view.progressBar.setVisible(True)
         self.timer.start()
+    
+    def refreshSubject(self, level):
+        if level == "EIP":
+            self.setLabelIntoTable(self.promotionId, level)
+            self.fetchAll()
         
     def fetchAll(self):
         self.subjects = self.modelSubject.fetch_all(promotion_id=self.promotionId, level="EIP")
@@ -93,8 +98,12 @@ class EipPresenter(BaseStudentPresenter):
             totalCoef = sum([int(sub.coef) for sub in self.subjects])
             avg = totalMarks/totalCoef
             if totalMarks != 0:
-                self.table.item(i, nMaxCol).setText(self.strToFloat(sum(allMarks)))
-                self.table.item(i, nMaxCol+1).setText(self.strToFloat(avg))
+                totalItem = self.table.item(i, nMaxCol)
+                avgItem = self.table.item(i, nMaxCol+1)
+                if totalItem != None:
+                    totalItem.setText(self.strToFloat(sum(allMarks)))
+                if avgItem != None:
+                    avgItem.setText(self.strToFloat(avg))
             
     def calculateItemAVG(self, item):
         maxCol = len(self.labels)+len(self.subjects)
