@@ -87,8 +87,21 @@ class StudentsPresenter:
         dialog.table.setRowCount(len(subjects))
         dialog.table.setData(allSbjcts)
         dialog.table.setColNoEditable(0)
+        dialog.btnExport.clicked.connect(lambda: self.exportSubject(dialog))
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
         dialog.exec()
+        
+    def exportSubject(self, dialog: NewStudentDialog):
+        data = dialog.table.getData()
+        if len(data) > 0:
+            destination_path, _ = QFileDialog.getSaveFileName(self.view, "Exporter", "", "All Files (*);;Text Files (*.csv)")
+            if destination_path:
+                with open(destination_path, 'w') as f:
+                    for item in data:
+                        line = ";".join([nItem for nItem in item])
+                        f.writelines(f'{line}\n')
+        else:
+            self.utils.infoBarError('Erreur', "Aucune donnée à exporter", self.view)
         
     def getTableDialogData(self, dialog):
         data = dialog.table.getData()
