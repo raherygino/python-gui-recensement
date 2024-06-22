@@ -1,7 +1,8 @@
 from PyQt5.QtCore import QTimer, pyqtSignal
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
 from qfluentwidgets import MessageBox
 
+from ...components import DialogImport
 from ...common import Function, Utils
 from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
 from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel, Marks
@@ -88,6 +89,7 @@ class StudentsPresenter:
         dialog.table.setData(allSbjcts)
         dialog.table.setColNoEditable(0)
         dialog.btnExport.clicked.connect(lambda: self.exportSubject(dialog))
+        dialog.btnImport.clicked.connect(lambda: self.importSubject(dialog))
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
         dialog.exec()
         
@@ -103,6 +105,28 @@ class StudentsPresenter:
         else:
             self.utils.infoBarError('Erreur', "Aucune donnée à exporter", self.view)
         
+    def importSubject(self, dialog: NewStudentDialog):
+        destination_path, _ = QFileDialog.getOpenFileName(self.view, "Exporter", "", "CSV File (*.csv)")
+        if destination_path:
+            lenData = len(dialog.table.getData())
+            with open(destination_path, 'r') as f:
+                data = []
+                for i, line in enumerate(f):
+                    i = lenData + i
+                    nLine = line.replace("\n", "").split(";")
+                    data.append(nLine)
+                
+                dialogImport = DialogImport(data, dialog.table.getHorizontalLabels(), dialog)
+                if dialogImport.exec():
+                    nData = dialogImport.getData()
+                    for i, item in enumerate(nData):
+                        dialog.table.insertRow(i)
+                        for j, nItem in enumerate(item):
+                            qWidget = QTableWidgetItem(nItem)
+                            dialog.table.setItem(i, j, qWidget)
+                            
+                
+                
     def getTableDialogData(self, dialog):
         data = dialog.table.getData()
         dataSubject = []
