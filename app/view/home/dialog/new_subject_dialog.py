@@ -52,19 +52,21 @@ class NewSubjectDialog(Dialog):
         self.setFixedWidth(450)
         
     def contextMenu(self, event):
-        item = self.table.selectedItems()[0]
+        items = self.table.selectionModel().selectedRows()
         menu = RoundMenu(parent=self)
-        menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered = lambda:self.deleteSubject(item.row())))
+        menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered = lambda:self.deleteSubject(items)))
         self.posCur = QCursor().pos()
         cur_x = self.posCur.x()
         cur_y = self.posCur.y()
         menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
         
-    def deleteSubject(self, row):
+    def deleteSubject(self, items):
         dialog = Dialog("Supprimer?", "Voulez vous supprimer vraiment?", self)
         dialog.setTitleBarVisible(False)
+        print(items)
         if dialog.exec():
-            self.table.removeRow(row)
+            for index in sorted(items, key=lambda x: x.row(), reverse=True):
+                self.table.removeRow(index.row())
 
     def __countChange(self, value):
         self.table.setRowCount(int(value))
