@@ -1,38 +1,91 @@
-/*QTableWidget {	
-	background-color: transparent;
-	gridline-color: #545454;
+QTableView {
+    background: transparent;
+	gridline-color: #e2e2e2;
     outline: none;
+    border: none;
+    /* font: 13px 'Segoe UI', 'Microsoft YaHei'; */
+    selection-background-color: transparent;
+    alternate-background-color: transparent;
 }
-QTableWidget::item{
-	border-color: #9faeda;
-	padding-left: 5px;
-	padding-right: 5px;
-	gridline-color: #9faeda;
+
+QTableView[isBorderVisible=true] {
+    border: 1px solid rgba(0, 0, 0, 15);
 }
+
+QTableView::item {
+    background: transparent;
+    border: 0px;
+    height: 35px;
+}
+
 QTableWidget::item:selected{
 	background-color: #327bcc;
     color: #f8f8f2;
 }
-QHeaderView::section{
-	background-color: #327bcc;
-	max-width: 30px;
-	border: none;
-	border-style: none;
-}*/
 
-QTableWidget::horizontalHeader {	
-	/*background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.05 rgba(14, 8, 73, 255), stop:0.36 rgba(28, 17, 145, 255), stop:0.6 rgba(126, 14, 81, 255), stop:0.75 rgba(234, 11, 11, 255), stop:0.79 rgba(244, 70, 5, 255), stop:0.86 rgba(255, 136, 0, 255), stop:0.935 rgba(239, 236, 55, 255));
-	*/
-	gridline-color: #9faeda;
+
+QTableView::indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: none;
+    background-color: transparent;
 }
-QHeaderView::section:horizontal	
-{
-    border: 0.5px solid #c4c4c4;
-	/*background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(200, 200, 200, 255), stop:1 rgba(215, 215, 215, 255));
-	padding: 3px;*/
-    color: #454545;
+
+
+QHeaderView {
+    background-color: transparent;
 }
-QHeaderView::section:vertical
-{
-    border: 1px solid #6272a4;
+
+QHeaderView::section {
+    background-color: transparent;
+    color: rgb(96, 96, 96);
+    padding-left: 5px;
+    padding-right: 5px;
+    border: 1px solid rgba(0, 0, 0, 15);
+    font: 13px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';
+}
+
+QHeaderView::section:horizontal {
+    border-left: none;
+    height: 33px;
+}
+
+QTableView[isBorderVisible=true] QHeaderView::section:horizontal {
+    border-top: none;
+}
+
+QHeaderView::section:horizontal:last {
+    border-right: none;
+}
+
+QHeaderView::section:vertical {
+    border-top: none;
+}
+
+QHeaderView::section:checked {
+    background-color: transparent;
+}
+
+QHeaderView::down-arrow {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    margin-right: 6px;
+    image: url(:/qfluentwidgets/images/table_view/Down_black.svg);
+}
+
+QHeaderView::up-arrow {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    margin-right: 6px;
+    image: url(:/qfluentwidgets/images/table_view/Up_black.svg);
+}
+
+QTableCornerButton::section {
+    background-color: transparent;
+    border: 1px solid rgba(0, 0, 0, 15);
+}
+
+QTableCornerButton::section:pressed {
+    background-color: rgba(0, 0, 0, 12);
 }

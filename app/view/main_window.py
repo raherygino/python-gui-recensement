@@ -80,9 +80,9 @@ class MainWindow(FluentWindow):
         self.initWindow()
 
         # create sub interface
+        self.settingInterface = SettingInterface(self)
         self.homeInterface = HomeInterface(self)
         self.studentsInterface = StudentsInterface(self)
-        self.settingInterface = SettingInterface(self)
 
         # enable acrylic effect
         self.navigationInterface.setAcrylicEnabled(True)
