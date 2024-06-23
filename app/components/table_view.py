@@ -10,9 +10,11 @@ class TableView(QTableWidget):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setWordWrap(False)
+        
         #self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.header = self.horizontalHeader()
         self.verticalHeader().hide()
+        self.scroll
         #self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setContentsMargins(0,0,0,0)
         self.setQss(cfg.get(cfg.theme))
@@ -61,6 +63,7 @@ class TableView(QTableWidget):
                         widgetItem.setFlags(widgetItem.flags() & ~Qt.ItemIsEditable)
                 
         self.resizeColumnsToContents()
+        self.horizontalHeaderItem(0).setBackground(QColor(154,150,144))
         '''item = self.item(1, 1)
         if item != None:
             item.setBackground(QColor(240, 240, 240))'''
