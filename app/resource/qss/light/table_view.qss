@@ -2,7 +2,7 @@ QTableView {
     background: transparent;
 	gridline-color: #e2e2e2;
     outline: none;
-    border: none;
+    border: 1px solid #e2e2e2;
     /* font: 13px 'Segoe UI', 'Microsoft YaHei'; */
     selection-background-color: transparent;
     alternate-background-color: transparent;
