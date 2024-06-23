@@ -30,7 +30,8 @@ class BaseStudentPresenter:
     def __init_widget(self):
         self.view.tableView.contextMenuEvent = lambda event: self.mouseRightClick(event)
         self.view.tableView.setHorizontalHeaderLabels(self.labels)
-        self.view.tableView.horizontalHeader().sectionClicked.connect(lambda index: self.showFilterTip(index))
+        if type(self.view).__name__ == "DatabaseStudentTab":
+            self.view.tableView.horizontalHeader().sectionClicked.connect(lambda index: self.showFilterTip(index))
         
     def __init_var(self):
         self.promotionId = 0
@@ -75,8 +76,6 @@ class BaseStudentPresenter:
         self.sectionStudents = self.fetchDataGroup(self.model, key="section", label=LABEL.SECTION)
         self.levelStudents = self.fetchDataGroup(self.model, key="level")
         self.genderStudents = self.fetchDataGroup(self.model, key="gender")
-        #self.motifsMove = self.fetchDataGroup(self.modelMove, key="motif")
-        #self.obsMove = self.fetchDataGroup(self.modelMove, key="subType")
         self.day = list(map(str, self.fetchDataGroup(self.model, key="day")))
         
     def fetchData(self, data):
@@ -188,8 +187,6 @@ class BaseStudentPresenter:
     def getDataFilter(self,key:str, view:FilterFlyoutView):
         self.query[key] = view.getDataFilter(self.popupFilter)
         model = self.model
-        '''if self.view.parent.stackedWidget.currentIndex() == 1:
-            model = self.modelMove'''
         if key == "company" or key == "section":
             self.query[key] = [val[0] for val in view.getDataFilter(self.popupFilter)]
         self.defaultData = model.fetch_all(**self.query)

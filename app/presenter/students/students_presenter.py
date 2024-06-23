@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QTimer, pyqtSignal
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
-from qfluentwidgets import MessageBox
+from qfluentwidgets import MessageBox, InfoBarPosition
 
 from ...components import DialogImport
 from ...common import Function, Utils
@@ -275,7 +275,13 @@ class StudentsPresenter:
                     lastname = name[0]
                     firstname = ' '.join([val for val in name[1:]]) if len(name) > 1 else ""
                     genre = items[3]
-                    listStudent.append(Student(
+                    if len(self.model.fetch_all(matricule=matricule)) > 0:
+                        self.utils.infoBarError('Erreur', "Assurer que vous n'avez pas encore importer cette base de données", self.view, 
+                                                position=InfoBarPosition.TOP,
+                                                duration=5000)
+                        break;
+                    else:
+                        listStudent.append(Student(
                         promotion_id=self.promotionId,
                         lastname=lastname,
                         firstname=firstname,
@@ -285,9 +291,11 @@ class StudentsPresenter:
                         company=matricule[0],
                         section=matricule[1],
                         number=matricule[2:4]
-                    ))
-                self.model.create_multiple(listStudent)
-                self.view.nParent.currentPromotion.emit(self.promotionId)
+                        ))
+                    
+                if len(listStudent) > 0:
+                    self.model.create_multiple(listStudent)
+                    self.view.nParent.currentPromotion.emit(self.promotionId)
                 
     def deleteAll(self):
         currentTab = self.view.stackedWidget.currentIndex()
@@ -295,8 +303,9 @@ class StudentsPresenter:
             dialog = MessageBox('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
                 self.model.delete_by(promotion_id = self.promotionId)
+                self.modelMark.delete_by(promotion_id = self.promotionId)
                 self.view.nParent.refresh.emit(["mouvement"])
-                self.dbPresenter.setPromotionId(self.promotionId)
+                self.view.nParent.currentPromotion.emit(self.promotionId)
         elif currentTab == 1:
             dialog = MessageBox('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
