@@ -10,12 +10,8 @@ class TableView(QTableWidget):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setWordWrap(False)
-        
-        #self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.header = self.horizontalHeader()
         self.verticalHeader().hide()
-        self.scroll
-        #self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setContentsMargins(0,0,0,0)
         self.setQss(cfg.get(cfg.theme))
         self.colNoEditable = []
@@ -23,7 +19,6 @@ class TableView(QTableWidget):
         
     def setHorizontalHeaderLabels(self, labels: Iterable[str | None]) -> None:
         self.setColumnCount(len(labels))
-        #self.header.setSectionResizeMode(len(labels) - 1, QHeaderView.Stretch)
         return super().setHorizontalHeaderLabels(labels)
     
     @pyqtSlot(QTableWidgetItem)
@@ -44,7 +39,7 @@ class TableView(QTableWidget):
         themeColor = f'rgba{str(cfg.get(cfg.themeColor).getRgb())}'
         if theme == "auto":
             theme = "light" if darkdetect.isLight() else "dark"
-        with open(f'app/resource/{theme}.qss', encoding='utf-8') as f:
+        with open(f'app/resource/qss/{theme}/table_view.qss', encoding='utf-8') as f:
             self.setStyleSheet(f.read().replace("#327bcc", themeColor))
         
     def setData(self, items):
@@ -64,9 +59,6 @@ class TableView(QTableWidget):
                 
         self.resizeColumnsToContents()
         self.horizontalHeaderItem(0).setBackground(QColor(154,150,144))
-        '''item = self.item(1, 1)
-        if item != None:
-            item.setBackground(QColor(240, 240, 240))'''
         
     def setColumnNoEditable(self, *args):
         self.colNoEditable = list(args)
@@ -100,7 +92,6 @@ class TableView(QTableWidget):
                 if column in colNoEditable:
                     if item is not None:
                         item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-                        #item.setFlags(item.flags() | Qt.ItemIsEditable)
                         
     def getData(self) -> list:
         row_count = self.rowCount()
