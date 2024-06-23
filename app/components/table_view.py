@@ -113,3 +113,10 @@ class TableView(QTableWidget):
                     row_data.append("")
             table_data.append(row_data)
         return table_data
+    
+
+    def getHorizontalLabels(self):
+        labels = []
+        for i in range(self.columnCount()):
+            labels.append(self.horizontalHeaderItem(i).text())
+        return labels

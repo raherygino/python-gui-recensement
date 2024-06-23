@@ -1,7 +1,8 @@
 from PyQt5.QtCore import QTimer, pyqtSignal
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
 from qfluentwidgets import MessageBox
 
+from ...components import DialogImport
 from ...common import Function, Utils
 from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
 from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel, Marks
@@ -87,9 +88,45 @@ class StudentsPresenter:
         dialog.table.setRowCount(len(subjects))
         dialog.table.setData(allSbjcts)
         dialog.table.setColNoEditable(0)
+        dialog.btnExport.clicked.connect(lambda: self.exportSubject(dialog))
+        dialog.btnImport.clicked.connect(lambda: self.importSubject(dialog))
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
         dialog.exec()
         
+    def exportSubject(self, dialog: NewStudentDialog):
+        data = dialog.table.getData()
+        if len(data) > 0:
+            destination_path, _ = QFileDialog.getSaveFileName(self.view, "Exporter", "", "All Files (*);;Text Files (*.csv)")
+            if destination_path:
+                with open(destination_path, 'w') as f:
+                    for item in data:
+                        line = ";".join([nItem for nItem in item])
+                        f.writelines(f'{line}\n')
+        else:
+            self.utils.infoBarError('Erreur', "Aucune donnée à exporter", self.view)
+        
+    def importSubject(self, dialog: NewStudentDialog):
+        destination_path, _ = QFileDialog.getOpenFileName(self.view, "Exporter", "", "CSV File (*.csv)")
+        if destination_path:
+            lenData = len(dialog.table.getData())
+            with open(destination_path, 'r') as f:
+                data = []
+                for i, line in enumerate(f):
+                    i = lenData + i
+                    nLine = line.replace("\n", "").split(";")
+                    data.append(nLine)
+                
+                dialogImport = DialogImport(data, dialog.table.getHorizontalLabels(), dialog)
+                if dialogImport.exec():
+                    nData = dialogImport.getData()
+                    for i, item in enumerate(nData):
+                        dialog.table.insertRow(i)
+                        for j, nItem in enumerate(item):
+                            qWidget = QTableWidgetItem(nItem)
+                            dialog.table.setItem(i, j, qWidget)
+                            
+                
+                
     def getTableDialogData(self, dialog):
         data = dialog.table.getData()
         dataSubject = []
@@ -107,12 +144,16 @@ class StudentsPresenter:
     def create(self, table_data, dialog):
         isValid = True
         message = ""
+        abrv = [subject.abrv for subject in table_data]
         for subject in table_data:
             if not subject.abrv:
                 message = "Une matière doit avoir une abréviation"
                 isValid = False
             if not subject.title:
                 message = "Une matière doit avoir un titre"
+                isValid = False
+            if abrv.count(subject.abrv) > 1:
+                message = "Une matière doit être répéter plusieurs fois"
                 isValid = False
                 
         if isValid:

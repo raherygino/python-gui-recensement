@@ -11,9 +11,9 @@ class StudentModel(Model):
         sql += f",{", ".join([item.abrv.replace("/","_") for item in items])}" if len(items) != 0 else ''
         sql += f",{", ".join([f'coef_{item.abrv.replace("/","_")}' for item in items])}" if len(items) != 0 else ''
         sql += f",{" + ".join([f'coef_{item.abrv.replace("/","_")}' for item in items])}" if len(items) != 0 else ''
-        sql += " as total "
+        sql += f" as total " if len(items) != 0 else ''
         sql += f",{" + ".join([f'coef_{item.abrv.replace("/","_")}' for item in items])}" if len(items) != 0 else ''
-        sql += " as total2 "
+        sql += f" as total2 " if len(items) != 0 else ''
         sql += f",({" + ".join([f'coef_{item.abrv.replace("/","_")}' for item in items])})/{sumCoef}" if len(items) != 0 else ''
         sql += f" FROM ({self.fetchNoteSQL(promotionId, items)}) WHERE level = '{level}'"
         cursor = self.conn.cursor()
