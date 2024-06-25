@@ -175,3 +175,6 @@ class Function:
             return True
         except ValueError:
             return False
+        
+    def strToFloat(self, value:str) -> str:
+        return str("{:.2f}".format(float(value))) if self.isFloat(value) else ""

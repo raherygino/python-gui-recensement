@@ -8,59 +8,36 @@ class BaseGradesPresenter(BaseStudentPresenter):
     
     def __init__(self, view, parent):
         super().__init__(view, parent)
+        self.labels = [LABEL.MATRICULE, LABEL.GRADE,LABEL.LASTNAME,LABEL.FIRSTNAME, LABEL.GENDER]
+        self.data = []
         self.func = Function()
         self.mainView.subjectRefresh.connect(self.refreshSubject)
+        self.__init_table()
         
-        self.labels = [
-            LABEL.MATRICULE, LABEL.GRADE,
-            LABEL.LASTNAME,LABEL.FIRSTNAME, LABEL.GENDER]
-        
+    def __init_table(self):
         self.table = self.view.tableView
         self.table.setSortingEnabled(True)
         self.table.itemChanged.connect(self.itemChanged)
         
-        self.data = []
-        self.timer = QTimer()
-        self.timer.setInterval(500)
-        self.timer.timeout.connect(self.fetchAll)
-        
     def fetchData(self, data):
         self.view.progressBar.setVisible(True)
-        self.timer.start()
+        nData = self.model.fetchNote(self.promotionId, self.subjects, self.getLevel())
+        for item in nData:
+            new_row = []
+            for it in item:
+                new_row.append(it if it != None else "")
+            self.data.append(new_row)
+        self.actionWorkerThread(nData)
     
     def refreshSubject(self, level):
         self.data.clear()
         self.setPromotionId(self.promotionId)
         
-    def fetchAll(self):
-        data = self.model.fetchNote(self.promotionId, self.subjects, self.getLevel())
-        for item in data:
-            new_row = []
-            for it in item:
-                new_row.append(it if it != None else "")
-            self.data.append(new_row)
-        self.actionWorkerThread(data)
-        self.timer.stop()
-        
-    def findSubjectIdByAbrv(self, abrv:str):
-        subjectId = 0
-        for subject in self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel()):
-            if subject.abrv == abrv:
-                subjectId = subject.id
-        return subjectId
-            
-    def findStudentIdByMatricule(self, matricule:int):
-        studentId = 0
-        for student in self.defaultData:
-            if student.matricule == matricule:
-                studentId = student.id
-        return studentId
-            
     def itemChanged(self, item):
         maxCol = len(self.labels)+len(self.subjects)
         if item.column() > 4 and item.column() < maxCol:
-            old = self.strToFloat(self.data[item.row()][item.column()])
-            new = self.strToFloat(item.text())
+            old = self.func.strToFloat(self.data[item.row()][item.column()])
+            new = self.func.strToFloat(item.text())
             if old != new:
                 self.data[item.row()][item.column()] = new
                 self.calculateCoef(item)
@@ -75,7 +52,7 @@ class BaseGradesPresenter(BaseStudentPresenter):
                 self.table.resizeColumnToContents(item.column())
                 self.calculateRank()
             else:
-                item.setText(self.strToFloat(item.text()))
+                item.setText(self.func.strToFloat(item.text()))
             
     def calculateCoef(self, item):
         maxCol = len(self.labels)+len(self.subjects)
@@ -85,7 +62,7 @@ class BaseGradesPresenter(BaseStudentPresenter):
             result = float(item.text() if item.text() != "" else 0) * self.subjects[pos].coef
             nItem = self.view.tableView.item(item.row(),col)
             if nItem != None:
-                nItem.setText(self.strToFloat(result if item.text() != "" else item.text()))
+                nItem.setText(self.func.strToFloat(result if item.text() != "" else item.text()))
             self.calculateItemAVG(item)
         
     def calculateAVG(self):
@@ -103,9 +80,9 @@ class BaseGradesPresenter(BaseStudentPresenter):
                 totalItem = self.table.item(i, nMaxCol)
                 avgItem = self.table.item(i, nMaxCol+1)
                 if totalItem != None:
-                    totalItem.setText(self.strToFloat(sum(allMarks)))
+                    totalItem.setText(self.func.strToFloat(sum(allMarks)))
                 if avgItem != None:
-                    avgItem.setText(self.strToFloat(avg))
+                    avgItem.setText(self.func.strToFloat(avg))
             
     def calculateItemAVG(self, item):
         maxCol = len(self.labels)+len(self.subjects)
@@ -120,14 +97,13 @@ class BaseGradesPresenter(BaseStudentPresenter):
                     totalMarks = sum(allMarks)
                     totalCoef = sum([int(sub.coef) for sub in self.subjects])
                     avg = totalMarks/totalCoef if totalCoef > 0 else 0
-                    self.table.item(item.row(), nMaxCol).setText(self.strToFloat(sum(allMarks)))
-                    self.table.item(item.row(), nMaxCol+1).setText(self.strToFloat(avg))
+                    self.table.item(item.row(), nMaxCol).setText(self.func.strToFloat(sum(allMarks)))
+                    self.table.item(item.row(), nMaxCol+1).setText(self.func.strToFloat(avg))
             
-    def strToFloat(self, value:str) -> str:
-        return str("{:.2f}".format(float(value))) if self.func.isFloat(value) else ""
+    
         
     def markFromItem(self, item):
-        value = self.strToFloat(item.text())
+        value = self.func.strToFloat(item.text())
         matricule = self.view.tableView.item(item.row(), 0).text()
         abrv = self.view.tableView.horizontalHeaderItem(item.column()).text()
         studentId = self.findStudentIdByMatricule(int(matricule))

@@ -40,7 +40,7 @@ class BaseStudentPresenter:
         self.sectionStudents = 0
         self.day = 0
         self.query = {"promotion_id":self.promotionId}
-        self.subjects = self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
+        self.subjects = []
         
     def actionWorkerThread(self, data):
         if self.workerThread is None or not self.workerThread.isRunning():
@@ -62,7 +62,23 @@ class BaseStudentPresenter:
         self.promotionId = promotionId
         self.query = {"promotion_id":promotionId}
         self.defaultData = self.model.fetch_all(**self.query)
+        self.subjects =  self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
         self.fetchData(self.defaultData)
+    
+        
+    def findSubjectIdByAbrv(self, abrv:str):
+        subjectId = 0
+        for subject in self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel()):
+            if subject.abrv == abrv:
+                subjectId = subject.id
+        return subjectId
+            
+    def findStudentIdByMatricule(self, matricule:int):
+        studentId = 0
+        for student in self.defaultData:
+            if student.matricule == matricule:
+                studentId = student.id
+        return studentId
     
     def setLabelIntoTable(self,promotionId, level):
         subjects = self.modelSubject.fetch_all(promotion_id=promotionId, level=level)
