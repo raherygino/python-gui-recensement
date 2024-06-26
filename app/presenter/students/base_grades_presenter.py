@@ -18,6 +18,10 @@ class BaseGradesPresenter(BaseStudentPresenter):
         self.table = self.view.tableView
         self.table.setSortingEnabled(True)
         self.table.itemChanged.connect(self.itemChanged)
+            
+    def setPromotionId(self, promotionId):
+        self.setLabelIntoTable(promotionId, level=self.getLevel())
+        return super().setPromotionId(promotionId)
         
     def fetchData(self, data):
         self.view.progressBar.setVisible(True)
@@ -35,11 +39,13 @@ class BaseGradesPresenter(BaseStudentPresenter):
         
     def itemChanged(self, item):
         maxCol = len(self.labels)+len(self.subjects)
-        if item.column() > 4 and item.column() < maxCol:
-            old = self.func.strToFloat(self.data[item.row()][item.column()])
+        col = item.column()
+        row = item.row()
+        if col > 4 and col < maxCol:
+            old = self.func.strToFloat(self.data[row][col])
             new = self.func.strToFloat(item.text())
             if old != new:
-                self.data[item.row()][item.column()] = new
+                self.data[row][col] = new
                 self.calculateCoef(item)
                 mark = self.markFromItem(item)
                 marks = self.modelMark.fetch_all(student_id=mark.student_id, subject_id=mark.subject_id)
@@ -49,7 +55,7 @@ class BaseGradesPresenter(BaseStudentPresenter):
                 else:
                     self.modelMark.update_item(marks[0].id, value=str(mark.value))
                 self.modelMark.commit()
-                self.table.resizeColumnToContents(item.column())
+                self.table.resizeColumnToContents(col)
                 self.calculateRank()
             else:
                 item.setText(self.func.strToFloat(item.text()))
@@ -99,21 +105,6 @@ class BaseGradesPresenter(BaseStudentPresenter):
                     avg = totalMarks/totalCoef if totalCoef > 0 else 0
                     self.table.item(item.row(), nMaxCol).setText(self.func.strToFloat(sum(allMarks)))
                     self.table.item(item.row(), nMaxCol+1).setText(self.func.strToFloat(avg))
-            
-    
-        
-    def markFromItem(self, item):
-        value = self.func.strToFloat(item.text())
-        matricule = self.view.tableView.item(item.row(), 0).text()
-        abrv = self.view.tableView.horizontalHeaderItem(item.column()).text()
-        studentId = self.findStudentIdByMatricule(int(matricule))
-        subjectId = self.findSubjectIdByAbrv(abrv)
-        item.setText(str(value))
-        return Marks(promotion_id=self.promotionId, student_id=studentId, subject_id=subjectId, value=value)
-            
-    def setPromotionId(self, promotionId):
-        self.setLabelIntoTable(promotionId, level=self.getLevel())
-        return super().setPromotionId(promotionId)
     
     def calculateRank(self):
         lenSub = len(self.subjects)
@@ -128,6 +119,15 @@ class BaseGradesPresenter(BaseStudentPresenter):
             if itemAvg != None:
                 itemVal = str(sorted_list.index(nAvg) + 1)
                 itemAvg.setText(itemVal.zfill(len(str(len(self.data)))))
+        
+    def markFromItem(self, item):
+        value = self.func.strToFloat(item.text())
+        matricule = self.view.tableView.item(item.row(), 0).text()
+        abrv = self.view.tableView.horizontalHeaderItem(item.column()).text()
+        studentId = self.findStudentIdByMatricule(int(matricule))
+        subjectId = self.findSubjectIdByAbrv(abrv)
+        item.setText(str(value))
+        return Marks(promotion_id=self.promotionId, student_id=studentId, subject_id=subjectId, value=value)
             
     def handleResult(self, data: list):
         self.view.progressBar.setVisible(False)

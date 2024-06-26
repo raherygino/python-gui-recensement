@@ -24,7 +24,7 @@ class PromotionPresenter:
         self.btnAdd = LinkCard(FluentIcon.ADD, 'Ajouter', 'Ajouter une autre promotion', self.view)
         self.btnAdd.mouseReleaseEvent = lambda event: self.nPromPresenter.dialogNew(event)
         self.mainView.currentPromotion.connect(self.setCurrentPromotion)
-        promotions = self.model.fetch_all_items(order="id DESC")
+        promotions = self.model.fetch_all(order="id")
         self.view.flowLayout.addWidget(self.btnAdd)
         for promotion in promotions:
             logo = FluentIcon.PEOPLE

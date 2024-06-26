@@ -96,7 +96,7 @@ class Model:
         
     def fetch_item(self, **kwargs):
         items =  self.fetch_all(**kwargs)
-        return items[0] if items > 0 else Entity()
+        return items[0] if len(items) > 0 else Entity()
         
     def search(self, **kwargs):
         
