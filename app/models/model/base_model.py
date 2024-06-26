@@ -13,13 +13,11 @@ class WorkerThread(QThread):
         super(WorkerThread, self).__init__(parent)
         self.conn = conn
         self.sql = sql
-        
 
     def run(self):
         # Connect to SQLite database
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        
 
         # Fetch data from SQLite database
         cursor.execute(self.sql)
@@ -55,13 +53,10 @@ class Model:
         
         for field in dataclasses.fields(self.entity):
             fieldType = str(field.type)
-            if (fieldType.find('str') != -1):
+            if fieldType.find('str') != -1:
                 fieldType = "TEXT"
             else:
-                if (field.name == "id"):
-                    fieldType = "INTEGER PRIMARY KEY"
-                else:
-                    fieldType = "INTEGER NOT NULL"
+                fieldType = f"INTEGER {'PRIMARY KEY' if  field.name == 'id' else 'NOT NULL'}"
             query += f"{field.name} {fieldType}, "
 
         query += "updated_at DATETIME, created_at DATETIME)"
@@ -90,10 +85,7 @@ class Model:
                         cond += f'AND {key}="{value}" '
                         keys.append(key)
                 else:
-                    if key == "order":
-                        order += f" ORDER BY {kwargs.get(key)} DESC"
-                    elif key == "group":
-                        order += f" GROUP BY {kwargs.get(key)}"
+                    order += f" {key.upper()} BY {kwargs.get(key)} {'DESC' if key == 'order' else ''}"
                     orders.append(key)
             query += " WHERE "+cond[4:] if "order" not in keys and "group" not in keys else ""
             query = query.replace("WHERE","") if query.find("\"") == -1 else query
@@ -101,84 +93,11 @@ class Model:
         cursor = self.conn.cursor()
         cursor.execute(query)
         return self.resultToEntity(cursor.fetchall())
-
-    def fetch_all_items(self, **kwargs):
-        query = f'SELECT * FROM {self.TABLE}'
-        if "order" in kwargs.keys():
-            query += f' ORDER BY {kwargs.get('order')}'
-        cursor = self.conn.cursor()
-        cursor.execute(query)
-        data = cursor.fetchall()
-        listItems = []
-        listItems.clear()
-
-        for val in data:
-            nVal = self.entity.copy()
-            fieldsEntity = dataclasses.fields(nVal)
-            for i, field in enumerate(fieldsEntity):
-                nVal.set(field.name, val[i])
-            listItems.append(nVal)
-        return listItems
-    
-    def fetch_items_by_id(self, id_item,**kwargs):
-        id_col = dataclasses.fields(self.entity)[1].name
-        sql = f'SELECT * FROM {self.TABLE} WHERE {id_col} = "{id_item}"'
-        if "order" in kwargs.keys():
-            sql += f' ORDER BY {kwargs.get('order')}'
-        if "group_by" in kwargs.keys():
-            sql += f' GROUP BY {kwargs.get('group_by')}'
-        cursor = self.conn.cursor()
-        cursor.execute(sql)
-        data = cursor.fetchall()
-        listItems = []
-        listItems.clear()
-
-        for val in data:
-            nVal = self.entity.copy()
-            fieldsEntity = dataclasses.fields(nVal)
-            for i, field in enumerate(fieldsEntity):
-                nVal.set(field.name, val[i])
-            listItems.append(nVal)
-        return listItems
-    
-    def fetch_items_by_cond(self, **kwargs):
-        col = ""
-        for key in kwargs.keys():
-            col = key
-        cursor = self.conn.cursor()
-        cursor.execute(f'SELECT * FROM {self.TABLE} WHERE {col} LIKE "%{kwargs.get(col)}%"')
-        data = cursor.fetchall()
-        listItems = []
-        listItems.clear()
-
-        for val in data:
-            nVal = self.entity.copy()
-            fieldsEntity = dataclasses.fields(nVal)
-            for i, field in enumerate(fieldsEntity):
-                nVal.set(field.name, val[i])
-            listItems.append(nVal)
-        return listItems
-    
-    def fetch_items_by_col(self, id, **kwargs):
-        id_col = dataclasses.fields(self.entity)[1].name
-        listItems = []
-        if len(kwargs) != 0:
-            cols = ' AND '.join([f'{key}="{kwargs.get(key)}"' for key in kwargs])
-            sql = f'SELECT * FROM {self.TABLE} WHERE {id_col} = "{id}" AND '
-            sql += cols
-            cursor = self.conn.cursor()
-            cursor.execute(sql)
-            data = cursor.fetchall()
-            
-            for val in data:
-                nVal = self.entity.copy()
-                fieldsEntity = dataclasses.fields(nVal)
-                for i, field in enumerate(fieldsEntity):
-                    nVal.set(field.name, val[i])
-                listItems.append(nVal)
-            cursor.close()
-        return listItems
-    
+        
+    def fetch_item(self, **kwargs):
+        items =  self.fetch_all(**kwargs)
+        return items[0] if items > 0 else Entity()
+        
     def search(self, **kwargs):
         
         sql = f'SELECT * FROM {self.TABLE} WHERE '
@@ -256,39 +175,6 @@ class Model:
             listItems.append(nVal)
         return listItems
 
-    def fetch_item_by_id(self, id_item):
-        id_col = dataclasses.fields(self.entity)[0].name
-        cursor = self.conn.cursor()
-        cursor.execute(f'SELECT * FROM {self.TABLE} WHERE {id_col} = "{id_item}"')
-        data = cursor.fetchall()
-        listItems = []
-        listItems.clear()
-
-        for val in data:
-            nVal = self.entity.copy()
-            fieldsEntity = dataclasses.fields(nVal)
-            for i, field in enumerate(fieldsEntity):
-                nVal.set(field.name, val[i])
-            listItems.append(nVal)
-        return listItems[0] if len(listItems) != 0 else None
-
-    def fetch_item_by_cols(self, **kwargs):
-        cursor = self.conn.cursor()
-        sql = f'SELECT * FROM {self.TABLE} WHERE '
-        sql += ' AND '.join([f'{key}="{kwargs.get(key)}"' for key in kwargs.keys()])
-        cursor.execute(sql)
-        data = cursor.fetchall()
-        listItems = []
-        listItems.clear()
-
-        for val in data:
-            nVal = self.entity.copy()
-            fieldsEntity = dataclasses.fields(nVal)
-            for i, field in enumerate(fieldsEntity):
-                nVal.set(field.name, val[i])
-            listItems.append(nVal)
-        return listItems[0] if len(listItems) != 0 else None
-
     def create(self, entity: Entity):
         created_at = self.current_date()
         fieldsEntity = dataclasses.fields(entity)
@@ -353,20 +239,6 @@ class Model:
         sql += f"WHERE {id_col}={item_id}"
         cursor.execute(sql)
         self.conn.commit()
-        
-    def update_test(self, item_id, **fields):
-        cursor = self.conn.cursor()
-        id_col = dataclasses.fields(self.entity)[0].name
-        sql = f"UPDATE {self.TABLE} SET"
-
-        for i, key in enumerate(fields.keys()):
-            if i == 0:
-                sql += f" {key} = {key}+{fields.get(key)} "
-            else:
-                sql += f", {key} = {key}+{fields.get(key)} "
-        sql += f"WHERE {id_col}={item_id}"
-        cursor.execute(sql)
-        self.conn.commit()
     
     def update_multiple_int(self, conditions, values):
         cursor = self.conn.cursor()
@@ -391,7 +263,6 @@ class Model:
         self.conn.commit()
 
     def delete_by(self,**kwargs):
-        
         sql = f'DELETE FROM {self.TABLE} WHERE '
         conditions = ' AND '.join([f'{key}="{kwargs.get(key)}"' for key in kwargs.keys()])
         sql += conditions
