@@ -34,6 +34,7 @@ class DialogImport(MessageBoxBase):
         for nItem in self.data:
             newItem = [None] * len(data)
             for i, n in enumerate(data):
-                newItem[n] = nItem[i]
+                if n != -1:
+                    newItem[n] = nItem[i]
             nData.append(newItem)
         return nData
