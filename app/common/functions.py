@@ -16,10 +16,10 @@ class Function:
     USER_DIR = os.path.expanduser('~')
     def importFile(self, parent, title, fileType:str):
         configModel = ConfigModel()
-        countConfig = len(configModel.fetch_all_items())
+        countConfig = len(configModel.fetch_all())
         directory = self.USER_DIR
         if countConfig != 0:
-            directory = configModel.fetch_all_items()[0].directory
+            directory = configModel.fetch_all()[0].directory
         options = QFileDialog.Options()
         fileName, _ = QFileDialog.getOpenFileName(parent,title, directory,fileType, options=options)
         if fileName:
@@ -175,3 +175,6 @@ class Function:
             return True
         except ValueError:
             return False
+        
+    def strToFloat(self, value:str) -> str:
+        return str("{:.2f}".format(float(value))) if self.isFloat(value) else ""
