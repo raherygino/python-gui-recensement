@@ -11,8 +11,9 @@ class NewStudentDialog(MessageBoxBase):
 
         self.row = QHBoxLayout()
         self.matriculeEdit = LineEditWithLabel("Matricule")
-        self.matriculeEdit.lineEdit.textChanged.connect(self.__isValid)
+        self.matriculeEdit.lineEdit.textChanged.connect(lambda: self.__isValid(None))
         self.lastnameEdit = LineEditWithLabel("Nom")
+        self.lastnameEdit.lineEdit.textChanged.connect(lambda: self.__isValid(None))
         self.firstnameEdit = LineEditWithLabel("Prénoms")
         self.row.addLayout(self.matriculeEdit)
         self.row.addLayout(self.lastnameEdit)
