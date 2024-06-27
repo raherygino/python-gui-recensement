@@ -38,7 +38,6 @@ class BaseStudentPresenter:
         self.promotionId = 0
         self.companyStudents = 0
         self.sectionStudents = 0
-        self.day = 0
         self.query = {"promotion_id":self.promotionId}
         self.subjects = []
         
@@ -94,7 +93,6 @@ class BaseStudentPresenter:
         self.sectionStudents = self.fetchDataGroup(self.model, key="section", label=LABEL.SECTION)
         self.levelStudents = self.fetchDataGroup(self.model, key="level")
         self.genderStudents = self.fetchDataGroup(self.model, key="gender")
-        self.day = list(map(str, self.fetchDataGroup(self.model, key="day")))
         
     def fetchData(self, data):
         self.view.progressBar.setVisible(True)
@@ -178,10 +176,6 @@ class BaseStudentPresenter:
             elif label == LABEL.GENDER:
                 data = self.genderStudents
                 key = "gender"
-                
-            elif label == LABEL.NB_DAY:
-                data = self.day
-                key = "day"
                 
             elif label == LABEL.MOTIFS:
                 data = self.motifsMove

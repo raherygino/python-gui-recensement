@@ -16,7 +16,6 @@ class Student(Entity):
     section: int = 0
     number: int = 0
     matricule: int = 0
-    day: int = 0
     
     def toDict(self):
         student = {}
