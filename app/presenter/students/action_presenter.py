@@ -1,3 +1,4 @@
+from qfluentwidgets import Dialog
 from ...view import NewStudentDialog, ShowStudentDialog
 from ...models import StudentModel, Student
 from ...common import Utils
@@ -17,6 +18,23 @@ class ActionPresenter:
         dialog = ShowStudentDialog(self.view.parent.nParent)
         student = self.studentByMatricule(matricule)
         dialog.exec()
+        
+    def deleteStudent(self, matricule):
+        dialog = Dialog('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
+        dialog.setTitleBarVisible(False)
+        if dialog.exec():
+            self.model.delete_by(promotion_id=self.presenter.promotionId, matricule=matricule)
+            self.presenter.setPromotionId(self.presenter.promotionId)
+            self.utils.infoBarSuccess("Succès", "Suppression avec réussite", self.view)
+            
+    def deleteMultiple(self, matricules):
+        dialog = Dialog('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
+        dialog.setTitleBarVisible(False)
+        if dialog.exec():
+            items = [{'promotion_id':self.presenter.promotionId, 'matricule':matricule} for matricule in matricules]
+            self.model.delete_mutlitple(items)
+            self.presenter.setPromotionId(self.presenter.promotionId)
+            self.utils.infoBarSuccess("Succès", "Suppression avec réussite", self.view)
         
     def editStudent(self, matricule):
         dialog = NewStudentDialog(self.view.parent.nParent)

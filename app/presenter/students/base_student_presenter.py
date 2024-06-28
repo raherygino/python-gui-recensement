@@ -129,28 +129,30 @@ class BaseStudentPresenter:
         selectedItems = self.view.tableView.selectedItems()
         if (len(selectedItems) > 0):
             nItems = []
+            matricules = []
             for item in selectedItems:
-                if item.row() not in nItems:
+                if item.row() not in nItems and item.column() == 0:
                     nItems.append(item.row())
+                    matricules.append(self.view.tableView.item(item.row(), 0).text())
             if len(nItems) < 400:
                 for item in selectedItems:
                     self.selectItemFromInitCol(item)
-            action = ActionPresenter(self)
-            matricule = self.findMatricule(self.view.tableView.selectedItems()[0])
-            menu = RoundMenu(parent=self.view)
-            menu.addAction(Action(FluentIcon.FOLDER, 'Voir', triggered=lambda: action.showStudent(matricule)))
-            menu.addAction(Action(FluentIcon.EDIT, 'Modifier', triggered=lambda: action.editStudent(matricule)))
-            menu.addSeparator()
-            menu.addAction(Action(FluentIcon.SCROLL, 'Mouvement'))
-            menu.addSeparator()
-            menu.addAction(Action(FluentIcon.DELETE, 'Supprimer'))
-            menu.menuActions()[-2].setCheckable(True)
-            menu.menuActions()[-2].setChecked(True)
-
-            self.posCur = QCursor().pos()
-            cur_x = self.posCur.x()
-            cur_y = self.posCur.y()
-            menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
+                    
+            if len(nItems) > 0:
+                action = ActionPresenter(self)
+                matricule = self.findMatricule(self.view.tableView.selectedItems()[0])
+                menu = RoundMenu(parent=self.view)
+                if len(nItems) == 1:
+                    menu.addAction(Action(FluentIcon.FOLDER, 'Voir', triggered=lambda: action.showStudent(matricule)))
+                    menu.addAction(Action(FluentIcon.EDIT, 'Modifier', triggered=lambda: action.editStudent(matricule)))
+                    menu.addSeparator()
+                    menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered=lambda: action.deleteStudent(matricule)))
+                else:
+                    menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered=lambda: action.deleteMultiple(matricules)))
+                self.posCur = QCursor().pos()
+                cur_x = self.posCur.x()
+                cur_y = self.posCur.y()
+                menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
         
     def updateProgress(self, progress):
         self.view.progressBar.setValue(int(progress))
