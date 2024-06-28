@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import QHBoxLayout
 from qfluentwidgets import MessageBoxBase, SubtitleLabel, PrimaryPushButton, PushButton
-
 from ...components import LineEditWithLabel, ComboxEditWithLabel
 
 class NewStudentDialog(MessageBoxBase):
@@ -15,6 +14,7 @@ class NewStudentDialog(MessageBoxBase):
         self.lastnameEdit = LineEditWithLabel("Nom")
         self.lastnameEdit.lineEdit.textChanged.connect(lambda: self.__isValid(None))
         self.firstnameEdit = LineEditWithLabel("Prénoms")
+        
         self.row.addLayout(self.matriculeEdit)
         self.row.addLayout(self.lastnameEdit)
         self.row.addLayout(self.firstnameEdit)
@@ -36,7 +36,7 @@ class NewStudentDialog(MessageBoxBase):
         
         self.yesBtn = PrimaryPushButton("Ok")
         self.cancelBtn = PushButton('Annuler')
-        self.cancelBtn.clicked.connect(self.__cancel)
+        self.cancelBtn.clicked.connect(self.reject)
         
         self.buttonLayout.addWidget(self.yesBtn)
         self.buttonLayout.addWidget(self.cancelBtn)
@@ -47,6 +47,3 @@ class NewStudentDialog(MessageBoxBase):
         name = self.lastnameEdit.lineEdit.text()
         matricule = self.matriculeEdit.lineEdit.text()
         self.yesBtn.setEnabled(len(name) > 2 and len(matricule) == 4)
-        
-    def __cancel(self):
-        self.reject()

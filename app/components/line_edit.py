@@ -1,53 +1,47 @@
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-from qfluentwidgets import BodyLabel, LineEdit, ComboBox, SpinBox, DateEdit
+from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtCore import QDate
+from qfluentwidgets import LineEdit, BodyLabel, ComboBox, CompactSpinBox, DateEdit
 
-class EditWithLabel(QVBoxLayout):
-    def __init__(self, label:str,parent=None, **kwargs):
-        super().__init__(None)
-        self.parent = parent
-        self.setContentsMargins(0,0,0,0)
-        self.setSpacing(5)
-        self.label = BodyLabel(parent)
-        self.label.setText(label)
+
+class LineEditWithLabel(QVBoxLayout):
+    def __init__(self, label:str, parent=None):
+        super().__init__(parent)
+        self.setSpacing(2)
+        self.lineEdit = LineEdit(parent)
+        self.label = BodyLabel(label)
         self.addWidget(self.label)
-        self.args = kwargs
-        self.lineEdits = []
-        self.LineEdit()
+        self.addWidget(self.lineEdit)
 
-    def LineEdit(self):
-        self.hBoxLayout = QHBoxLayout()
-        self.lineEdits.clear()
-        if "placeholders" in self.args.keys():
-            placeholders = self.args.get("placeholders")
-            for placeholder in placeholders:
-                lineEdit = LineEdit(self.parent)
-                lineEdit.setClearButtonEnabled(True)
-                lineEdit.setPlaceholderText(placeholder)
-                self.hBoxLayout.addWidget(lineEdit)
-                self.lineEdits.append(lineEdit)
-                
-        if "combox" in self.args.keys():
-            self.combox = ComboBox(self.parent)
-            self.combox.setMinimumWidth(200)
-            self.combox.addItems(self.args.get("combox"))
-            self.hBoxLayout.addWidget(self.combox)
-            
-        if "spin" in self.args.keys():
-            self.spin = SpinBox(self.parent)
-            self.hBoxLayout.addWidget(self.spin)
-            
-        if "date" in self.args.keys():
-            self.date = DateEdit(self.parent)
-            self.hBoxLayout.addWidget(self.date)
+class DateEditWithLabel(QVBoxLayout):
+    def __init__(self, label:str, parent=None):
+        super().__init__(parent)
+        self.setSpacing(2)
+        self.lineEdit = DateEdit(parent)
+        self.lineEdit.setDate(QDate(1950,1,1))
+        self.label = BodyLabel(label)
+        self.addWidget(self.label)
+        self.addWidget(self.lineEdit)
         
-        self.addLayout(self.hBoxLayout)
-            
-    def value(self):
-        return self.combox.text()
-    
-    def text(self, pos:int):
-        return self.lineEdits[pos].text()
-    
-    def lineEdit(self, pos:int) -> LineEdit:
-        return self.lineEdits[pos]
+    def text(self) -> str:
+        value = self.lineEdit.text()
+        return value if value != "01/01/1950" else ""
+        
+class ComboxEditWithLabel(QVBoxLayout):
+    def __init__(self, label:str, data=[], parent=None):
+        super().__init__(parent)
+        self.setSpacing(2)
+        self.combox = ComboBox(parent)
+        self.combox.addItems(data)
+        self.label = BodyLabel(label)
+        self.addWidget(self.label)
+        self.addWidget(self.combox)
+        
+class SpinBoxEditWithLabel(QVBoxLayout):
+    def __init__(self, label:str, parent=None):
+        super().__init__(parent)
+        self.setSpacing(2)
+        self.spinbox = CompactSpinBox(parent)
+        self.label = BodyLabel(label)
+        self.addWidget(self.label)
+        self.addWidget(self.spinbox)
         
