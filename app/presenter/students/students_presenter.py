@@ -1,11 +1,11 @@
-from PyQt5.QtCore import QTimer, pyqtSignal
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
-from qfluentwidgets import MessageBox, InfoBarPosition
+from qfluentwidgets import MessageBox
 
 from ...components import DialogImport
 from ...common import Function, Utils
 from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
-from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel, Marks
+from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel
 
 from .db_presenter import StudentDbPresenter
 from .eap_presenter import EapPresenter
@@ -314,5 +314,4 @@ class StudentsPresenter:
         elif currentTab == 1:
             dialog = MessageBox('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
-                #self.modelMove.delete_by(promotion_id = self.promotionId)
                 self.view.nParent.refresh.emit(["mouvement"])

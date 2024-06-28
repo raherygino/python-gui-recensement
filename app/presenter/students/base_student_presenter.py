@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QPoint, QThread
 from PyQt5.QtGui import QCursor 
+from PyQt5.QtWidgets import QTableWidgetItem
 from qfluentwidgets import RoundMenu, Action, FluentIcon, MenuAnimationType
 
 from ...view import DatabaseStudentTab
@@ -31,6 +32,7 @@ class BaseStudentPresenter:
     def __init_widget(self):
         self.view.tableView.contextMenuEvent = lambda event: self.mouseRightClick(event)
         self.view.tableView.setHorizontalHeaderLabels(self.labels)
+        self.view.tableView.itemClicked.connect(self.itemClicked)
         if type(self.view).__name__ == "DatabaseStudentTab":
             self.view.tableView.horizontalHeader().sectionClicked.connect(lambda index: self.showFilterTip(index))
         
@@ -56,6 +58,16 @@ class BaseStudentPresenter:
         
     def __actions(self):
         self.mainView.currentPromotion.connect(lambda currentId : self.setPromotionId(currentId))
+      
+    def selectItemFromInitCol(self,  item: QTableWidgetItem):
+        if item.column() == 0:
+            for i in range(self.view.tableView.columnCount()):
+                nItem:QTableWidgetItem = self.view.tableView.item(item.row(), i)
+                if not nItem.isSelected():
+                    nItem.setSelected(True)
+        
+    def itemClicked(self, item: QTableWidgetItem):
+        self.selectItemFromInitCol(item)
         
     def setPromotionId(self, promotionId):
         self.promotionId = promotionId
@@ -63,7 +75,6 @@ class BaseStudentPresenter:
         self.defaultData = self.model.fetch_all(**self.query)
         self.subjects =  self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
         self.fetchData(self.defaultData)
-    
         
     def findSubjectIdByAbrv(self, abrv:str):
         subjectId = 0
@@ -117,6 +128,13 @@ class BaseStudentPresenter:
     def mouseRightClick(self, event):
         selectedItems = self.view.tableView.selectedItems()
         if (len(selectedItems) > 0):
+            nItems = []
+            for item in selectedItems:
+                if item.row() not in nItems:
+                    nItems.append(item.row())
+            if len(nItems) < 400:
+                for item in selectedItems:
+                    self.selectItemFromInitCol(item)
             action = ActionPresenter(self)
             matricule = self.findMatricule(self.view.tableView.selectedItems()[0])
             menu = RoundMenu(parent=self.view)
