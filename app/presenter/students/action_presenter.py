@@ -52,8 +52,8 @@ class ActionPresenter:
     def updateStudent(self,oldStudent:Student, dialog: NewStudentDialog):
         lastname  = dialog.lastnameEdit.lineEdit.text()
         firstname = dialog.firstnameEdit.lineEdit.text()
-        gender    = dialog.genderEdit.combox.currentText()
         grade     = dialog.gradeEdit.combox.currentText()
+        gender    = dialog.genderEdit.combox.currentText()
         self.model.update_item(oldStudent.id, lastname=lastname, firstname=firstname, gender=gender, level=grade)
         self.presenter.setPromotionId(self.presenter.promotionId)
         self.utils.infoBarSuccess("Succès", "Mise à jour avec réussite", self.view)
