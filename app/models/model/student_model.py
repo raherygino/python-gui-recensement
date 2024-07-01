@@ -1,5 +1,6 @@
 from ..entity import Student, Subject
 from .base_model import Model
+from .mark_model import MarkModel
 
 class StudentModel(Model):
     def __init__(self):
@@ -39,3 +40,9 @@ class StudentModel(Model):
     def markValueWithCoef(self, item:Subject) -> str:
         return f'(SELECT marks.value * {item.coef} FROM marks WHERE marks.student_id = students.id AND marks.subject_id = {item.id}) as coef_{item.abrv.replace("/","_")}'
     
+    def delete_mutlitple(self, items:list[Student]):
+        markModel = MarkModel()
+        for item in items:
+            student = self.fetch_item(promotion_id=item['promotion_id'], matricule=item['matricule'])
+            markModel.delete_by(promotion_id=student.promotion_id, student_id=student.id)
+        return super().delete_mutlitple(items)

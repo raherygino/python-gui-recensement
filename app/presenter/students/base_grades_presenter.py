@@ -118,7 +118,7 @@ class BaseGradesPresenter(BaseStudentPresenter):
             itemAvg = self.table.item(i, posAvg + 1)
             if itemAvg != None:
                 itemVal = str(sorted_list.index(nAvg) + 1)
-                itemAvg.setText(itemVal.zfill(len(str(len(self.data)))))
+                #itemAvg.setText(itemVal.zfill(len(str(len(self.data)))))
         
     def markFromItem(self, item):
         value = self.func.strToFloat(item.text())

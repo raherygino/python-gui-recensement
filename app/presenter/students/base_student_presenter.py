@@ -71,6 +71,7 @@ class BaseStudentPresenter:
         
     def setPromotionId(self, promotionId):
         self.promotionId = promotionId
+        self.view.tableView.clearContents()
         self.query = {"promotion_id":promotionId}
         self.defaultData = self.model.fetch_all(**self.query)
         self.subjects =  self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
