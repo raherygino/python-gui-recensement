@@ -1,7 +1,9 @@
+from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtCore import Qt
 from qfluentwidgets import Dialog
 from ...view import NewStudentDialog, ShowStudentDialog
-from ...models import StudentModel, Student
-from ...common import Utils
+from ...models import StudentModel, Student, MarkModel, SubjectModel
+from ...common import Utils, Function
 
 class ActionPresenter:
     
@@ -9,14 +11,49 @@ class ActionPresenter:
         self.presenter = parent
         self.view = parent.view
         self.model:StudentModel = parent.model
+        self.markModel:MarkModel = parent.modelMark
+        self.subjectModel:SubjectModel = parent.modelSubject
         self.utils = Utils()
+        self.func = Function()
         
     def studentByMatricule(self, matricule) -> Student:
         return self.model.fetch_item(matricule=matricule, promotion_id=self.presenter.promotionId)
+    
+    def addRow(self, table, nData:list):
+        data = table.getData()
+        table.setRowCount(len(data)+1)
+        for col, value in enumerate(nData):
+            item = QTableWidgetItem(value)
+            if self.func.isFloat(value):
+                item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            table.setItem(len(data), col, item)
         
     def showStudent(self, matricule):
         dialog = ShowStudentDialog(self.view.parent.nParent)
         student = self.studentByMatricule(matricule)
+        dialog.label.setText(f'{student.level} {student.matricule}\n{student.lastname} {student.firstname}')
+        data = self.subjectModel.fetch_all(promotion_id=self.presenter.promotionId, level=student.level)
+        dialog.table.setRowCount(len(data))
+        sm = 0
+        coefs = 0
+        for i, sub in enumerate(data):
+            mark = self.markModel.fetch_item(
+                promotion_id=self.presenter.promotionId,
+                student_id=student.id,
+                subject_id=sub.id)
+            mValue = self.func.strToFloat(str(mark.value)) if type(mark).__name__ == 'Marks' else '0'
+            mValueCoef = self.func.strToFloat(str(mark.value*sub.coef)) if type(mark).__name__ == 'Marks' else '0'
+            items = [sub.title, str(sub.coef), mValue ,mValueCoef]
+            sm += self.func.toFloat(mValueCoef)
+            coefs += sub.coef
+            for col, itm in enumerate(items):
+                item = QTableWidgetItem(itm)
+                if col != 0:
+                    item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                dialog.table.setItem(i, col, item)
+        self.addRow(dialog.table, ['TOTAL', '','',self.func.strToFloat(str(sm))])
+        self.addRow(dialog.table, ['MOYENNE', '','',self.func.strToFloat(str(sm/coefs))])
+        dialog.table.resizeColumnsToContents()
         dialog.exec()
         
     def deleteStudent(self, matricule):

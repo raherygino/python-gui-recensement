@@ -27,23 +27,23 @@ class ShowStudentDialog(Dialog):
         self.line.setFrameShadow(QFrame.Sunken)
         self.line.setObjectName("line")
         
-        self.title = SubtitleLabel("Mouvement", self)
+        self.title = SubtitleLabel("Notes", self)
         self.title.setAlignment(Qt.AlignCenter)
         
+        self.textLayout.addWidget(self.line)
+        self.textLayout.addWidget(self.title)
 
-        self.ImageMessage = ImageLabel(self)
+        '''self.ImageMessage = ImageLabel(self)
         self.ImageMessage.setImage("app/resource/images/default-file-icon.png")
         self.ImageMessage.setFixedSize(QSize(100,100))
         self.message = BodyLabel("Aucune mouvement", self)
         self.message.setAlignment(Qt.AlignCenter)
-        self.textLayout.addWidget(self.line)
-        self.textLayout.addWidget(self.title)
         self.textLayout.addWidget(self.ImageMessage, 0, Qt.AlignCenter)
-        self.textLayout.addWidget(self.message)
+        self.textLayout.addWidget(self.message)'''
         
         self.table = TableView(self)
-        self.table.setHorizontalHeaderLabels(["Observations","Motifs", "Date début","Date fin", "Nb Jours"])
-        self.table.setMinimumHeight(280)
+        self.table.setHorizontalHeaderLabels(["Matières","Coef", "Note", "Note\navec Coef"])
+        self.table.setMinimumHeight(400)
         self.textLayout.addWidget(self.table)
         
         
