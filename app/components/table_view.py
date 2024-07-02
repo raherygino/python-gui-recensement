@@ -21,6 +21,16 @@ class TableView(QTableWidget):
         self.setColumnCount(len(labels))
         return super().setHorizontalHeaderLabels(labels)
     
+    def getHeaderLabels(self):
+        header_labels = []
+        for column in range(self.columnCount()):
+            header_item = self.horizontalHeaderItem(column)
+            if header_item is not None:
+                header_labels.append(header_item.text())
+            else:
+                header_labels.append(f"Column {column}")  # Default label if item is None
+        return header_labels
+    
     @pyqtSlot(QTableWidgetItem)
     def validateInput(self, col, item, default = "0"):
         if item.column() == col:  # Assuming the column where you want to enforce integer input is column 1

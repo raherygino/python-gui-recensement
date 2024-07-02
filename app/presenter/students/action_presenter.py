@@ -1,6 +1,12 @@
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog
 from PyQt5.QtCore import Qt
 from qfluentwidgets import Dialog
+from docx import Document
+from docx.shared import Inches, Pt
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
+import os
+
 from ...view import NewStudentDialog, ShowStudentDialog
 from ...models import StudentModel, Student, MarkModel, SubjectModel
 from ...common import Utils, Function
@@ -31,6 +37,7 @@ class ActionPresenter:
     def showStudent(self, matricule):
         dialog = ShowStudentDialog(self.view.parent.nParent)
         student = self.studentByMatricule(matricule)
+        dialog.exportButton.clicked.connect(lambda: self.exportStudent(student, dialog.table))
         dialog.label.setText(f'{student.level} {student.matricule}\n{student.lastname} {student.firstname}')
         data = self.subjectModel.fetch_all(promotion_id=self.presenter.promotionId, level=student.level)
         dialog.table.setRowCount(len(data))
@@ -56,6 +63,37 @@ class ActionPresenter:
         dialog.table.resizeColumnsToContents()
         dialog.exec()
         
+    def exportStudent(self, student:Student, table):
+        destination_path, _ = QFileDialog.getSaveFileName(self.view, "Exporter", "", "Text Files (*.docx);;All Files (*)")
+        if destination_path:
+            # Create a new Document
+            doc = Document()
+            doc.add_heading('Rélevé de Note', level=1)
+            # Add some more paragraphs
+            doc.add_paragraph(f'Nom et prénoms: {student.lastname} {student.firstname}')
+            doc.add_paragraph(f'Matricule: {student.matricule}')
+            doc.add_paragraph(f'Grade: {student.level}')
+            data = [table.getHeaderLabels()]
+            data.extend(table.getData())
+            # Adding a table
+            rows = len(data)
+            cols = len(data[0])
+            table = doc.add_table(rows=rows, cols=cols)
+            # Set the style of the table (optional)
+            table.style = 'Table Grid'
+            # Set cell margins
+            for i, row in enumerate(table.rows):
+                for j, cell in enumerate(row.cells):
+                    cell.text = data[i][j]
+                    for paragraph in cell.paragraphs:
+                        if self.func.isFloat(data[i][j]):
+                            paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT  # Align text to the right
+                        for run in paragraph.runs:
+                            run.font.size = Pt(12)  # Set font size
+            # Save the document
+            doc.save(destination_path)
+            os.startfile(destination_path)
+            
     def deleteStudent(self, matricule):
         dialog = Dialog('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
         dialog.setTitleBarVisible(False)
