@@ -178,3 +178,6 @@ class Function:
         
     def strToFloat(self, value:str) -> str:
         return str("{:.2f}".format(float(value))) if self.isFloat(value) else ""
+    
+    def toFloat(self, value:str) -> float:
+        return float(value) if self.isFloat(value) else 0
