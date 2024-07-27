@@ -1,0 +1,22 @@
+PrimaryButton {
+    font: 14px 'Segoe UI', 'Microsoft YaHei';
+    border-radius: 2px;
+    border: 1px solid nColor;
+    color: #ffffff;
+    background: nColor ;
+}
+PrimaryButton:hover {
+    border-color: hColor;
+    background: hColor;
+}
+
+Button {
+    font: 14px 'Segoe UI', 'Microsoft YaHei';
+    border-radius: 2px;
+    border: 1px solid #cccccc;
+    color: #454545;
+    background: transparent;
+}
+Button:hover {
+    background: #f4f4f4;
+}
