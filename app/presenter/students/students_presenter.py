@@ -2,7 +2,7 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
 from qfluentwidgets import MessageBox
 
-from ...components import DialogImport, MyDialog
+from ...components import DialogImport, DialogConfirm
 from ...common import Function, Utils
 from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
 from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel
@@ -232,9 +232,6 @@ class StudentsPresenter:
     
     
     def exportData(self):
-        dialog = MyDialog(self.view)
-        dialog.exec()
-        '''
         options = QFileDialog.Options()
         fileName, _ = QFileDialog.getSaveFileName(self.view,"Exporter",f"{os.path.expanduser('~')}","Excel File (*.xlsx)", options=options)
         db = self.func.getTableData(self.dbPresenter.view.tableView)
@@ -249,7 +246,7 @@ class StudentsPresenter:
         if fileName:
             
             self.func.writeExcelFile(fileName, base_de_donnees=db, grille_d_abscence=dAbs, total_nombre_de_jour=dDay)
-            os.startfile(fileName) '''
+            os.startfile(fileName)
     
     def exportCsv(self):
         data = ""
