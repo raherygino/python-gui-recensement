@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog
 from PyQt5.QtCore import Qt
-from qfluentwidgets import Dialog
 from docx import Document
 from docx.shared import Inches, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -10,6 +9,7 @@ import os
 from ...view import NewStudentDialog, ShowStudentDialog
 from ...models import StudentModel, Student, MarkModel, SubjectModel
 from ...common import Utils, Function
+from ...components import DialogConfirm
 
 class ActionPresenter:
     
@@ -95,7 +95,7 @@ class ActionPresenter:
             os.startfile(destination_path)
             
     def deleteStudent(self, matricule):
-        dialog = Dialog('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
+        dialog = DialogConfirm('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
         dialog.setTitleBarVisible(False)
         if dialog.exec():
             self.model.delete_by(promotion_id=self.presenter.promotionId, matricule=matricule)
@@ -103,7 +103,7 @@ class ActionPresenter:
             self.utils.infoBarSuccess("Succès", "Suppression avec réussite", self.view)
             
     def deleteMultiple(self, matricules):
-        dialog = Dialog('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
+        dialog = DialogConfirm('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
         dialog.setTitleBarVisible(False)
         if dialog.exec():
             items = [{'promotion_id':self.presenter.promotionId, 'matricule':matricule} for matricule in matricules]

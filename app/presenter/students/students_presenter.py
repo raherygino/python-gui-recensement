@@ -1,6 +1,5 @@
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
-from qfluentwidgets import MessageBox
 
 from ...components import DialogImport, DialogConfirm
 from ...common import Function, Utils
@@ -237,15 +236,15 @@ class StudentsPresenter:
         db = self.func.getTableData(self.dbPresenter.view.tableView)
         db.insert(0, self.getHeaderLabels(self.dbPresenter.view.tableView))
         
-        dAbs = self.func.getTableData(self.absPresenter.view.tableView)
-        dAbs.insert(0, self.getHeaderLabels(self.absPresenter.view.tableView))
+        dEip = self.func.getTableData(self.eipPresenter.view.tableView)
+        dEip.insert(0, self.getHeaderLabels(self.eipPresenter.view.tableView))
         
-        dDay = self.func.getTableData(self.dayPresenter.view.tableView)
-        dDay.insert(0, self.getHeaderLabels(self.dayPresenter.view.tableView))
+        dEap = self.func.getTableData(self.eapPresenter.view.tableView)
+        dEap.insert(0, self.getHeaderLabels(self.eapPresenter.view.tableView))
         
         if fileName:
             
-            self.func.writeExcelFile(fileName, base_de_donnees=db, grille_d_abscence=dAbs, total_nombre_de_jour=dDay)
+            self.func.writeExcelFile(fileName, base_de_donnees=db, EIP=dEip, EAP=dEap)
             os.startfile(fileName)
     
     def exportCsv(self):
@@ -305,13 +304,13 @@ class StudentsPresenter:
     def deleteAll(self):
         currentTab = self.view.stackedWidget.currentIndex()
         if currentTab == 0 or currentTab == 2:
-            dialog = MessageBox('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
+            dialog = DialogConfirm('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
                 self.model.delete_by(promotion_id = self.promotionId)
                 self.modelMark.delete_by(promotion_id = self.promotionId)
                 self.view.nParent.refresh.emit(["mouvement"])
                 self.view.nParent.currentPromotion.emit(self.promotionId)
         elif currentTab == 1:
-            dialog = MessageBox('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
+            dialog = DialogConfirm('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
                 self.view.nParent.refresh.emit(["mouvement"])
