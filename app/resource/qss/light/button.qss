@@ -20,3 +20,11 @@ Button {
 Button:hover {
     background: #f4f4f4;
 }
+
+ButtonIcon {
+    border: none;
+    background: transparent
+}
+ButtonClose:hover {
+    background: #ff5555;
+}
