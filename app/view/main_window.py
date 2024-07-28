@@ -9,6 +9,7 @@ from qframelesswindow import TitleBar
 from .setting_interface import SettingInterface
 from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
 from ..common.signal_bus import signalBus
+from ..components import DialogConfirm
 from ..models import PromotionModel, StudentModel
 from . import HomeInterface, StudentsInterface
 from ..presenter import PromotionPresenter, StudentsPresenter
@@ -147,15 +148,8 @@ class MainWindow(FluentWindow):
             self.splashScreen.resize(self.size())
     
     def closeEvent(self, event):
-        
-        exitDialog = Dialog(
-            'Quitter', 'Voulez vous quitter vraiment?',
-            self
-        )
-        exitDialog.setTitleBarVisible(False)
-        exitDialog.yesButton.setText('Oui')
-        exitDialog.cancelButton.setText('Non')
-        if exitDialog.exec():
+        dialog = DialogConfirm('Fermer', 'Voulez-vous fermer l\'application vraiment?',self)
+        if dialog.exec():
             event.accept()
         else:
             event.ignore()
