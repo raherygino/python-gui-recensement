@@ -30,19 +30,14 @@ class ButtonIcon(QPushButton):
             icon = icon.replace('black', 'white')
         super().__init__(QIcon(icon), '')
         self.setFixedSize(40,32)
-        self.setStyle()
-        
-    def setStyle(self):
-        self.setStyleSheet('''
-            QPushButton {
-                border: none;
-                background: transparent
-            }
-            QPushButton:hover {
-                background: #ff5555;
-            }
-        ''')
-        
+        self.setStyleSheet(theme.getQss('button'))
+    
+
+class ButtonClose(ButtonIcon):
+    def __init__(self):
+        super().__init__('app/resource/images/icons/Close_black.svg')
+    
+    
 class PrimaryButton(QPushButton):
     
     def __init__(self, text):

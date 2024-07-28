@@ -5,28 +5,30 @@ from PyQt5.QtCore import Qt
 from .btn import ButtonClose, PrimaryButton, Button
 
 class DialogConfirm(Dialog):
-    def __init__(self, parent=None):
-        super().__init__("", "", parent)
+    def __init__(self, title:str, content:str, parent=None):
+        super().__init__(title, content, parent)
         self.hideDefaultWidget()
         self.nTitleBar = QHBoxLayout()
         self.nTitleBar.setContentsMargins(12,0,0,0)
         self.btnClose = ButtonClose()
         self.btnClose.clicked.connect(self.close)
-        self.nTitleBar.addWidget(StrongBodyLabel('Quitter'))
+        self.nTitleBar.addWidget(StrongBodyLabel(title))
         self.nTitleBar.addWidget(self.btnClose,0, Qt.AlignRight)
-        self.textLayout.addWidget(BodyLabel('Voulez-vous quitter vraiment?'))
+        self.textLayout.addWidget(BodyLabel(content))
         self.textLayout.setContentsMargins(12,5,12,0)
         self.btnLayout = QHBoxLayout()
         self.btnLayout.setContentsMargins(0,5,0,8)
         self.yesBtn = PrimaryButton("Oui")
+        self.yesBtn.clicked.connect(self.accept)
         self.cancelBtn = Button("Non")
+        self.cancelBtn.clicked.connect(self.close)
         self.btnLayout.addWidget(self.yesBtn)
         self.btnLayout.addWidget(self.cancelBtn)
         self.textLayout.addLayout(self.btnLayout)
         self.removeLayout()
         self.addLayout()
         self.setFixedHeight(90)
-        self.setMinimumWidth(250)
+        self.setMinimumWidth(350)
         
     def removeLayout(self):
         while self.vBoxLayout.count():
