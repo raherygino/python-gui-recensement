@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
 
-from ...components import DialogImport, DialogConfirm
+from ...components import ImportDialog, ConfirmDialog
 from ...common import Function, Utils
 from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
 from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel
@@ -115,11 +115,11 @@ class StudentsPresenter:
                     nLine = line.replace("\n", "").split(";")
                     data.append(nLine)
                 
-                dialogImport = DialogImport(data, dialog.table.getHorizontalLabels(), dialog)
-                dialogImport.yesBtn.clicked.connect(lambda:  self.addSubToTable(dialogImport, dialog))
+                dialogImport = ImportDialog(data, dialog.table.getHorizontalLabels(), dialog)
+                dialogImport.yesBtn.clicked.connect(lambda:  self.addSubToTable(ImportDialog, dialog))
                 dialogImport.exec()
                     
-    def addSubToTable(self, dialogImport: DialogImport, dialog):
+    def addSubToTable(self, dialogImport: ImportDialog, dialog):
         nData = dialogImport.getData()
         first =  []
         for nItem in nData[0]:
@@ -270,11 +270,11 @@ class StudentsPresenter:
                 for i, line in enumerate(f):
                     nLine = line.replace("\n", "").split(";")
                     data.append(nLine)
-                dialogImport = DialogImport(data, ['Matricule', 'Grade', 'Nom et prénoms', 'Genre'], self.view.nParent)
-                dialogImport.yesBtn.clicked.connect(lambda:  self.addDataImported(dialogImport))
+                dialogImport = ImportDialog(data, ['Matricule', 'Grade', 'Nom et prénoms', 'Genre'], self.view.nParent)
+                dialogImport.yesBtn.clicked.connect(lambda:  self.addDataImported(ImportDialog))
                 dialogImport.exec()
                     
-    def addDataImported(self, dialog:DialogImport):
+    def addDataImported(self, dialog:ImportDialog):
         data = dialog.getData()
         matricule  = data[0][0]
         if matricule == None:
@@ -304,13 +304,13 @@ class StudentsPresenter:
     def deleteAll(self):
         currentTab = self.view.stackedWidget.currentIndex()
         if currentTab == 0 or currentTab == 2:
-            dialog = DialogConfirm('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
+            dialog = ConfirmDialog('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
                 self.model.delete_by(promotion_id = self.promotionId)
                 self.modelMark.delete_by(promotion_id = self.promotionId)
                 self.view.nParent.refresh.emit(["mouvement"])
                 self.view.nParent.currentPromotion.emit(self.promotionId)
         elif currentTab == 1:
-            dialog = DialogConfirm('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
+            dialog = ConfirmDialog('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
                 self.view.nParent.refresh.emit(["mouvement"])

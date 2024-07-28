@@ -9,7 +9,7 @@ import os
 from ...view import NewStudentDialog, ShowStudentDialog
 from ...models import StudentModel, Student, MarkModel, SubjectModel
 from ...common import Utils, Function
-from ...components import DialogConfirm
+from ...components import ConfirmDialog
 
 class ActionPresenter:
     
@@ -95,7 +95,7 @@ class ActionPresenter:
             os.startfile(destination_path)
             
     def deleteStudent(self, matricule):
-        dialog = DialogConfirm('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
+        dialog = ConfirmDialog('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
         dialog.setTitleBarVisible(False)
         if dialog.exec():
             self.model.delete_by(promotion_id=self.presenter.promotionId, matricule=matricule)
@@ -103,7 +103,7 @@ class ActionPresenter:
             self.utils.infoBarSuccess("Succès", "Suppression avec réussite", self.view)
             
     def deleteMultiple(self, matricules):
-        dialog = DialogConfirm('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
+        dialog = ConfirmDialog('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
         dialog.setTitleBarVisible(False)
         if dialog.exec():
             items = [{'promotion_id':self.presenter.promotionId, 'matricule':matricule} for matricule in matricules]
