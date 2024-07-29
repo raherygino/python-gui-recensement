@@ -1,8 +1,10 @@
-from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtGui import QResizeEvent
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt5.QtCore import Qt
+from qframelesswindow import FramelessDialog
 from qfluentwidgets import Dialog, StrongBodyLabel, BodyLabel, \
                            PrimaryPushButton, PushButton, LineEdit, \
-                           ComboBox, SubtitleLabel
+                           ComboBox, SubtitleLabel, FluentStyleSheet
 from .button import ButtonClose, PrimaryButton, Button
 
 class ConfirmDialog(Dialog):
@@ -96,3 +98,22 @@ class ImportDialog(Dialog):
                     newItem[n] = nItem[i]
             nData.append(newItem)
         return nData
+    
+class BigDialog(FramelessDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)# add a label to dialog
+        self.mainLayout = QVBoxLayout()
+        self.contentLayout = QVBoxLayout()
+        self.buttonLayout = QHBoxLayout()
+        self.yesBtn = PrimaryButton("Ok")
+        self.cancelBtn = Button('Annuler')
+        self.buttonLayout.addWidget(self.yesBtn)
+        self.buttonLayout.addWidget(self.cancelBtn)
+        self.mainLayout.addLayout(self.contentLayout)
+        self.mainLayout.addLayout(self.buttonLayout)
+        self.buttonLayout.setAlignment(Qt.AlignBottom)
+        self.setLayout(self.mainLayout)
+        # raise title bar
+        self.titleBar.raise_()
+        FluentStyleSheet.DIALOG.apply(self)
+    

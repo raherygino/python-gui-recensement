@@ -15,7 +15,7 @@
         "MicaEnabled": false
     },
     "QFluentWidgets": {
-        "ThemeColor": "#fffe8317",
-        "ThemeMode": "Light"
+        "ThemeColor": "#ff1a4bfe",
+        "ThemeMode": "Dark"
     }
 }

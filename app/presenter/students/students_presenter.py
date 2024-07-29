@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
 
-from ...components import ImportDialog, ConfirmDialog
+from ...components import ImportDialog, ConfirmDialog, BigDialog
 from ...common import Function, Utils
 from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
 from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel
@@ -302,7 +302,9 @@ class StudentsPresenter:
             self.view.nParent.currentPromotion.emit(self.promotionId)  
         
     def deleteAll(self):
-        currentTab = self.view.stackedWidget.currentIndex()
+        dialog = BigDialog(self.view)
+        dialog.exec()
+        '''currentTab = self.view.stackedWidget.currentIndex()
         if currentTab == 0 or currentTab == 2:
             dialog = ConfirmDialog('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
@@ -313,4 +315,4 @@ class StudentsPresenter:
         elif currentTab == 1:
             dialog = ConfirmDialog('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
-                self.view.nParent.refresh.emit(["mouvement"])
+                self.view.nParent.refresh.emit(["mouvement"])'''
