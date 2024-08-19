@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
 
 from ...components import ImportDialog, ConfirmDialog
 from ...common import Function, Utils
-from ...view import StudentsInterface, NewStudentDialog, SubjectsDialog, AddStudentDialog
+from ...view import StudentsInterface, SubjectsDialog, AddStudentDialog
 from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel
 
 from .db_presenter import StudentDbPresenter
@@ -99,7 +99,7 @@ class StudentsPresenter:
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
         dialog.exec()
         
-    def exportSubject(self, dialog: NewStudentDialog):
+    def exportSubject(self, dialog):
         data = dialog.table.getData()
         if len(data) > 0:
             destination_path, _ = QFileDialog.getSaveFileName(self.view, "Exporter", "", "All Files (*);;Text Files (*.csv)")
@@ -111,7 +111,7 @@ class StudentsPresenter:
         else:
             self.utils.infoBarError('Erreur', "Aucune donnée à exporter", self.view)
         
-    def importSubject(self, dialog: NewStudentDialog):
+    def importSubject(self, dialog):
         destination_path, _ = QFileDialog.getOpenFileName(self.view, "Exporter", "", "CSV File (*.csv)")
         if destination_path:
             lenData = len(dialog.table.getData())

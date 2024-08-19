@@ -1,3 +1,2 @@
 from .new_prom_dialog import NewPromotionDialog
-from .new_subject_dialog import NewSubjectDialog
 from .subject_dialog import SubjectsDialog

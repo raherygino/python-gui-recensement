@@ -6,7 +6,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 import os
 
-from ...view import NewStudentDialog, ShowStudentDialog, AddStudentDialog
+from ...view import ShowStudentDialog, AddStudentDialog
 from ...models import StudentModel, Student, MarkModel, SubjectModel
 from ...common import Utils, Function
 from ...components import ConfirmDialog
@@ -124,7 +124,7 @@ class ActionPresenter:
         dialog.yesBtn.clicked.connect(lambda: self.updateStudent(student, dialog))
         dialog.exec()
     
-    def updateStudent(self,oldStudent:Student, dialog: NewStudentDialog):
+    def updateStudent(self,oldStudent:Student, dialog: AddStudentDialog):
         lastname  = dialog.lastnameEdit.lineEdit.text()
         firstname = dialog.firstnameEdit.lineEdit.text()
         grade     = dialog.gradeEdit.combox.currentText()
