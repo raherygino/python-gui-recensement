@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QResizeEvent
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QLayout
 from PyQt5.QtCore import Qt
 from qframelesswindow import FramelessDialog
 from qfluentwidgets import Dialog, StrongBodyLabel, BodyLabel, \
@@ -100,13 +100,17 @@ class ImportDialog(Dialog):
         return nData
     
 class BigDialog(FramelessDialog):
-    def __init__(self, parent=None):
+    def __init__(self, title, parent=None):
         super().__init__(parent)# add a label to dialog
         self.mainLayout = QVBoxLayout()
         self.contentLayout = QVBoxLayout()
+        self.title = StrongBodyLabel(title)
+        self.contentLayout.addWidget(self.title, 0, Qt.AlignTop)
         self.buttonLayout = QHBoxLayout()
         self.yesBtn = PrimaryButton("Ok")
+        self.yesBtn.clicked.connect(self.accept)
         self.cancelBtn = Button('Annuler')
+        self.cancelBtn.clicked.connect(self.hide)
         self.buttonLayout.addWidget(self.yesBtn)
         self.buttonLayout.addWidget(self.cancelBtn)
         self.mainLayout.addLayout(self.contentLayout)
@@ -116,4 +120,9 @@ class BigDialog(FramelessDialog):
         # raise title bar
         self.titleBar.raise_()
         FluentStyleSheet.DIALOG.apply(self)
-    
+        
+    def addWidget(self, a0: QWidget | None, stretch: int = ..., alignment = ...) -> None:
+        self.contentLayout.addWidget(a0, stretch, alignment)
+        
+    def addLayout(self, layout: QLayout | None, stretch: int = 0) -> None:
+        self.contentLayout.addLayout(layout, stretch)
