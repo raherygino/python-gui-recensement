@@ -1,9 +1,9 @@
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
 
-from ...components import ImportDialog, ConfirmDialog, BigDialog
+from ...components import ImportDialog, ConfirmDialog
 from ...common import Function, Utils
-from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
+from ...view import StudentsInterface, NewStudentDialog, SubjectsDialog
 from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel
 
 from .db_presenter import StudentDbPresenter
@@ -78,7 +78,7 @@ class StudentsPresenter:
             number=matricule[2:4])
         
     def showDialogSubject(self):
-        dialog = NewSubjectDialog(self.view)
+        dialog = SubjectsDialog(self.view)
         subjects:list[Subject] = self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
         allSbjcts = []
         for subject in subjects:
@@ -87,6 +87,13 @@ class StudentsPresenter:
         dialog.table.setRowCount(len(subjects))
         dialog.table.setData(allSbjcts)
         dialog.table.setColNoEditable(0)
+        width =  50
+        height = 500
+        for i, item in enumerate(dialog.table.getHeaderLabels()):
+            width += dialog.table.columnWidth(i)
+        if width > 293:
+            dialog.resize(width, height)
+            
         dialog.btnExport.clicked.connect(lambda: self.exportSubject(dialog))
         dialog.btnImport.clicked.connect(lambda: self.importSubject(dialog))
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
@@ -135,7 +142,7 @@ class StudentsPresenter:
                     dialog.table.setItem(i, j, qWidget)
             dialogImport.accept()
                 
-    def getTableDialogData(self, dialog):
+    def getTableDialogData(self, dialog: SubjectsDialog):
         data = dialog.table.getData()
         dataSubject = []
         for item in data:
@@ -302,9 +309,7 @@ class StudentsPresenter:
             self.view.nParent.currentPromotion.emit(self.promotionId)  
         
     def deleteAll(self):
-        dialog = BigDialog(self.view)
-        dialog.exec()
-        '''currentTab = self.view.stackedWidget.currentIndex()
+        currentTab = self.view.stackedWidget.currentIndex()
         if currentTab == 0 or currentTab == 2:
             dialog = ConfirmDialog('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
@@ -315,4 +320,4 @@ class StudentsPresenter:
         elif currentTab == 1:
             dialog = ConfirmDialog('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
-                self.view.nParent.refresh.emit(["mouvement"])'''
+                self.view.nParent.refresh.emit(["mouvement"])
