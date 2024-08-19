@@ -8,7 +8,7 @@ from ...components import BigDialog, LineEditWithLabel, ComboxEditWithLabel
 class AddStudentDialog(BigDialog):
     
     def __init__(self, parent=None):
-        super().__init__('Elève', parent)
+        super().__init__('Ajouter un(e) élève', parent)
         self.row = QHBoxLayout()
         self.matriculeEdit = LineEditWithLabel("Matricule")
         self.matriculeEdit.lineEdit.textChanged.connect(lambda: self.__isValid(None))

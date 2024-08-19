@@ -6,7 +6,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 import os
 
-from ...view import NewStudentDialog, ShowStudentDialog
+from ...view import NewStudentDialog, ShowStudentDialog, AddStudentDialog
 from ...models import StudentModel, Student, MarkModel, SubjectModel
 from ...common import Utils, Function
 from ...components import ConfirmDialog
@@ -112,9 +112,9 @@ class ActionPresenter:
             self.utils.infoBarSuccess("Succès", "Suppression avec réussite", self.view)
         
     def editStudent(self, matricule):
-        dialog = NewStudentDialog(self.view.parent.nParent)
+        dialog = AddStudentDialog(self.view.parent.nParent)
         student = self.studentByMatricule(matricule)  
-        dialog.titleLabel.setText(f'Modifier {student.level} {student.lastname}')
+        dialog.title.setText(f'Modifier {student.level} {student.lastname}')
         dialog.matriculeEdit.lineEdit.setText(str(student.matricule))
         dialog.matriculeEdit.lineEdit.setEnabled(False)
         dialog.lastnameEdit.lineEdit.setText(student.lastname)
