@@ -6,7 +6,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 import os
 
-from ...view import ShowStudentDialog, AddStudentDialog
+from ...view import StudentDialog, AddStudentDialog
 from ...models import StudentModel, Student, MarkModel, SubjectModel
 from ...common import Utils, Function
 from ...components import ConfirmDialog
@@ -35,9 +35,9 @@ class ActionPresenter:
             table.setItem(len(data), col, item)
         
     def showStudent(self, matricule):
-        dialog = ShowStudentDialog(self.view.parent.nParent)
+        dialog = StudentDialog(self.view.parent.nParent)
         student = self.studentByMatricule(matricule)
-        dialog.exportButton.clicked.connect(lambda: self.exportStudent(student, dialog.table))
+        #dialog.exportButton.clicked.connect(lambda: self.exportStudent(student, dialog.table))
         dialog.label.setText(f'{student.level} {student.matricule}\n{student.lastname} {student.firstname}')
         data = self.subjectModel.fetch_all(promotion_id=self.presenter.promotionId, level=student.level)
         dialog.table.setRowCount(len(data))
@@ -61,6 +61,12 @@ class ActionPresenter:
         self.addRow(dialog.table, ['TOTAL', '','',self.func.strToFloat(str(sm))])
         self.addRow(dialog.table, ['MOYENNE', '','',self.func.strToFloat(str(sm/coefs))])
         dialog.table.resizeColumnsToContents()
+        width =  50
+        height = 500
+        for i, item in enumerate(dialog.table.getHeaderLabels()):
+            width += dialog.table.columnWidth(i)
+        if width > 293:
+            dialog.resize(width, height)
         dialog.exec()
         
     def exportStudent(self, student:Student, table):
