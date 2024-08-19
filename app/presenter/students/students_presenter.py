@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
 
 from ...components import ImportDialog, ConfirmDialog
 from ...common import Function, Utils
-from ...view import StudentsInterface, NewStudentDialog, SubjectsDialog
+from ...view import StudentsInterface, SubjectsDialog, AddStudentDialog
 from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel
 
 from .db_presenter import StudentDbPresenter
@@ -50,7 +50,7 @@ class StudentsPresenter:
         self.promotionId = promotionId
     
     def addStudent(self):
-        dialog = NewStudentDialog(self.view.nParent)
+        dialog = AddStudentDialog(self.view.nParent)
         if dialog.exec():
             student = self.dataStudentFromDialog(dialog)
             if len(self.model.fetch_all(promotion_id=self.promotionId, matricule=student.matricule)) == 0:
@@ -60,12 +60,12 @@ class StudentsPresenter:
             else:
                 self.func.errorSuccess("Matricule invalide", "Matricule exist déjà", self.view.nParent)
     
-    def dataStudentFromDialog(self, dialog):
-        lastname = dialog.lastnameEdit.lineEdit(0).text()
-        firstname = dialog.firstnameEdit.lineEdit(0).text()
-        matricule = dialog.matriculeEdit.lineEdit(0).text()
-        level = dialog.gradeEdit.value()
-        gender = dialog.genderEdit.value()
+    def dataStudentFromDialog(self, dialog:AddStudentDialog):
+        lastname = dialog.lastnameEdit.lineEdit.text()
+        firstname = dialog.firstnameEdit.lineEdit.text()
+        matricule = dialog.matriculeEdit.lineEdit.text()
+        level = dialog.gradeEdit.combox.currentText()
+        gender = dialog.genderEdit.combox.currentText()
         return Student(
             promotion_id=self.promotionId,
             lastname=lastname,
@@ -99,7 +99,7 @@ class StudentsPresenter:
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
         dialog.exec()
         
-    def exportSubject(self, dialog: NewStudentDialog):
+    def exportSubject(self, dialog):
         data = dialog.table.getData()
         if len(data) > 0:
             destination_path, _ = QFileDialog.getSaveFileName(self.view, "Exporter", "", "All Files (*);;Text Files (*.csv)")
@@ -111,7 +111,7 @@ class StudentsPresenter:
         else:
             self.utils.infoBarError('Erreur', "Aucune donnée à exporter", self.view)
         
-    def importSubject(self, dialog: NewStudentDialog):
+    def importSubject(self, dialog):
         destination_path, _ = QFileDialog.getOpenFileName(self.view, "Exporter", "", "CSV File (*.csv)")
         if destination_path:
             lenData = len(dialog.table.getData())
