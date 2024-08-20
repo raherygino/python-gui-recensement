@@ -7,7 +7,7 @@ from docx.oxml import OxmlElement
 from openpyxl import Workbook
 import os
 
-from ...view import StudentDialog, AddStudentDialog
+from ...view import StudentDialog, AddStudentDialog, ViewStudentDialog
 from ...models import StudentModel, Student, MarkModel, SubjectModel
 from ...common import Utils, Function
 from ...components import ConfirmDialog
@@ -36,6 +36,9 @@ class ActionPresenter:
             table.setItem(len(data), col, item)
         
     def showStudent(self, matricule):
+        dialog = ViewStudentDialog(self.view.parent.nParent)
+        dialog.exec()
+        '''
         dialog = StudentDialog(self.view.parent.nParent)
         student = self.studentByMatricule(matricule)
         dialog.label.setText(f'{student.level} {student.matricule}\n{student.lastname} {student.firstname}')
@@ -70,7 +73,7 @@ class ActionPresenter:
             width += dialog.table.columnWidth(i)
         if width > 293:
             dialog.resize(width, height)
-        dialog.exec()
+        dialog.exec()'''
         
     def exportStudent(self, student:Student, table):
         destination_path, _ = QFileDialog.getSaveFileName(self.view, "Exporter", "", "Text Files (*.docx);;All Files (*)")
