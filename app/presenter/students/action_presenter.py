@@ -4,6 +4,7 @@ from docx import Document
 from docx.shared import Inches, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
+from openpyxl import Workbook
 import os
 
 from ...view import StudentDialog, AddStudentDialog
@@ -37,7 +38,6 @@ class ActionPresenter:
     def showStudent(self, matricule):
         dialog = StudentDialog(self.view.parent.nParent)
         student = self.studentByMatricule(matricule)
-        #dialog.exportButton.clicked.connect(lambda: self.exportStudent(student, dialog.table))
         dialog.label.setText(f'{student.level} {student.matricule}\n{student.lastname} {student.firstname}')
         data = self.subjectModel.fetch_all(promotion_id=self.presenter.promotionId, level=student.level)
         dialog.table.setRowCount(len(data))
@@ -55,12 +55,15 @@ class ActionPresenter:
             coefs += sub.coef
             for col, itm in enumerate(items):
                 item = QTableWidgetItem(itm)
+                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
                 if col != 0:
                     item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
                 dialog.table.setItem(i, col, item)
         self.addRow(dialog.table, ['TOTAL', '','',self.func.strToFloat(str(sm))])
         self.addRow(dialog.table, ['MOYENNE', '','',self.func.strToFloat(str(sm/coefs))])
         dialog.table.resizeColumnsToContents()
+        dialog.exportWord.triggered.connect(lambda : self.exportStudent(student, dialog.table))
+        dialog.exportExcel.triggered.connect(lambda : self.exportExcel(student, dialog.table))
         width =  50
         height = 500
         for i, item in enumerate(dialog.table.getHeaderLabels()):
@@ -99,6 +102,28 @@ class ActionPresenter:
             # Save the document
             doc.save(destination_path)
             os.startfile(destination_path)
+            
+            
+    def exportExcel(self, student:Student, table):
+        destination_path, _ = QFileDialog.getSaveFileName(self.view, "Exporter", "", "Text Files (*.xlsx);;All Files (*)")
+        if destination_path:
+            # Create a new Workbook and select the active worksheet
+            wb = Workbook()
+            ws = wb.active
+            data = [
+                ['Nom et prénoms', f'{student.lastname} {student.firstname}'],
+                ['Matricule', student.matricule],
+                ['Grade', student.level],
+            ]
+            data.extend([['']])
+            data.extend([['']])
+            data.extend([[sub for sub in table.getHeaderLabels()]])
+            data.extend(table.getData())
+            # Write data to the worksheet
+            for row in data:
+                ws.append(row)
+                
+            wb.save(destination_path)
             
     def deleteStudent(self, matricule):
         dialog = ConfirmDialog('Suppimer', 'Voulez-vous le suppimer vraiment?', self.view)
