@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Preview</title>
+            <style>
+                * {
+                    padding: 0;
+                    margin: 0;
+                }
+                body { 
+                    font-family: Arial, sans-serif; 
+                    font-size: 12pt;
+                }
+                .header {
+                    width: calc(100% - 20px);
+                    margin: 10px;
+                }
+                .bar {
+                    width: 100%;
+                    height: 10px;
+                    background: linear-gradient(to right, #05791e, #ffffff, #ff2f2f);
+                    margin-top: 15px;
+                }
+                .content {
+                    padding: 10px;
+                }
+                .content-info {
+                    margin-top: 20px;
+                    margin-left: 50px;
+                }
+                .content-info tr td {
+                    height: 30px;
+                    padding-left: 10px;
+                }
+                .marks {
+                    width: calc(100% - 100px);
+                    margin-left: 50px;
+                    margin-right: 50px;
+                    margin-top: 20px;
+                }
+                .marks, .marks td {
+                    border: solid 1px #000000;
+                    border-collapse: collapse;
+                }
+                .marks td {
+                    padding: 4px;
+                }
+                .marks tr:last-child td {
+                    font-weight: bold;
+                }
+            </style>
+        </head>
+        <body>
+            <table class="header">
+                <tr>
+                    <td width="120"><img src="img/logo_pn.png" width="120" alt="Logo pn"></td>
+                    <td class="content">
+                        <center>
+                            <p>
+                                MINISTERE DE LA SECURITE PUBLIQUE <br>
+                                ----------------- <br>
+                                SECRETARIAT GENERAL <br>
+                                ----------------- <br>
+                                <b>DIRECTION DE L’ECOLE NATIONALE DES INSPECTEURS ET AGENTS DE POLICE</b>
+                            </p>
+                        </center>
+                    </td>
+                    <td align="right" width="80"><img src="img/eniap.png" width="80" alt="Logo ENIAP"></td>
+                </tr>
+            </table>
+            <div class="bar"></div>
+            <table class="content-info">
+                <tr>
+                    <td>
+                        <b>Matricule:</b>
+                    </td>
+                    <td><!--matricule--></td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>Catégorie:</b>
+                    </td>
+                    <td><!--level--></td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>Nom et Prénoms:</b>
+                    </td>
+                    <td><!--name--></td>
+                </tr>
+            </table>
+            <table class="marks">
+                <tr>
+                    <td><b>Matières</b></td>
+                    <td align="right" width="40"><b>Note</b></td>
+                    <td align="right" width="80"><b>Note avec Coef</b></td>
+                </tr>
+                <!--here-->
+            </table>
+        </body>
+        </html>
