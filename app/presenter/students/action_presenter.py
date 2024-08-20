@@ -60,7 +60,7 @@ class ActionPresenter:
                     item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
                 dialog.table.setItem(i, col, item)
         self.addRow(dialog.table, ['TOTAL', '','',self.func.strToFloat(str(sm))])
-        self.addRow(dialog.table, ['MOYENNE', '','',self.func.strToFloat(str(sm/coefs))])
+        self.addRow(dialog.table, ['MOYENNE', '','',self.func.strToFloat(str(sm/coefs) if coefs > 0 else '')])
         dialog.table.resizeColumnsToContents()
         dialog.exportWord.triggered.connect(lambda : self.exportStudent(student, dialog.table))
         dialog.exportExcel.triggered.connect(lambda : self.exportExcel(student, dialog.table))

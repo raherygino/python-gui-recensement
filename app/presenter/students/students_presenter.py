@@ -278,7 +278,7 @@ class StudentsPresenter:
                     nLine = line.replace("\n", "").split(";")
                     data.append(nLine)
                 dialogImport = ImportDialog(data, ['Matricule', 'Grade', 'Nom et prénoms', 'Genre'], self.view.nParent)
-                dialogImport.yesBtn.clicked.connect(lambda:  self.addDataImported(ImportDialog))
+                dialogImport.yesBtn.clicked.connect(lambda:  self.addDataImported(dialogImport))
                 dialogImport.exec()
                     
     def addDataImported(self, dialog:ImportDialog):
