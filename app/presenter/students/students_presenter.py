@@ -1,11 +1,10 @@
-from PyQt5.QtCore import QTimer, pyqtSignal
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
-from qfluentwidgets import MessageBox, InfoBarPosition
 
-from ...components import DialogImport
+from ...components import ImportDialog, ConfirmDialog
 from ...common import Function, Utils
-from ...view import StudentsInterface, NewStudentDialog, NewSubjectDialog
-from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel, Marks
+from ...view import StudentsInterface, SubjectsDialog, AddStudentDialog
+from ...models import StudentModel, Student,SubjectModel, Subject, MarkModel
 
 from .db_presenter import StudentDbPresenter
 from .eap_presenter import EapPresenter
@@ -51,7 +50,7 @@ class StudentsPresenter:
         self.promotionId = promotionId
     
     def addStudent(self):
-        dialog = NewStudentDialog(self.view.nParent)
+        dialog = AddStudentDialog(self.view.nParent)
         if dialog.exec():
             student = self.dataStudentFromDialog(dialog)
             if len(self.model.fetch_all(promotion_id=self.promotionId, matricule=student.matricule)) == 0:
@@ -61,12 +60,12 @@ class StudentsPresenter:
             else:
                 self.func.errorSuccess("Matricule invalide", "Matricule exist déjà", self.view.nParent)
     
-    def dataStudentFromDialog(self, dialog):
-        lastname = dialog.lastnameEdit.lineEdit(0).text()
-        firstname = dialog.firstnameEdit.lineEdit(0).text()
-        matricule = dialog.matriculeEdit.lineEdit(0).text()
-        level = dialog.gradeEdit.value()
-        gender = dialog.genderEdit.value()
+    def dataStudentFromDialog(self, dialog:AddStudentDialog):
+        lastname = dialog.lastnameEdit.lineEdit.text()
+        firstname = dialog.firstnameEdit.lineEdit.text()
+        matricule = dialog.matriculeEdit.lineEdit.text()
+        level = dialog.gradeEdit.combox.currentText()
+        gender = dialog.genderEdit.combox.currentText()
         return Student(
             promotion_id=self.promotionId,
             lastname=lastname,
@@ -79,7 +78,7 @@ class StudentsPresenter:
             number=matricule[2:4])
         
     def showDialogSubject(self):
-        dialog = NewSubjectDialog(self.view)
+        dialog = SubjectsDialog(self.view)
         subjects:list[Subject] = self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
         allSbjcts = []
         for subject in subjects:
@@ -88,12 +87,19 @@ class StudentsPresenter:
         dialog.table.setRowCount(len(subjects))
         dialog.table.setData(allSbjcts)
         dialog.table.setColNoEditable(0)
+        width =  50
+        height = 500
+        for i, item in enumerate(dialog.table.getHeaderLabels()):
+            width += dialog.table.columnWidth(i)
+        if width > 293:
+            dialog.resize(width, height)
+            
         dialog.btnExport.clicked.connect(lambda: self.exportSubject(dialog))
         dialog.btnImport.clicked.connect(lambda: self.importSubject(dialog))
         dialog.yesBtn.clicked.connect(lambda: self.getTableDialogData(dialog))
         dialog.exec()
         
-    def exportSubject(self, dialog: NewStudentDialog):
+    def exportSubject(self, dialog):
         data = dialog.table.getData()
         if len(data) > 0:
             destination_path, _ = QFileDialog.getSaveFileName(self.view, "Exporter", "", "All Files (*);;Text Files (*.csv)")
@@ -105,7 +111,7 @@ class StudentsPresenter:
         else:
             self.utils.infoBarError('Erreur', "Aucune donnée à exporter", self.view)
         
-    def importSubject(self, dialog: NewStudentDialog):
+    def importSubject(self, dialog):
         destination_path, _ = QFileDialog.getOpenFileName(self.view, "Exporter", "", "CSV File (*.csv)")
         if destination_path:
             lenData = len(dialog.table.getData())
@@ -116,18 +122,27 @@ class StudentsPresenter:
                     nLine = line.replace("\n", "").split(";")
                     data.append(nLine)
                 
-                dialogImport = DialogImport(data, dialog.table.getHorizontalLabels(), dialog)
-                if dialogImport.exec():
-                    nData = dialogImport.getData()
-                    for i, item in enumerate(nData):
-                        dialog.table.insertRow(i)
-                        for j, nItem in enumerate(item):
-                            qWidget = QTableWidgetItem(nItem)
-                            dialog.table.setItem(i, j, qWidget)
-                            
+                dialogImport = ImportDialog(data, dialog.table.getHorizontalLabels(), dialog)
+                dialogImport.yesBtn.clicked.connect(lambda:  self.addSubToTable(ImportDialog, dialog))
+                dialogImport.exec()
+                    
+    def addSubToTable(self, dialogImport: ImportDialog, dialog):
+        nData = dialogImport.getData()
+        first =  []
+        for nItem in nData[0]:
+            if nItem != None:
+                first.append(nItem)
+        if len(first) == 0:
+            self.utils.infoBarError('Erreur', 'Aucune données n\'a été choisi!', dialog)
+        else:
+            for i, item in enumerate(nData):
+                dialog.table.insertRow(i)
+                for j, nItem in enumerate(item):
+                    qWidget = QTableWidgetItem(nItem)
+                    dialog.table.setItem(i, j, qWidget)
+            dialogImport.accept()
                 
-                
-    def getTableDialogData(self, dialog):
+    def getTableDialogData(self, dialog: SubjectsDialog):
         data = dialog.table.getData()
         dataSubject = []
         for item in data:
@@ -223,21 +238,20 @@ class StudentsPresenter:
     
     
     def exportData(self):
-        #print(self.view.parent.absInterface.tableView)
         options = QFileDialog.Options()
         fileName, _ = QFileDialog.getSaveFileName(self.view,"Exporter",f"{os.path.expanduser('~')}","Excel File (*.xlsx)", options=options)
         db = self.func.getTableData(self.dbPresenter.view.tableView)
         db.insert(0, self.getHeaderLabels(self.dbPresenter.view.tableView))
         
-        dAbs = self.func.getTableData(self.absPresenter.view.tableView)
-        dAbs.insert(0, self.getHeaderLabels(self.absPresenter.view.tableView))
+        dEip = self.func.getTableData(self.eipPresenter.view.tableView)
+        dEip.insert(0, self.getHeaderLabels(self.eipPresenter.view.tableView))
         
-        dDay = self.func.getTableData(self.dayPresenter.view.tableView)
-        dDay.insert(0, self.getHeaderLabels(self.dayPresenter.view.tableView))
+        dEap = self.func.getTableData(self.eapPresenter.view.tableView)
+        dEap.insert(0, self.getHeaderLabels(self.eapPresenter.view.tableView))
         
         if fileName:
             
-            self.func.writeExcelFile(fileName, base_de_donnees=db, grille_d_abscence=dAbs, total_nombre_de_jour=dDay)
+            self.func.writeExcelFile(fileName, base_de_donnees=db, EIP=dEip, EAP=dEap)
             os.startfile(fileName)
     
     def exportCsv(self):
@@ -258,56 +272,52 @@ class StudentsPresenter:
     def importData(self):
         filename = self.func.importFile(self.view, "Importer base de données", "CSV File (*.csv)")
         if filename:
-            with open(filename, "r") as data: 
-                listStudent = []
-                for line in data:
-                    items = line.strip().split(";")
-                    matricule = items[0]
-                    level = items[1]
-                    #FOR PROMOTION SANDRATRA
-                    level = "EAP"
-                    if matricule.find("11") == 0 or \
-                        matricule.find("12") == 0 or \
-                        matricule.find("21") == 0 or \
-                        matricule.find("31") == 0:
-                        level = "EIP"
-                    name = items[2].split(" ")
-                    lastname = name[0]
-                    firstname = ' '.join([val for val in name[1:]]) if len(name) > 1 else ""
-                    genre = items[3]
-                    if len(self.model.fetch_all(matricule=matricule)) > 0:
-                        self.utils.infoBarError('Erreur', "Assurer que vous n'avez pas encore importer cette base de données", self.view, 
-                                                position=InfoBarPosition.TOP,
-                                                duration=5000)
-                        break;
-                    else:
-                        listStudent.append(Student(
-                        promotion_id=self.promotionId,
-                        lastname=lastname,
-                        firstname=firstname,
-                        gender=genre,
-                        level=level,
-                        matricule=matricule,
-                        company=matricule[0],
-                        section=matricule[1],
-                        number=matricule[2:4]
-                        ))
+            with open(filename, 'r') as f:
+                data = []
+                for i, line in enumerate(f):
+                    nLine = line.replace("\n", "").split(";")
+                    data.append(nLine)
+                dialogImport = ImportDialog(data, ['Matricule', 'Grade', 'Nom et prénoms', 'Genre'], self.view.nParent)
+                dialogImport.yesBtn.clicked.connect(lambda:  self.addDataImported(dialogImport))
+                dialogImport.exec()
                     
-                if len(listStudent) > 0:
-                    self.model.create_multiple(listStudent)
-                    self.view.nParent.currentPromotion.emit(self.promotionId)
-                
+    def addDataImported(self, dialog:ImportDialog):
+        data = dialog.getData()
+        matricule  = data[0][0]
+        if matricule == None:
+            self.utils.infoBarError('', 'Vous  n\'avez pas choisi le colonne matricule', dialog)
+        else:
+            listStudent =  []
+            for item in data:
+                name = item[2].split(" ")
+                lastname = name[0]
+                firstname = ' '.join([val for val in name[1:]]) if len(name) > 1 else ""
+                listStudent.append(
+                    Student(
+                        promotion_id = self.promotionId,
+                        matricule    = item[0],
+                        company      = item[0][0],
+                        section      = item[0][1],
+                        number       = item[0][2:4],
+                        firstname    = firstname,
+                        lastname     = lastname,
+                        gender       = item[3],
+                        level        = item[1]
+                    ))
+            self.model.create_multiple(listStudent)
+            dialog.accept()
+            self.view.nParent.currentPromotion.emit(self.promotionId)  
+        
     def deleteAll(self):
         currentTab = self.view.stackedWidget.currentIndex()
         if currentTab == 0 or currentTab == 2:
-            dialog = MessageBox('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
+            dialog = ConfirmDialog('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
                 self.model.delete_by(promotion_id = self.promotionId)
                 self.modelMark.delete_by(promotion_id = self.promotionId)
                 self.view.nParent.refresh.emit(["mouvement"])
                 self.view.nParent.currentPromotion.emit(self.promotionId)
         elif currentTab == 1:
-            dialog = MessageBox('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
+            dialog = ConfirmDialog('Supprimer', "Voulez vous le supprimer?", self.view.nParent)
             if dialog.exec():
-                #self.modelMove.delete_by(promotion_id = self.promotionId)
                 self.view.nParent.refresh.emit(["mouvement"])

@@ -1,32 +1,28 @@
 from PyQt5.QtWidgets import QHBoxLayout, QTableWidgetItem
 from PyQt5.QtCore import QPoint, Qt
-from PyQt5.QtGui import QCursor, QKeyEvent
+from PyQt5.QtGui import QCursor, QKeyEvent, QMouseEvent
 
-from qfluentwidgets import Dialog, Action, RoundMenu, MenuAnimationType, \
-     PrimaryPushButton, PushButton, FluentIcon, SubtitleLabel, ToolButton
-from ....components.table_view import TableView
-from ....components import SpinBoxEditWithLabel
+from qfluentwidgets import Dialog, Action, RoundMenu, MenuAnimationType, FluentIcon, ToolButton
+from ....components import SpinBoxEditWithLabel, TableView, BigDialog
 
-class NewSubjectDialog(Dialog):
-
+class SubjectsDialog(BigDialog):
+    
     def __init__(self, parent=None):
-        super().__init__("", "", parent)
-        self.setTitleBarVisible(False)
-        self.titleLabel.setVisible(False)
-        self.contentLabel.setVisible(False)
+        super().__init__('Matières', parent)
         self.row = QHBoxLayout()
         self.btnGroup = QHBoxLayout()
-        self.title = SubtitleLabel("Matières")
         self.btnImport = ToolButton(FluentIcon.DOWNLOAD)
         self.btnExport= ToolButton(FluentIcon.SHARE)
-        self.row.addWidget(self.title, 0, Qt.AlignLeft)
         self.btnGroup.addWidget(self.btnImport)
         self.btnGroup.addWidget(self.btnExport)
-        self.btnGroup.setAlignment(Qt.AlignRight)
-        self.row.addLayout(self.btnGroup)
+        self.btnGroup.setAlignment(Qt.AlignBottom)
         self.count = SpinBoxEditWithLabel("Nombre de matières")
         self.count.spinbox.setValue(1)
         self.count.spinbox.textChanged.connect(self.__countChange)
+        
+        self.row.addLayout(self.count)
+        self.row.addLayout(self.btnGroup)
+        
         self.table = TableView(self)
         self.table.contextMenuEvent = lambda event: self.contextMenu(event)
         self.table.itemClicked.connect(self.itemClicked)
@@ -36,22 +32,14 @@ class NewSubjectDialog(Dialog):
         self.table.setColumnCount(4)
         self.table.setMinimumHeight(300)
         self.table.itemChanged.connect(lambda item: self.table.validateInput(3, item, "1"))
+        self.contentLayout.addLayout(self.row)
+        self.contentLayout.addWidget(self.table)
+        self.contentLayout.setAlignment(Qt.AlignTop)
         
-        self.yesBtn = PrimaryPushButton("Ok")
-        self.cancelBtn = PushButton("Annuler")
-        self.cancelBtn.clicked.connect(self.yesBtnClicked)
-        self.textLayout.addLayout(self.row)
-        self.textLayout.addLayout(self.count)
-        self.textLayout.addWidget(self.table)
+    def getWidth(self):
+        item = self.table.cellWidget(0,0)
+        return item
         
-        self.yesButton.setVisible(False)
-        self.cancelButton.setVisible(False)
-        
-        self.buttonLayout.addWidget(self.yesBtn)
-        self.buttonLayout.addWidget(self.cancelBtn)
-        
-        self.setFixedWidth(450)
-
     def keyPress(self, event: QKeyEvent | None) -> None:
         if event.key() == Qt.Key_Delete:
             items = self.table.selectionModel().selectedRows()
@@ -89,8 +77,4 @@ class NewSubjectDialog(Dialog):
     def __countChange(self, value):
         self.table.setRowCount(int(value))
         self.table.setColNoEditable(0)
-
-    def yesBtnClicked(self):
-        self.close()
-
         

@@ -9,6 +9,7 @@ from qframelesswindow import TitleBar
 from .setting_interface import SettingInterface
 from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
 from ..common.signal_bus import signalBus
+from ..components import ConfirmDialog
 from ..models import PromotionModel, StudentModel
 from . import HomeInterface, StudentsInterface
 from ..presenter import PromotionPresenter, StudentsPresenter
@@ -119,7 +120,7 @@ class MainWindow(FluentWindow):
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
         self.fluentTitleBar = FluentTitleBar(self)
         self.fluentTitleBar.setIcon(QIcon('app/resource/images/logo_eniap.png'))
-        self.fluentTitleBar.titleLabel.setText('Gestion de comportement')
+        self.fluentTitleBar.titleLabel.setText('Note')
         self.setTitleBar(self.fluentTitleBar)
 
         # create splash screen
@@ -147,15 +148,8 @@ class MainWindow(FluentWindow):
             self.splashScreen.resize(self.size())
     
     def closeEvent(self, event):
-        
-        exitDialog = Dialog(
-            'Quitter', 'Voulez vous quitter vraiment?',
-            self
-        )
-        exitDialog.setTitleBarVisible(False)
-        exitDialog.yesButton.setText('Oui')
-        exitDialog.cancelButton.setText('Non')
-        if exitDialog.exec():
+        dialog = ConfirmDialog('Fermer', 'Voulez-vous fermer l\'application vraiment?',self)
+        if dialog.exec():
             event.accept()
         else:
             event.ignore()

@@ -1,10 +1,13 @@
 from PyQt5.QtCore import QPoint, QThread
 from PyQt5.QtGui import QCursor 
+from PyQt5.QtWidgets import QTableWidgetItem
+from qfluentwidgets import RoundMenu, Action, FluentIcon, MenuAnimationType
 
 from ...view import DatabaseStudentTab
 from ...models import StudentModel, DatabaseWorker, SubjectModel, MarkModel
 from ...components import PopupTeachingTip, TeachingTipTailPosition, FilterFlyoutView
 from ...common.constants import *
+from .action_presenter import  ActionPresenter
 
 class BaseStudentPresenter:
     
@@ -20,7 +23,6 @@ class BaseStudentPresenter:
         self.model:StudentModel = parent.model
         self.modelSubject = parent.modelSubject
         self.modelMark = MarkModel()
-        
         self.mainView = self.view.parent.nParent
         self.parent = parent
         self.labels = [
@@ -30,6 +32,7 @@ class BaseStudentPresenter:
     def __init_widget(self):
         self.view.tableView.contextMenuEvent = lambda event: self.mouseRightClick(event)
         self.view.tableView.setHorizontalHeaderLabels(self.labels)
+        self.view.tableView.itemClicked.connect(self.itemClicked)
         if type(self.view).__name__ == "DatabaseStudentTab":
             self.view.tableView.horizontalHeader().sectionClicked.connect(lambda index: self.showFilterTip(index))
         
@@ -37,8 +40,8 @@ class BaseStudentPresenter:
         self.promotionId = 0
         self.companyStudents = 0
         self.sectionStudents = 0
-        self.day = 0
         self.query = {"promotion_id":self.promotionId}
+        self.subjects = []
         
     def actionWorkerThread(self, data):
         if self.workerThread is None or not self.workerThread.isRunning():
@@ -55,12 +58,38 @@ class BaseStudentPresenter:
         
     def __actions(self):
         self.mainView.currentPromotion.connect(lambda currentId : self.setPromotionId(currentId))
+      
+    def selectItemFromInitCol(self,  item: QTableWidgetItem):
+        if item.column() == 0:
+            for i in range(self.view.tableView.columnCount()):
+                nItem:QTableWidgetItem = self.view.tableView.item(item.row(), i)
+                if not nItem.isSelected():
+                    nItem.setSelected(True)
+        
+    def itemClicked(self, item: QTableWidgetItem):
+        self.selectItemFromInitCol(item)
         
     def setPromotionId(self, promotionId):
         self.promotionId = promotionId
+        self.view.tableView.clearContents()
         self.query = {"promotion_id":promotionId}
         self.defaultData = self.model.fetch_all(**self.query)
+        self.subjects =  self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel())
         self.fetchData(self.defaultData)
+        
+    def findSubjectIdByAbrv(self, abrv:str):
+        subjectId = 0
+        for subject in self.modelSubject.fetch_all(promotion_id=self.promotionId, level=self.getLevel()):
+            if subject.abrv == abrv:
+                subjectId = subject.id
+        return subjectId
+            
+    def findStudentIdByMatricule(self, matricule:int):
+        studentId = 0
+        for student in self.defaultData:
+            if student.matricule == matricule:
+                studentId = student.id
+        return studentId
     
     def setLabelIntoTable(self,promotionId, level):
         subjects = self.modelSubject.fetch_all(promotion_id=promotionId, level=level)
@@ -76,7 +105,6 @@ class BaseStudentPresenter:
         self.sectionStudents = self.fetchDataGroup(self.model, key="section", label=LABEL.SECTION)
         self.levelStudents = self.fetchDataGroup(self.model, key="level")
         self.genderStudents = self.fetchDataGroup(self.model, key="gender")
-        self.day = list(map(str, self.fetchDataGroup(self.model, key="day")))
         
     def fetchData(self, data):
         self.view.progressBar.setVisible(True)
@@ -92,25 +120,40 @@ class BaseStudentPresenter:
                 data.append(item[kwargs.get("key")])
         return data
     
+    def findMatricule(self, item) -> str:
+        return self.view.tableView.item(item.row(), 0).text()
+    
+    def getLevel(self) -> str:
+        return type(self.view).__name__.replace("Tab", "").upper()
+    
     def mouseRightClick(self, event):
         selectedItems = self.view.tableView.selectedItems()
-        if (len(selectedItems) != 0):
-            matricule_item = self.view.tableView.selectedItems()[0].text()
-            #action = MenuAction(self)
-            '''menu = RoundMenu(parent=self.view)
-            menu.addAction(Action(FluentIcon.FOLDER, 'Voir', triggered = lambda:action.show(matricule_item)))
-            menu.addAction(Action(FluentIcon.EDIT, 'Modifier', triggered = lambda: action.update(matricule_item)))
-            menu.addSeparator()
-            menu.addAction(Action(FluentIcon.SCROLL, 'Mouvement', triggered = lambda: action.mouvement(matricule_item)))
-            menu.addSeparator()
-            menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered = lambda: action.delete(matricule_item)))
-            menu.menuActions()[-2].setCheckable(True)
-            menu.menuActions()[-2].setChecked(True)
-
-            self.posCur = QCursor().pos()
-            cur_x = self.posCur.x()
-            cur_y = self.posCur.y()
-            menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)'''
+        if (len(selectedItems) > 0):
+            nItems = []
+            matricules = []
+            for item in selectedItems:
+                if item.row() not in nItems and item.column() == 0:
+                    nItems.append(item.row())
+                    matricules.append(self.view.tableView.item(item.row(), 0).text())
+            if len(nItems) < 400:
+                for item in selectedItems:
+                    self.selectItemFromInitCol(item)
+                    
+            if len(nItems) > 0:
+                action = ActionPresenter(self)
+                matricule = self.findMatricule(self.view.tableView.selectedItems()[0])
+                menu = RoundMenu(parent=self.view)
+                if len(nItems) == 1:
+                    menu.addAction(Action(FluentIcon.FOLDER, 'Voir', triggered=lambda: action.showStudent(matricule)))
+                    menu.addAction(Action(FluentIcon.EDIT, 'Modifier', triggered=lambda: action.editStudent(matricule)))
+                    menu.addSeparator()
+                    menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered=lambda: action.deleteStudent(matricule)))
+                else:
+                    menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered=lambda: action.deleteMultiple(matricules)))
+                self.posCur = QCursor().pos()
+                cur_x = self.posCur.x()
+                cur_y = self.posCur.y()
+                menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
         
     def updateProgress(self, progress):
         self.view.progressBar.setValue(int(progress))
@@ -154,10 +197,6 @@ class BaseStudentPresenter:
             elif label == LABEL.GENDER:
                 data = self.genderStudents
                 key = "gender"
-                
-            elif label == LABEL.NB_DAY:
-                data = self.day
-                key = "day"
                 
             elif label == LABEL.MOTIFS:
                 data = self.motifsMove

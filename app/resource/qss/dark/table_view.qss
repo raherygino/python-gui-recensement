@@ -2,7 +2,7 @@ QTableWidget {
     background: transparent;
 	gridline-color: #343434;
     outline: none;
-    border: none;
+    border: 1px solid #343434;
     /* font: 13px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC'; */
     selection-background-color: transparent;
     alternate-background-color: transparent;
