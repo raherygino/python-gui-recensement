@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QUrl
 from docx import Document
 from docx.shared import Inches, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -37,13 +37,9 @@ class ActionPresenter:
         
     def showStudent(self, matricule):
         dialog = ViewStudentDialog(self.view.parent.nParent)
-        dialog.exec()
-        '''
-        dialog = StudentDialog(self.view.parent.nParent)
         student = self.studentByMatricule(matricule)
-        dialog.label.setText(f'{student.level} {student.matricule}\n{student.lastname} {student.firstname}')
         data = self.subjectModel.fetch_all(promotion_id=self.presenter.promotionId, level=student.level)
-        dialog.table.setRowCount(len(data))
+        nData = ''
         sm = 0
         coefs = 0
         for i, sub in enumerate(data):
@@ -53,27 +49,19 @@ class ActionPresenter:
                 subject_id=sub.id)
             mValue = self.func.strToFloat(str(mark.value)) if type(mark).__name__ == 'Marks' else '0'
             mValueCoef = self.func.strToFloat(str(mark.value*sub.coef)) if type(mark).__name__ == 'Marks' else '0'
-            items = [sub.title, str(sub.coef), mValue ,mValueCoef]
+            '''items = [sub.title, str(sub.coef), mValue ,mValueCoef]'''
             sm += self.func.toFloat(mValueCoef)
             coefs += sub.coef
-            for col, itm in enumerate(items):
-                item = QTableWidgetItem(itm)
-                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-                if col != 0:
-                    item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
-                dialog.table.setItem(i, col, item)
-        self.addRow(dialog.table, ['TOTAL', '','',self.func.strToFloat(str(sm))])
-        self.addRow(dialog.table, ['MOYENNE', '','',self.func.strToFloat(str(sm/coefs) if coefs > 0 else '')])
-        dialog.table.resizeColumnsToContents()
-        dialog.exportWord.triggered.connect(lambda : self.exportStudent(student, dialog.table))
-        dialog.exportExcel.triggered.connect(lambda : self.exportExcel(student, dialog.table))
-        width =  50
-        height = 500
-        for i, item in enumerate(dialog.table.getHeaderLabels()):
-            width += dialog.table.columnWidth(i)
-        if width > 293:
-            dialog.resize(width, height)
-        dialog.exec()'''
+            nData += dialog.rowMark(sub.title, mValue ,mValueCoef)
+        nData += dialog.rowMark('TOTAL', '' ,self.func.strToFloat(str(sm))) 
+        nData += dialog.rowMark('MOYENNE', '' ,self.func.strToFloat(str(sm/coefs) if coefs > 0 else '')) 
+        dialog.html_content = dialog.html_content.replace('<!--matricule-->', str(student.matricule))
+        dialog.html_content = dialog.html_content.replace('<!--name-->', f'{student.lastname} {student.firstname}')
+        dialog.html_content = dialog.html_content.replace('<!--level-->', f'Elève {'Inspecteur' if student.level == 'EIP' else 'Agent'} de Police')
+        dialog.html_content = dialog.html_content.replace('<!--here-->', nData)
+        dialog.html_content = dialog.html_content.replace('default.doc', f'{student.level}-{matricule}.doc')
+        dialog.browser.setHtml(dialog.html_content, QUrl.fromLocalFile(os.path.join(dialog.current_dir, "../../resource/public/index.html")))
+        dialog.exec()
         
     def exportStudent(self, student:Student, table):
         destination_path, _ = QFileDialog.getSaveFileName(self.view, "Exporter", "", "Text Files (*.docx);;All Files (*)")
