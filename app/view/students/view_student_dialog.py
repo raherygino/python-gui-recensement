@@ -1,8 +1,9 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout
-from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtCore import QUrl, Qt
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFileDialog
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineDownloadItem
+from PyQt5.QtCore import QUrl, Qt, QThread, pyqtSignal
 from PyQt5 import QtCore, QtWidgets, QtPrintSupport
-from qfluentwidgets import CommandBar, FluentIcon, Action, isDarkTheme
+from qfluentwidgets import CommandBar, FluentIcon, Action, isDarkTheme, InfoBar, InfoBarIcon, InfoBarPosition
+from ...components import ConfirmDialog
 import os
 
 class ViewStudentDialog(QDialog):
@@ -36,14 +37,48 @@ class ViewStudentDialog(QDialog):
         with open('app/resource/public/template.html', 'r', encoding='utf-8') as file:
             self.html_content = file.read()
         
+        with open('app/resource/public/img/eniap.base64', 'r', encoding='utf-8') as file:
+            self.html_content = self.html_content.replace('img/eniap.png', file.read())
+            
+        with open('app/resource/public/img/pn.base64', 'r', encoding='utf-8') as file:
+            self.html_content = self.html_content.replace('img/logo_pn.png', file.read())
 
         # Show the preview
-        
-        # Show the preview
         #self.browser.show()
-        
+        # Download file
+        self.browser.page().profile().downloadRequested.connect(self.download_file)
         self.layout.addWidget(self.browser)
         self.setLayout(self.layout)
+    
+    def download_file(self, download_item: QWebEngineDownloadItem):
+        # Set a download path
+        save_path, _ = QFileDialog.getSaveFileName(self, "Save File", download_item.suggestedFileName())
+        if save_path:
+            ext = '.doc'
+            save_path += ext if save_path.find(ext) == -1 else ''
+            download_item.stateChanged.connect(self.on_download_state_changed)
+            download_item.setPath(save_path)
+            download_item.accept()
+            
+    def on_download_state_changed(self, state):
+        if state == QWebEngineDownloadItem.DownloadRequested:
+            content = "Exportation en cours"
+            w = InfoBar(
+                icon=InfoBarIcon.INFORMATION,
+                title='Progression',
+                content=content,
+                orient=Qt.Vertical,    # vertical layout
+                isClosable=True,
+                position=InfoBarPosition.TOP_RIGHT,
+                duration=2000,
+                parent=self
+            )
+            w.show()
+        elif state == QWebEngineDownloadItem.DownloadCompleted:
+            dialog = ConfirmDialog('Réussi', 'Exportation avec succès', self)
+            dialog.cancelBtn.setVisible(False)
+            dialog.yesBtn.setText('Ok')
+            dialog.exec()
         
     def show_print_dialog(self):
         # Configure the printer
@@ -65,7 +100,7 @@ class ViewStudentDialog(QDialog):
     def rowMark(self, label, value, valueCoef):
         return f'''
                 <tr>
-                    <td>{label}</td>
-                    <td align="right">{value}</td>
-                    <td align="right">{valueCoef}</td>
+                    <td style="border: solid 1px #000000; border-collapse: collapse;">{label}</td>
+                    <td style="border: solid 1px #000000; border-collapse: collapse;" align="right">{value}</td>
+                    <td style="border: solid 1px #000000; border-collapse: collapse;" align="right">{valueCoef}</td>
                 </tr>'''

@@ -59,6 +59,7 @@ class ActionPresenter:
         dialog.html_content = dialog.html_content.replace('<!--name-->', f'{student.lastname} {student.firstname}')
         dialog.html_content = dialog.html_content.replace('<!--level-->', f'Elève {'Inspecteur' if student.level == 'EIP' else 'Agent'} de Police')
         dialog.html_content = dialog.html_content.replace('<!--here-->', nData)
+        dialog.html_content = dialog.html_content.replace('default.doc', f'{student.level}-{matricule}.doc')
         dialog.browser.setHtml(dialog.html_content, QUrl.fromLocalFile(os.path.join(dialog.current_dir, "../../resource/public/index.html")))
         dialog.exec()
         
