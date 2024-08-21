@@ -1,17 +1,16 @@
-<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Preview</title>
-            <style>
-                * {
+<html>
+<head>
+<title>How to Export HTML to Word Document with JavaScript</title>
+<style>
+
+* {
                     padding: 0;
                     margin: 0;
                 }
                 body { 
                     font-family: Arial, sans-serif; 
                     font-size: 12pt;
+                    padding-bottom: 90px;
                 }
                 .header {
                     width: calc(100% - 20px);
@@ -40,64 +39,211 @@
                     margin-right: 50px;
                     margin-top: 20px;
                 }
-                .marks, .marks td {
-                    border: solid 1px #000000;
-                    border-collapse: collapse;
-                }
                 .marks td {
                     padding: 4px;
                 }
                 .marks tr:last-child td {
                     font-weight: bold;
                 }
-            </style>
-        </head>
-        <body>
-            <table class="header">
-                <tr>
-                    <td width="120"><img src="img/logo_pn.png" width="120" alt="Logo pn"></td>
-                    <td class="content">
-                        <center>
-                            <p>
-                                MINISTERE DE LA SECURITE PUBLIQUE <br>
-                                ----------------- <br>
-                                SECRETARIAT GENERAL <br>
-                                ----------------- <br>
-                                <b>DIRECTION DE L’ECOLE NATIONALE DES INSPECTEURS ET AGENTS DE POLICE</b>
-                            </p>
-                        </center>
-                    </td>
-                    <td align="right" width="80"><img src="img/eniap.png" width="80" alt="Logo ENIAP"></td>
-                </tr>
-            </table>
-            <div class="bar"></div>
-            <table class="content-info">
-                <tr>
-                    <td>
-                        <b>Matricule:</b>
-                    </td>
-                    <td><!--matricule--></td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Catégorie:</b>
-                    </td>
-                    <td><!--level--></td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Nom et Prénoms:</b>
-                    </td>
-                    <td><!--name--></td>
-                </tr>
-            </table>
-            <table class="marks">
-                <tr>
-                    <td><b>Matières</b></td>
-                    <td align="right" width="40"><b>Note</b></td>
-                    <td align="right" width="80"><b>Note avec Coef</b></td>
-                </tr>
-                <!--here-->
-            </table>
-        </body>
-        </html>
+#btn-export {
+    background: #484848;
+    color: #FFF;
+    border: #000 1px solid;
+    padding: 10px 20px;
+    font-size: 12px;
+    border-radius: 3px;
+}
+
+.content-footer {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+}
+
+.fab {
+  background-color: transparent;
+  height: 64px;
+  width: 64px;
+  border-radius: 32px;
+  transition: height 300ms;
+  transition-timing-function: ease;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  text-align: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+.minifab img{
+    margin-top: 10px;
+}
+.minifab .label {
+    background-color: #484848;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+}
+
+.fab:hover {
+  height: 360px;
+}
+
+.fab:hover .mainop {
+  transform: rotate(180deg);
+}
+
+.mainop {
+  margin: auto;
+  width: 64px;
+  height: 64px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transition: transform 300ms;
+  background-color: #f44336;
+  border-radius: 32px;
+  z-index: 6;
+}
+
+.mainopShadow {
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.mainop img {
+  margin-top: 18px;
+}
+
+.minifab {
+  position: relative;
+  cursor: pointer;
+  z-index: 5;
+  float: left;
+  margin-bottom: 8px;
+  margin-left: 8px;
+  margin-right: 8px;
+  transition: cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.minifab:hover {
+    transform: scale(0.9);
+}
+
+.minifabIcon {
+  height: 64px;
+  width: 64px;
+  margin-top: 12px;
+}
+
+.minifab span {
+    background-color: #454545;
+    border-radius: 8px;
+    padding: 8px;
+    color: #fff;
+    position: relative;
+    font-size: 9pt;
+}
+
+</style>
+</head>
+<body>
+<div class="source-html-outer">
+    <div id="source-html">
+        <table class="header">
+            <tr>
+                <td width="120"><img src="img/logo_pn.png" width="120" height="120" alt="Logo pn"></td>
+                <td class="content">
+                    <center>
+                        <p>
+                            MINISTERE DE LA SECURITE PUBLIQUE <br>
+                            ----------------- <br>
+                            SECRETARIAT GENERAL <br>
+                            ----------------- <br>
+                            <b>DIRECTION DE L’ECOLE NATIONALE DES INSPECTEURS ET AGENTS DE POLICE</b>
+                        </p>
+                    </center>
+                </td>
+                <td align="right" width="80"><img src="img/eniap.png" width="80" height="120" alt="Logo ENIAP"></td>
+            </tr>
+        </table>
+        <div class="bar"></div>
+        <p></p>
+        <p></p>
+        <table class="content-info">
+            <tr>
+                <td>
+                    <b>Matricule:</b>
+                </td>
+                <td><!--matricule--></td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Catégorie:</b>
+                </td>
+                <td><!--level--></td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Nom et Prénoms:</b>
+                </td>
+                <td><!--name--></td>
+            </tr>
+        </table>
+        <p></p>
+        <p></p>
+        <table class="marks" style="border: solid 1px #000000; border-collapse: collapse;">
+            <tr>
+                <td style="border: solid 1px #000000; border-collapse: collapse;"><b>Matières</b></td>
+                <td align="right" width="40" style="border: solid 1px #000000; border-collapse: collapse;"><b>Note</b></td>
+                <td align="right" width="80" style="border: solid 1px #000000; border-collapse: collapse;"><b>Note avec Coef</b></td>
+            </tr>
+            <!--here-->
+        </table>
+    </div>
+    <div class="content-footer">
+        <!--button id="btn-export" onclick=""> </button-->
+    </div>
+    <div class="mainopShadow"></div>
+<div class="fab">
+  <div class="mainop">
+    <img src="img/share.png" width="26" alt="Icon">
+  </div>
+  <div id="slides" class="minifab op3">
+    <img class="minifabIcon" src="img/pdf.png">
+    <span>PDF</span>
+  </div>
+  <div id="sheets" class="minifab op2">
+    <img class="minifabIcon" src="img/xls.png">
+    <span>Excel</span>
+  </div>
+  <div id="docs" class="minifab op1" onclick="exportHTML();">
+    <img class="minifabIcon" src="img/doc.png">
+    <span>Word</span>
+  </div>
+</div>
+</div>
+    <script>
+    function exportHTML(){
+       var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+            "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+            "xmlns='http://www.w3.org/TR/REC-html40'>"+
+            "<head><meta charset='utf-8'><title>Export HTML to Word Document with JavaScript</title></head><body>";
+       var footer = "</body></html>";
+       var sourceHTML = header+document.getElementById("source-html").innerHTML+footer;
+       
+       var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+       var fileDownload = document.createElement("a");
+       document.body.appendChild(fileDownload);
+       fileDownload.href = source;
+       fileDownload.download = 'default.doc';
+       fileDownload.click();
+       document.body.removeChild(fileDownload);
+    }
+</script>
+</body>
+</html>
