@@ -63,8 +63,9 @@ class BaseStudentPresenter:
         if item.column() == 0:
             for i in range(self.view.tableView.columnCount()):
                 nItem:QTableWidgetItem = self.view.tableView.item(item.row(), i)
-                if not nItem.isSelected():
-                    nItem.setSelected(True)
+                if nItem != None:
+                    if not nItem.isSelected():
+                        nItem.setSelected(True)
         
     def itemClicked(self, item: QTableWidgetItem):
         self.selectItemFromInitCol(item)
