@@ -112,7 +112,7 @@ class StudentsPresenter:
             self.utils.infoBarError('Erreur', "Aucune donnée à exporter", self.view)
         
     def importSubject(self, dialog):
-        destination_path, _ = QFileDialog.getOpenFileName(self.view, "Exporter", "", "CSV File (*.csv)")
+        destination_path, _ = QFileDialog.getOpenFileName(self.view, "Importer", "", "CSV File (*.csv)")
         if destination_path:
             lenData = len(dialog.table.getData())
             with open(destination_path, 'r') as f:
@@ -123,10 +123,10 @@ class StudentsPresenter:
                     data.append(nLine)
                 
                 dialogImport = ImportDialog(data, dialog.table.getHorizontalLabels(), dialog)
-                dialogImport.yesBtn.clicked.connect(lambda:  self.addSubToTable(ImportDialog, dialog))
+                dialogImport.yesBtn.clicked.connect(lambda:  self.addSubToTable(dialogImport, dialog))
                 dialogImport.exec()
                     
-    def addSubToTable(self, dialogImport: ImportDialog, dialog):
+    def addSubToTable(self, dialogImport: ImportDialog, dialog: SubjectsDialog):
         nData = dialogImport.getData()
         first =  []
         for nItem in nData[0]:

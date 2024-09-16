@@ -10,9 +10,10 @@ from .setting_interface import SettingInterface
 from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
 from ..common.signal_bus import signalBus
 from ..components import ConfirmDialog
-from ..models import PromotionModel, StudentModel
-from . import HomeInterface, StudentsInterface
-from ..presenter import PromotionPresenter, StudentsPresenter
+
+from ..models import PromotionModel, StudentModel, BelieverModel
+from . import HomeInterface, StudentsInterface, ListBelieverInterface, AddBelieverInterface
+from ..presenter import PromotionPresenter, StudentsPresenter, BelieverPresenter, MenuAction
 
 class Widget(QFrame):
 
@@ -81,20 +82,24 @@ class MainWindow(FluentWindow):
         self.initWindow()
 
         # create sub interface
+        self.listBelieverInterface = ListBelieverInterface(self)
+        self.addBelieverInterface = AddBelieverInterface(self)
         self.settingInterface = SettingInterface(self)
-        self.homeInterface = HomeInterface(self)
-        self.studentsInterface = StudentsInterface(self)
+        #self.homeInterface = HomeInterface(self)
+        #self.studentsInterface = StudentsInterface(self)
 
         # enable acrylic effect
         self.navigationInterface.setAcrylicEnabled(True)
         self.connectSignalToSlot()
 
-        self.promModel = PromotionModel()
+        """self.promModel = PromotionModel()
         self.promotionPresenter = PromotionPresenter(self.homeInterface, self.promModel, self)
         
         self.studentModel = StudentModel()
-        self.studentsPresenter = StudentsPresenter(self.studentsInterface, self.studentModel)
-
+        self.studentsPresenter = StudentsPresenter(self.studentsInterface, self.studentModel)"""
+        self.believerModel = BelieverModel()
+        self.believerPresenter = BelieverPresenter(self.believerModel, self.addBelieverInterface, self.listBelieverInterface)
+       
         # add items to navigation interface
         self.initNavigation()
         self.splashScreen.finish()
@@ -105,14 +110,16 @@ class MainWindow(FluentWindow):
 
     def initNavigation(self):
         # add navigation items
-        self.addSubInterface(self.homeInterface, FluentIcon.HOME, 'Accueil')
-        self.addSubInterface(self.studentsInterface, FluentIcon.PEOPLE, "Elèves")
+        ''''self.addSubInterface(self.homeInterface, FluentIcon.HOME, 'Accueil')
+        self.addSubInterface(self.studentsInterface, FluentIcon.PEOPLE, "Elèves")'''
+        self.addSubInterface(self.listBelieverInterface, FluentIcon.PEOPLE, "Lisitra")
+        self.addSubInterface(self.addBelieverInterface, FluentIcon.ADD, "Mampiditra")
+        
         self.navigationInterface.addSeparator()
        
         self.addSubInterface(
             self.settingInterface, FluentIcon.SETTING, 'Paramètres', NavigationItemPosition.BOTTOM)
         
-        self.navigationInterface.setVisible(False)
 
     def initWindow(self):
         self.resize(960, 780)
