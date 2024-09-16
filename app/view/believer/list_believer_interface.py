@@ -52,6 +52,7 @@ class ListBelieverInterface(QWidget):
         
         self.addAction = Action(FluentIcon.ADD, "Mampiditra", self)
         self.exportAction = Action(FluentIcon.DOCUMENT, "Avoaka Excel", self)
+        self.diaconAction = Action(FluentIcon.PEOPLE, "Diakona", self)
         '''
         self.addAction = Action(FluentIcon.APPLICATION, "Un matériel", self)
         self.addComp = Action(FluentIcon.LINK, "Options", self)
@@ -70,6 +71,7 @@ class ListBelieverInterface(QWidget):
         '''
         self.commandBar.addAction(self.addAction)
         self.commandBar.addAction(self.exportAction)
+        self.commandBar.addAction(self.diaconAction)
         '''self.commandBar.addAction(self.refreshAction)
         self.commandBar.addAction(self.importAction)
         self.commandBar.addWidget(self.dropDownButtonExp)

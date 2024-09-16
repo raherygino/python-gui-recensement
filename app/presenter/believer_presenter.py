@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action, Dialog
 from ..common import Function
 from ..models import DatabaseWorker, BelieverModel, Believer
-from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, ShowBelieverDialog
+from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, DiaconDialog
 from .menu_presenter import MenuAction
 import dataclasses
 import os
@@ -43,6 +43,7 @@ class BelieverPresenter:
     def __actions(self):
         self.view.addAction.triggered.connect(lambda: self.addView.nParent.stackedWidget.setCurrentWidget(self.addView))
         self.view.exportAction.triggered.connect(lambda: self.exportExcel())
+        self.view.diaconAction.triggered.connect(lambda: self.showDiaconDialog())
         self.addView.btnAdd.clicked.connect(self.addBeliver)
         self.addView.btnAddFamily.clicked.connect(self.addFamily)
         self.addView.btnClear.clicked.connect(self.clear)
@@ -147,7 +148,12 @@ class BelieverPresenter:
         if fileName:
             self.func.writeExcelFile(fileName, base_de_donnees=db)
             os.startfile(fileName)
-                
+            
+    def showDiaconDialog(self):
+        dialog = DiaconDialog(self.view)
+        if dialog.exec():
+            data = dialog.table.getData()
+            print(data)
             
     def deleteFamily(self, pos):
         dialog = Dialog("Voulez vous le supprimer vraiment?", "Cette donnée sera perdu. Voulez-vous la supprimer vraiment?", self.addView.nParent)

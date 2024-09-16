@@ -16,6 +16,7 @@ class TableView(QTableWidget):
         self.setQss(cfg.get(cfg.theme))
         self.colNoEditable = []
         self.isIncrement = False
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
         
     def setHorizontalHeaderLabels(self, labels: Iterable[str | None]) -> None:
         self.setColumnCount(len(labels))
