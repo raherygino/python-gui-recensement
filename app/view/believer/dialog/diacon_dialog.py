@@ -37,6 +37,15 @@ class DiaconDialog(BigDialog):
         self.contentLayout.setAlignment(Qt.AlignTop)
         self.table.resizeColumnsToContents()
         
+        
+    def setData(self, data:list):
+        self.table.setRowCount(len(data))
+        for row, item in enumerate(data):
+            self.table.setItem(row, 0, QTableWidgetItem(str(item.id)))
+            self.table.setItem(row, 1, QTableWidgetItem(str(item.name)))
+        self.table.resizeColumnsToContents()
+            
+        
     def getWidth(self):
         item = self.table.cellWidget(0,0)
         return item
@@ -81,6 +90,7 @@ class DiaconDialog(BigDialog):
         self.table.setRowCount(count+1)
         self.table.setItem(count, 1, QTableWidgetItem(nameDiacon))
         self.nameDiacon.lineEdit.setText("")
+        self.table.resizeColumnsToContents()
 
     def __nameChanged(self, text):
         self.btnAdd.setEnabled(len(text) > 3)

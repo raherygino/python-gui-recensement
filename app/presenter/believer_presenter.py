@@ -3,7 +3,7 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action, Dialog
 from ..common import Function
-from ..models import DatabaseWorker, BelieverModel, Believer
+from ..models import DatabaseWorker, BelieverModel, Believer, DiaconModel, Diacon
 from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, DiaconDialog
 from .menu_presenter import MenuAction
 import dataclasses
@@ -20,6 +20,7 @@ class BelieverPresenter:
         self.view = view
         self.addView = addView
         self.model = model
+        self.diaconModel = DiaconModel()
         self.func = Function()
         self.workerThread = None
         self.query = {'is_leader': '1'}
@@ -151,9 +152,19 @@ class BelieverPresenter:
             
     def showDiaconDialog(self):
         dialog = DiaconDialog(self.view)
+        diacons = self.diaconModel.fetch_all()
+        items = [[str(item.id), item.name ] for item in diacons]
+        dialog.setData(diacons)
         if dialog.exec():
             data = dialog.table.getData()
-            print(data)
+            for item in data:
+                if item[0] == "":
+                    self.diaconModel.create(Diacon(name=item[1]))
+                else:
+                    self.diaconModel.update_item(item[0], name=item[1])
+            for nItem in items:
+                if nItem not in data:
+                    self.diaconModel.delete_item(nItem[0])
             
     def deleteFamily(self, pos):
         dialog = Dialog("Voulez vous le supprimer vraiment?", "Cette donnée sera perdu. Voulez-vous la supprimer vraiment?", self.addView.nParent)
