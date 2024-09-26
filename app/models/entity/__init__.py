@@ -5,3 +5,4 @@ from .subject import Subject
 from .marks  import Marks
 from .believer import Believer
 from .diacon import Diacon
+from .dept_work import DeptWork

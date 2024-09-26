@@ -15,16 +15,6 @@ from ..models import PromotionModel, StudentModel, BelieverModel
 from . import HomeInterface, StudentsInterface, ListBelieverInterface, AddBelieverInterface
 from ..presenter import PromotionPresenter, StudentsPresenter, BelieverPresenter, MenuAction
 
-class Widget(QFrame):
-
-    def __init__(self, text: str, parent=None):
-        super().__init__(parent=parent)
-        self.label = TitleLabel(text, self)
-        self.label.setAlignment(Qt.AlignCenter)
-        self.hBoxLayout = QHBoxLayout(self)
-        self.hBoxLayout.addWidget(self.label, 1, Qt.AlignCenter)
-        self.setObjectName(text.replace(' ', '-'))
-
 class FluentTitleBar(TitleBar):
     """ Fluent title bar"""
 
@@ -112,7 +102,7 @@ class MainWindow(FluentWindow):
         # add navigation items
         ''''self.addSubInterface(self.homeInterface, FluentIcon.HOME, 'Accueil')
         self.addSubInterface(self.studentsInterface, FluentIcon.PEOPLE, "Elèves")'''
-        self.addSubInterface(self.listBelieverInterface, FluentIcon.PEOPLE, "Lisitra")
+        self.addSubInterface(self.listBelieverInterface, FluentIcon.DOCUMENT, "Lisitra")
         self.addSubInterface(self.addBelieverInterface, FluentIcon.ADD, "Mampiditra")
         
         self.navigationInterface.addSeparator()
@@ -126,8 +116,8 @@ class MainWindow(FluentWindow):
         self.setMinimumWidth(760)
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
         self.fluentTitleBar = FluentTitleBar(self)
-        self.fluentTitleBar.setIcon(QIcon('app/resource/images/logo_eniap.png'))
-        self.fluentTitleBar.titleLabel.setText('Note')
+        #self.fluentTitleBar.setIcon(QIcon('app/resource/images/logo_eniap.png'))
+        self.fluentTitleBar.titleLabel.setText('Recensement')
         self.setTitleBar(self.fluentTitleBar)
 
         # create splash screen
@@ -155,7 +145,9 @@ class MainWindow(FluentWindow):
             self.splashScreen.resize(self.size())
     
     def closeEvent(self, event):
-        dialog = ConfirmDialog('Fermer', 'Voulez-vous fermer l\'application vraiment?',self)
+        dialog = ConfirmDialog('Akatona', 'Akatona marina ve?',self)
+        dialog.yesBtn.setText("Eny")
+        dialog.cancelBtn.setText("Tsia")
         if dialog.exec():
             event.accept()
         else:

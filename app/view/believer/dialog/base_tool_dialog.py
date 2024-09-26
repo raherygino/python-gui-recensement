@@ -3,7 +3,7 @@ from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QCursor
 
 from qfluentwidgets import Dialog, Action, RoundMenu, MenuAnimationType, FluentIcon, PrimaryToolButton
-from ....components import TableView, BigDialog, LineEditWithLabel
+from ....components import TableView, BigDialog, LineEditWithLabel, ConfirmDialog
 
 class ToolDialog(BigDialog):
     
@@ -33,7 +33,8 @@ class ToolDialog(BigDialog):
         self.contentLayout.addWidget(self.table)
         self.contentLayout.setAlignment(Qt.AlignTop)
         self.table.resizeColumnsToContents()
-        
+        self.yesBtn.setText("Ekena")
+        self.cancelBtn.setText("Asorina")
         
     def setData(self, data:list):
         self.table.setRowCount(len(data))
@@ -49,15 +50,16 @@ class ToolDialog(BigDialog):
         items = self.table.selectionModel().selectedRows()
         if len(items) > 0:
             menu = RoundMenu(parent=self)
-            menu.addAction(Action(FluentIcon.DELETE, 'Supprimer', triggered = lambda:self.deleteSubject(items)))
+            menu.addAction(Action(FluentIcon.DELETE, 'Fafana', triggered = lambda:self.deleteSubject(items)))
             self.posCur = QCursor().pos()
             cur_x = self.posCur.x()
             cur_y = self.posCur.y()
             menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
         
     def deleteSubject(self, items):
-        dialog = Dialog("Supprimer?", "Voulez vous supprimer vraiment?", self)
-        dialog.setTitleBarVisible(False)
+        dialog = ConfirmDialog('Fafana', 'Hofafana marina ve?',self)
+        dialog.yesBtn.setText("Eny")
+        dialog.cancelBtn.setText("Tsia")
         if dialog.exec():
             for index in sorted(items, key=lambda x: x.row(), reverse=True):
                 self.table.removeRow(index.row())
@@ -75,5 +77,5 @@ class ToolDialog(BigDialog):
         self.table.resizeColumnsToContents()
 
     def __nameChanged(self, text):
-        self.btnAdd.setEnabled(len(text) > 3)
+        self.btnAdd.setEnabled(len(text) > 2)
         

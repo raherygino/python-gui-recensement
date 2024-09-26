@@ -3,8 +3,8 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action, Dialog
 from ..common import Function
-from ..models import DatabaseWorker, BelieverModel, Believer, DiaconModel, Diacon
-from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, DiaconDialog
+from ..models import DatabaseWorker, BelieverModel, Believer, DiaconModel, Diacon, DeptWork, DeptWorkModel
+from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, DiaconDialog, DeptWorkDialog
 from .menu_presenter import MenuAction
 import dataclasses
 import os
@@ -21,6 +21,7 @@ class BelieverPresenter:
         self.addView = addView
         self.model = model
         self.diaconModel = DiaconModel()
+        self.deptWorkModel = DeptWorkModel()
         self.func = Function()
         self.workerThread = None
         self.query = {'is_leader': '1'}
@@ -45,6 +46,7 @@ class BelieverPresenter:
         self.view.addAction.triggered.connect(lambda: self.addView.nParent.stackedWidget.setCurrentWidget(self.addView))
         self.view.exportAction.triggered.connect(lambda: self.exportExcel())
         self.view.diaconAction.triggered.connect(lambda: self.showDiaconDialog())
+        self.view.deptWorkAction.triggered.connect(lambda: self.showDeptWorkDialog())
         self.addView.btnAdd.clicked.connect(self.addBeliver)
         self.addView.btnAddFamily.clicked.connect(self.addFamily)
         self.addView.btnClear.clicked.connect(self.clear)
@@ -151,10 +153,11 @@ class BelieverPresenter:
             os.startfile(fileName)
             
     def showDiaconDialog(self):
-        dialog = DiaconDialog(self.view)
         diacons = self.diaconModel.fetch_all()
         items = [[str(item.id), item.name ] for item in diacons]
-        dialog.setData(diacons)
+        ids = [str(item.id) for item in diacons]
+        dialog = DiaconDialog(self.view)
+        dialog.setData(items)
         if dialog.exec():
             data = dialog.table.getData()
             for item in data:
@@ -163,8 +166,26 @@ class BelieverPresenter:
                 else:
                     self.diaconModel.update_item(item[0], name=item[1])
             for nItem in items:
-                if nItem not in data:
+                if nItem[0] not in ids:
                     self.diaconModel.delete_item(nItem[0])
+    
+    def showDeptWorkDialog(self):
+        dialog = DeptWorkDialog(self.view)
+        deptWorks = self.deptWorkModel.fetch_all()
+        items = [[str(item.id), item.name ] for item in deptWorks]
+        ids = [str(item.id) for item in deptWorks]
+        dialog.setData(items)
+        if dialog.exec():
+            data = dialog.table.getData()
+            nIds = [item[0] for item in data]
+            for item in data:
+                if item[0] == "":
+                    self.deptWorkModel.create(DeptWork(name=item[1]))
+                else:
+                    self.deptWorkModel.update_item(item[0], name=item[1])
+            for nId in ids:
+                if nId not in nIds:
+                    self.deptWorkModel.delete_item(nId)
             
     def deleteFamily(self, pos):
         dialog = Dialog("Voulez vous le supprimer vraiment?", "Cette donnée sera perdu. Voulez-vous la supprimer vraiment?", self.addView.nParent)
