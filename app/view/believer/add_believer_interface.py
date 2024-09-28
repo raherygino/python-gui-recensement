@@ -24,7 +24,7 @@ class AddBelieverInterface(QWidget):
         self.btnLayout = QHBoxLayout()
         self.btnAdd = PrimaryPushButton("Ampidirina", self)
         self.btnAdd.setEnabled(False)
-        self.btnClear = PushButton("Asorina", self)
+        self.btnClear = PushButton("Esorina", self)
         self.btnLayout.addWidget(self.btnAdd)
         self.btnLayout.addWidget(self.btnClear)
         self.mainLayout.addLayout(self.btnLayout)

@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QDate, QPoint
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QFileDialog
+from ..components import ConfirmDialog
 from ..models import Believer, BelieverModel
 from ..view import ShowBelieverDialog, AddBelieverInterface
 from qfluentwidgets import MessageDialog, RoundMenu, Action, MenuAnimationType, FluentIcon
@@ -239,9 +240,22 @@ class MenuAction:
         self.presenter.addView.btnAdd.setText("Ovaina")
         
     def confirmDelete(self, item):
-        dialog = MessageDialog('Fafana', 'Fafana marina ve?', self.view.nParent)
-        dialog.yesButton.clicked.connect(lambda: self.delete(item))
-        dialog.exec_()
+        #dialog = MessageDialog('Fafana', 'Fafana marina ve?', self.view.nParent)
+        dialog = ConfirmDialog('Fafana', 'Fafana marina ve?',  self.view.nParent)
+        dialog.yesBtn.setText("Eny")
+        dialog.cancelBtn.setText("Tsia")
+        #dialog.yesButton.clicked.connect(lambda: self.delete(item))
+        if dialog.exec_():
+            nItem = self.model.fetch_item(id=item)
+            if nItem.id_father == 0:
+                self.model.delete_item(item)
+            else:
+                self.model.update_item(item, is_leader="0", gender="Lahy")
+                self.model.delete_by(id_conjoint=nItem.id)
+                self.model.delete_by(id_father=nItem.id)
+            self.presenter.fetchData(self.model.fetch_all(**self.presenter.query))
+            
+            
         
     def delete(self, item):
         self.model.delete_item(item)
