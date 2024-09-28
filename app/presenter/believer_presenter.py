@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action, Dialog
 from ..common import Function
 from ..models import DatabaseWorker, BelieverModel, Believer, DiaconModel, Diacon, DeptWork, DeptWorkModel
-from ..view import ListBelieverInterface, AddBelieverInterface, DiaconDialog, DeptWorkDialog, AddBelieverDialog
+from ..view import ListBelieverInterface, AddBelieverInterface, DiaconDialog, DeptWorkDialog, AddBelieverDialog, AddFamilyDialog
 from .menu_presenter import MenuAction
 import dataclasses
 import os
@@ -345,7 +345,11 @@ class BelieverPresenter:
         
                 
     def addFamily(self):
-        w = AddBelieverDialog(self.view.nParent)
+        dialog = AddFamilyDialog(self.view.nParent)
+        self.__init_combox(self.diaconModel, dialog.diaconEdit.combox)
+        dialog.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
+        dialog.exec()
+        '''w = AddBelieverDialog(self.view.nParent)
         adrss = self.addView.addressEdit.lineEdit.text()
         rgn = self.addView.regionEdit.lineEdit.text()
         w.addressEdit.lineEdits[0].setText(adrss)
@@ -353,12 +357,10 @@ class BelieverPresenter:
         if w.exec():
             believer = self.getBelieverFromDialog(w)
             self.family.append(believer)
-            '''["", lastname, firstname, gender, posFamily, f'{birthday} {birthplace}', deptWork, dateBaptism, placeBaptism,
-                 dateRecipient, placeRecipient, numberRecipient, deptWork, responsability]
-            )'''
+            
             self.setData(self.addView.familyTableView, self.family)
             #self.model.create(believer)
-            #self.fetchData(self.model.fetch_all())
+            #self.fetchData(self.model.fetch_all()) '''
     def setData(self, table, believers: list[Believer]):
         data = []
         for i, believer in enumerate(believers):
