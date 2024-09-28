@@ -59,6 +59,7 @@ class AddBelieverInterface(QWidget):
         self.firstnameEdit = LineEditWithLabel("Fanampiny")
         self.addressEdit = LineEditWithLabel("Adiresy")
         self.regionEdit = ComboxEditWithLabel("Faritra", ["AVARATRA", "ATSIMO"])
+        self.regionEdit.combox.currentTextChanged.connect(self.__regionChanged)
         self.addChild(self.row1, [self.lastnameEdit, self.firstnameEdit, self.addressEdit, self.regionEdit])
         
         self.row2 = QHBoxLayout()
@@ -81,6 +82,7 @@ class AddBelieverInterface(QWidget):
         self.recipientDateEdit = DateEditWithLabel("Daty nahampandray")
         self.recipientPlaceEdit = LineEditWithLabel("Toerana nahampandray")
         self.recipientNumberEdit = LineEditWithLabel("Laharana ny mpandray")
+        self.recipientNumberEdit.lineEdit.setText("B ")
         self.addChild(self.row5, [self.recipientDateEdit, self.recipientPlaceEdit, self.recipientNumberEdit])
         
         self.row6 = QHBoxLayout()
@@ -110,7 +112,10 @@ class AddBelieverInterface(QWidget):
             self.btnAdd.setEnabled(True)
         else:
             self.btnAdd.setEnabled(False)
-            
+    
+    def __regionChanged(self, text):
+        self.recipientNumberEdit.lineEdit.setText("A " if text == "ATSIMO" else "B ")
+                
     def clearLineEdit(self):
         for i in range(self.vBoxlayout.count()):
             widget = self.vBoxlayout.itemAt(i).widget()

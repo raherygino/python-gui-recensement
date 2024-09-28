@@ -2,6 +2,7 @@ from PyQt5.QtCore import QThread, QPoint
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action, Dialog
+from ..components import ConfirmDialog
 from ..common import Function
 from ..models import DatabaseWorker, BelieverModel, Believer, DiaconModel, Diacon, DeptWork, DeptWorkModel
 from ..view import ListBelieverInterface, AddBelieverInterface, DiaconDialog, DeptWorkDialog, AddBelieverDialog, AddFamilyDialog
@@ -33,12 +34,12 @@ class BelieverPresenter:
     def __configView(self):
         self.labels = [
             'ID', 'Anarana', 'Fanampiny','Daty sy toerana nahaterahana',
-            'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
+            'Daty sy toerana batisa', 'Daty sy toerana maha mpandray','Laharana mpandray', 
             'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday']
         self.labelsFamily = [
             'ID', 'Anarana', 'Fanampiny','Lahy sa vavy','Amin\'ny fianakaviana', 'Daty sy toerana nahaterahana',
-            'Daty batisa', 'Daty sy toerana maha mpandray','Laharana karatra mpandray', 
-            'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday']
+            'Daty sy toerana batisa', 'Daty sy toerana maha mpandray','Laharana mpandray', 
+            'Sampana sy/na Sampan\'asa','Andraikitra', 'Asa', 'Laharana finday']
         self.setTableHeaderLabels(self.labels)
         self.addView.familyTableView.setHorizontalHeaderLabels(self.labelsFamily)
         
@@ -113,33 +114,16 @@ class BelieverPresenter:
             
     def editFamily(self, pos):
         family:Believer = self.family[pos]
-        dialog = AddBelieverDialog(self.addView.nParent)
-        dialog.lastnameEdit.lineEdits[0].setText(family.lastname)
-        dialog.firstnameEdit.lineEdits[0].setText(family.firstname)
-        dialog.posFamilyCombox.combox.setCurrentIndex(0 if family.pos_family == "Zanaka" else 1)
-        dialog.genderCombox.combox.setCurrentIndex(0 if family.gender == "Lahy" else 1)
-        dialog.addressEdit.lineEdits[0].setText(family.address)
-        dialog.regionEdit.lineEdits[0].setText(family.region)
-        dialog.diaconEdit.lineEdits[0].setText(family.diacon)
-        dialog.birthdayEdit.lineEdit.setDate(self.func.strToQDate(family.birthday))
-        dialog.birthplaceEdit.lineEdit.setText(family.birthplace)
-        dialog.dateBaptismDateEdit.lineEdit.setDate(self.func.strToQDate(family.date_of_baptism))
-        dialog.placeBaptismEdit.lineEdit.setText(family.place_of_baptism)
-        dialog.dateBaptismDateEdit.lineEdit.setDate(self.func.strToQDate(family.date_of_recipient))
-        dialog.placeRecipientEdit.lineEdit.setText(family.place_of_recipient)
-        dialog.numberRecipientEdit.lineEdit.setText(family.number_recipient)
-        dialog.phoneEdit.lineEdits[0].setText(family.phone)
-        dialog.deptWorkEdit.lineEdits[0].setText(family.dept_work)
-        dialog.responsibilityEdit.lineEdits[0].setText(family.responsibility)
-        dialog.yesButton.setText("Ovaina")
+        dialog = AddFamilyDialog(self.addView.nParent)
+        self.__init_combox(self.diaconModel, dialog.diaconEdit.combox)
+        dialog.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
+        dialog.setData(family)
         if dialog.exec():
-            believer = self.getBelieverFromDialog(dialog)
-            believer['id'] = family.id
-            #if believer.id == 0:
+            nFamily = dialog.data()
+            nFamily['id'] = family.id
             self.family.pop(pos)
-            self.family.insert(pos, believer)
+            self.family.insert(pos, nFamily)
             self.setData(self.addView.familyTableView, self.family)
-            print(self.family)
     
     def getHeaderLabels(self, table):
         header_labels = []
@@ -199,7 +183,9 @@ class BelieverPresenter:
             self.addView.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
             
     def deleteFamily(self, pos):
-        dialog = Dialog("Voulez vous le supprimer vraiment?", "Cette donnée sera perdu. Voulez-vous la supprimer vraiment?", self.addView.nParent)
+        dialog = ConfirmDialog("Fafana", "Hofafana marina ve?", self.addView.nParent)
+        dialog.yesBtn.setText("Eny")
+        dialog.cancelBtn.setText("Tsia")
         if dialog.exec():
             if self.idEdit != 0:
                 self.model.delete_item(self.family[pos].id)
@@ -346,28 +332,24 @@ class BelieverPresenter:
                 
     def addFamily(self):
         dialog = AddFamilyDialog(self.view.nParent)
+        adrss = self.addView.addressEdit.lineEdit.text()
+        dialog.addressEdit.lineEdit.setText(adrss)
+        
         self.__init_combox(self.diaconModel, dialog.diaconEdit.combox)
         dialog.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
-        dialog.exec()
-        '''w = AddBelieverDialog(self.view.nParent)
-        adrss = self.addView.addressEdit.lineEdit.text()
-        rgn = self.addView.regionEdit.lineEdit.text()
-        w.addressEdit.lineEdits[0].setText(adrss)
-        w.regionEdit.lineEdits[0].setText(rgn)
-        if w.exec():
-            believer = self.getBelieverFromDialog(w)
-            self.family.append(believer)
-            
+        dialog.yesBtn.setText("Ampidirina")
+        dialog.cancelBtn.setText("Esorina")
+        if dialog.exec():
+            self.family.append(dialog.data())
             self.setData(self.addView.familyTableView, self.family)
-            #self.model.create(believer)
-            #self.fetchData(self.model.fetch_all()) '''
+            
     def setData(self, table, believers: list[Believer]):
         data = []
         for i, believer in enumerate(believers):
             data.append([believer.id, believer.lastname, believer.firstname, believer.gender, believer.pos_family, 
-                         f'{believer.birthday} {believer.birthplace}', believer.date_of_baptism, 
-                         believer.place_of_baptism, believer.date_of_recipient, believer.place_of_recipient, 
-                         believer.number_recipient, "", believer.responsibility])
+                         f'{believer.birthday} {believer.birthplace}', f'{believer.date_of_baptism} {believer.place_of_baptism}', 
+                         f'{believer.date_of_recipient} {believer.place_of_recipient}',believer.number_recipient , believer.dept_work , 
+                         believer.responsibility, believer.work , believer.number_recipient])
         table.setData(data)
     
     def fetchData(self, data):
