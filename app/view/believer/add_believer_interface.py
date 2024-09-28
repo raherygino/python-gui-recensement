@@ -6,7 +6,7 @@ from qfluentwidgets import ComboBox, PrimaryPushButton, CommandBar, FluentIcon, 
     ToolButton, PushButton, RoundMenu, SearchLineEdit, IndeterminateProgressBar, \
     PrimaryToolButton, LineEdit, SmoothScrollArea, PixmapLabel, SubtitleLabel, StrongBodyLabel, \
         CheckBox, BodyLabel
-from ...components import TableView, LineEditWithLabel, ComboxEditWithLabel, DateEditWithLabel
+from ...components import TableView, LineEditWithLabel, ComboxEditWithLabel, DateEditWithLabel, CheckBoxWithLabel
 from ...common.config import OptionsConfigItem
 
 class AddBelieverInterface(QWidget):
@@ -58,11 +58,11 @@ class AddBelieverInterface(QWidget):
         self.lastnameEdit.lineEdit.textChanged.connect(self.__isValidate)
         self.firstnameEdit = LineEditWithLabel("Fanampiny")
         self.addressEdit = LineEditWithLabel("Adiresy")
-        self.regionEdit = LineEditWithLabel("Faritra")
+        self.regionEdit = ComboxEditWithLabel("Faritra", ["AVARATRA", "ATSIMO"])
         self.addChild(self.row1, [self.lastnameEdit, self.firstnameEdit, self.addressEdit, self.regionEdit])
         
         self.row2 = QHBoxLayout()
-        self.diaconEdit = LineEditWithLabel("Diakonina miandraikitra")
+        self.diaconEdit = ComboxEditWithLabel("Diakonina miandraikitra", ['-'])
         self.birthdayEdit = DateEditWithLabel("Daty nahaterahana")
         self.birthplaceEdit = LineEditWithLabel("Toerana nahaterahana")
         self.addChild(self.row2, [self.diaconEdit, self.birthdayEdit, self.birthplaceEdit])
@@ -85,12 +85,12 @@ class AddBelieverInterface(QWidget):
         
         self.row6 = QHBoxLayout()
         self.phoneEdit = LineEditWithLabel("Laharan'ny finday")
-        self.deptWorkEdit = LineEditWithLabel("Sampana na/sy sampan'asa")
         self.responsibilityEdit = LineEditWithLabel("Andraikitra")
-        self.addChild(self.row6, [self.phoneEdit, self.deptWorkEdit, self.responsibilityEdit])
+        self.addChild(self.row6, [self.phoneEdit,  self.responsibilityEdit])
         
         self.row7 = QHBoxLayout()
-        
+        self.deptWorkCheck = CheckBoxWithLabel("Sampana na/sy sampan'asa")
+        #self.deptWorkEdit = ComboxEditWithLabel("Sampana na/sy sampan'asa", ['-'])
         self.titleFamily = SubtitleLabel("FIANAKAVIANA")
         self.btnAddFamily = PrimaryToolButton(FluentIcon.ADD, self)
         self.familyTableView = TableView(self)
@@ -101,8 +101,8 @@ class AddBelieverInterface(QWidget):
         self.familyTableView.setMinimumHeight(200)
     
         self.addChild(self.vBoxlayout, [self.row1, self.row2, self.row3, 
-                                        self.row4, self.row5, self.row6, 
-                                        self.row7, self.familyTableView])
+                                        self.row4, self.row5, self.row6,  self.deptWorkCheck,
+                                        self.row7 , self.familyTableView])
     
     def __isValidate(self, text):
         if len(text) > 3:

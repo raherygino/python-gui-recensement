@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QFileDialog
 from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action, Dialog
 from ..common import Function
 from ..models import DatabaseWorker, BelieverModel, Believer, DiaconModel, Diacon, DeptWork, DeptWorkModel
-from ..view import ListBelieverInterface, AddBelieverDialog, AddBelieverInterface, DiaconDialog, DeptWorkDialog
+from ..view import ListBelieverInterface, AddBelieverInterface, DiaconDialog, DeptWorkDialog, AddBelieverDialog
 from .menu_presenter import MenuAction
 import dataclasses
 import os
@@ -53,8 +53,17 @@ class BelieverPresenter:
         self.addView.familyTableView.contextMenuEvent = lambda e : self.tableFamilyRightClicked(e)
         self.view.tableView.contextMenuEvent = lambda e : self.tableRightClicked(e)
         self.addView.nParent.stackedWidget.currentChanged.connect(self.stackedOnChange)
-    
+        
+        
+    def __init_combox(self, model, combox):
+        data = ['-']
+        data.extend([item.name for item in model.fetch_all()])
+        combox.clear()
+        combox.addItems(data)
+
     def stackedOnChange(self, pos):
+        self.__init_combox(self.diaconModel, self.addView.diaconEdit.combox)
+        self.addView.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
         if self.idEdit != 0 and pos != 1:
             self.addView.clearLineEdit()
             self.addView.familyTableView.clearContents()
@@ -64,7 +73,6 @@ class BelieverPresenter:
         if self.idEdit == 0:
             self.addView.btnAdd.setText("Ampidirina")
             
-    
     def clear(self):
         self.addView.clearLineEdit()
         self.addView.nParent.stackedWidget.setCurrentWidget(self.view)
@@ -208,8 +216,8 @@ class BelieverPresenter:
         lastname = w.lastnameEdit.lineEdit.text()
         firstname = w.firstnameEdit.lineEdit.text()
         address = w.addressEdit.lineEdit.text()
-        region = w.regionEdit.lineEdit.text()
-        diacon = w.diaconEdit.lineEdit.text()
+        region = w.regionEdit.combox.currentText()
+        diacon = w.diaconEdit.combox.currentText()
         birthday = w.birthdayEdit.text()
         birthplace = w.birthplaceEdit.lineEdit.text()
         nameFather = w.nameFatherEdit.lineEdit.text()
@@ -220,7 +228,7 @@ class BelieverPresenter:
         placeRecipient = w.recipientPlaceEdit.lineEdit.text()
         numberRecipient = w.recipientNumberEdit.lineEdit.text()
         phone = w.phoneEdit.lineEdit.text()
-        deptWork = w.deptWorkEdit.lineEdit.text()
+        deptWork = w.deptWorkCheck.itemsCheckedText()
         responsability = w.responsibilityEdit.lineEdit.text()
         believer = Believer(
                 lastname=lastname,
