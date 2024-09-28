@@ -217,8 +217,8 @@ class MenuAction:
         view.lastnameEdit.lineEdit.setText(believer.lastname)
         view.firstnameEdit.lineEdit.setText(believer.firstname)
         view.addressEdit.lineEdit.setText(believer.address)
-        view.regionEdit.lineEdit.setText(believer.region)
-        view.diaconEdit.lineEdit.setText(believer.diacon)
+        view.regionEdit.combox.setCurrentText(believer.region)
+        view.diaconEdit.combox.setCurrentText(believer.diacon)
         view.birthdayEdit.lineEdit.setDate(self.strToQDate(believer.birthday))
         view.birthplaceEdit.lineEdit.setText(believer.birthplace)
         view.baptismDateEdit.lineEdit.setDate(self.strToQDate(believer.date_of_baptism))
@@ -227,8 +227,9 @@ class MenuAction:
         view.recipientPlaceEdit.lineEdit.setText(believer.place_of_recipient)
         view.recipientNumberEdit.lineEdit.setText(believer.number_recipient)
         view.phoneEdit.lineEdit.setText(believer.phone)
-        view.deptWorkEdit.lineEdit.setText(believer.dept_work)
+        view.deptWorkCheck.check(believer.dept_work)
         view.responsibilityEdit.lineEdit.setText(believer.responsibility)
+        view.workEdit.lineEdit.setText(believer.work)
         
         data = self.model.fetch_all(id_conjoint=item)
         for value in self.model.fetch_all(id_father=item):

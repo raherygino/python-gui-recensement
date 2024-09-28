@@ -29,3 +29,4 @@ class Believer(Entity):
     phone: str = ""
     dept_work: str = ""
     responsibility: str = ""
+    work: str = ""

@@ -86,7 +86,8 @@ class AddBelieverInterface(QWidget):
         self.row6 = QHBoxLayout()
         self.phoneEdit = LineEditWithLabel("Laharan'ny finday")
         self.responsibilityEdit = LineEditWithLabel("Andraikitra")
-        self.addChild(self.row6, [self.phoneEdit,  self.responsibilityEdit])
+        self.workEdit = LineEditWithLabel("Asa")
+        self.addChild(self.row6, [self.phoneEdit,  self.responsibilityEdit, self.workEdit])
         
         self.row7 = QHBoxLayout()
         self.deptWorkCheck = CheckBoxWithLabel("Sampana na/sy sampan'asa")

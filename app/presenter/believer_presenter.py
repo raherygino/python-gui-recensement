@@ -53,6 +53,8 @@ class BelieverPresenter:
         self.addView.familyTableView.contextMenuEvent = lambda e : self.tableFamilyRightClicked(e)
         self.view.tableView.contextMenuEvent = lambda e : self.tableRightClicked(e)
         self.addView.nParent.stackedWidget.currentChanged.connect(self.stackedOnChange)
+        self.__init_combox(self.diaconModel, self.addView.diaconEdit.combox)
+        self.addView.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
         
         
     def __init_combox(self, model, combox):
@@ -62,14 +64,13 @@ class BelieverPresenter:
         combox.addItems(data)
 
     def stackedOnChange(self, pos):
-        self.__init_combox(self.diaconModel, self.addView.diaconEdit.combox)
-        self.addView.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
         if self.idEdit != 0 and pos != 1:
             self.addView.clearLineEdit()
             self.addView.familyTableView.clearContents()
             self.family.clear()
             self.idEdit = 0
             self.isNewLead = False
+            
         if self.idEdit == 0:
             self.addView.btnAdd.setText("Ampidirina")
             
@@ -176,6 +177,7 @@ class BelieverPresenter:
             for nItem in items:
                 if nItem[0] not in ids:
                     self.diaconModel.delete_item(nItem[0])
+            self.__init_combox(self.diaconModel, self.addView.diaconEdit.combox)
     
     def showDeptWorkDialog(self):
         dialog = DeptWorkDialog(self.view)
@@ -194,6 +196,7 @@ class BelieverPresenter:
             for nId in ids:
                 if nId not in nIds:
                     self.deptWorkModel.delete_item(nId)
+            self.addView.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
             
     def deleteFamily(self, pos):
         dialog = Dialog("Voulez vous le supprimer vraiment?", "Cette donnée sera perdu. Voulez-vous la supprimer vraiment?", self.addView.nParent)
@@ -230,6 +233,7 @@ class BelieverPresenter:
         phone = w.phoneEdit.lineEdit.text()
         deptWork = w.deptWorkCheck.itemsCheckedText()
         responsability = w.responsibilityEdit.lineEdit.text()
+        work = w.workEdit.lineEdit.text()
         believer = Believer(
                 lastname=lastname,
                 firstname=firstname,
@@ -248,7 +252,8 @@ class BelieverPresenter:
                 number_recipient=numberRecipient,
                 phone=phone,
                 dept_work=deptWork,
-                responsibility=responsability
+                responsibility=responsability,
+                work=work
             )
         if self.idEdit == 0:
             self.model.create(believer)

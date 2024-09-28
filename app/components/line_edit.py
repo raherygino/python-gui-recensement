@@ -51,6 +51,7 @@ class CheckBoxWithLabel(QVBoxLayout):
         self.nParent = parent
         self.setSpacing(2)
         self.itemsChecked = []
+        self.checkboxs = []
         self.fLayout = FlowLayout(parent, needAni=False)
 
         self.lineEdit = LineEdit(parent)
@@ -63,9 +64,11 @@ class CheckBoxWithLabel(QVBoxLayout):
         while self.fLayout.count():
             item = self.fLayout.takeAt(0)  # Take the item at the 0 index
             item.deleteLater()
+        self.checkboxs.clear()
         for item in data:
             checkbox = CheckBox(item, self.nParent)
             checkbox.stateChanged.connect(self.__checkboxChanged)
+            self.checkboxs.append(checkbox)
             self.fLayout.addWidget(checkbox)
     
     def __checkboxChanged(self):
@@ -74,6 +77,14 @@ class CheckBoxWithLabel(QVBoxLayout):
             self.itemsChecked.append(sender.text())
         else:
             self.itemsChecked.remove(sender.text())
+            
+    def check(self, text:str):
+        data = text.split(", ")
+        self.itemsChecked.clear()
+        for item in self.checkboxs:
+            if item.text() in data:
+                item.setChecked(True)
+                self.itemsChecked.append(item.text())
         
     def getItemChecked(self):
         return self.itemsChecked
