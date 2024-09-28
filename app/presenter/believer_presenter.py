@@ -35,7 +35,7 @@ class BelieverPresenter:
         self.labels = [
             'ID', 'Anarana', 'Fanampiny','Daty sy toerana nahaterahana',
             'Daty sy toerana batisa', 'Daty sy toerana maha mpandray','Laharana mpandray', 
-            'Sampana sy/na Sampan\'asa','Andraikitra', 'Laharana finday']
+            'Sampana sy/na Sampan\'asa','Andraikitra', 'Asa', 'Laharana finday']
         self.labelsFamily = [
             'ID', 'Anarana', 'Fanampiny','Lahy sa vavy','Amin\'ny fianakaviana', 'Daty sy toerana nahaterahana',
             'Daty sy toerana batisa', 'Daty sy toerana maha mpandray','Laharana mpandray', 
@@ -382,8 +382,8 @@ class BelieverPresenter:
         dataList = []
         for item in data:
             dataList.append([item.id, item.lastname, item.firstname,f'{item.birthday} {item.birthplace}', 
-                   item.date_of_baptism,f'{item.date_of_recipient} {item.place_of_recipient}', 
-                   item.number_recipient,item.dept_work, item.responsibility, item.phone])
+                   f'{item.date_of_baptism} {item.place_of_baptism}',f'{item.date_of_recipient} {item.place_of_recipient}', 
+                   item.number_recipient,item.dept_work, item.responsibility, item.work, item.phone])
         self.view.tableView.setData(dataList)
         
     def setTableContextMenu(self, contextMenu):

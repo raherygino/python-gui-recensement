@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QAbstractItemView
 from PyQt5.QtCore import Qt
 from qfluentwidgets import ProgressBar, StrongBodyLabel, BodyLabel, TransparentDropDownPushButton,\
     setFont, RoundMenu, CommandBar, Action, FluentIcon, SearchLineEdit
@@ -30,6 +30,7 @@ class ListBelieverInterface(QWidget):
         self.progressBar = ProgressBar(self)
         self.progressBar.setVisible(False)
         self.tableView = TableView(self)
+        self.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         self.vBoxLayout.addWidget(self.progressBar)
         self.vBoxLayout.addWidget(self.tableView)

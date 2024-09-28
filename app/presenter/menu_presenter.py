@@ -3,7 +3,7 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QFileDialog
 from ..components import ConfirmDialog
 from ..models import Believer, BelieverModel
-from ..view import ShowBelieverDialog, AddBelieverInterface
+from ..view import ViewBelieverDialog, AddBelieverInterface
 from qfluentwidgets import MessageDialog, RoundMenu, Action, MenuAnimationType, FluentIcon
 from docx import Document
 from docx.enum.section import WD_ORIENT
@@ -43,17 +43,20 @@ class MenuAction:
             ]
         
         row4 = [
-            ["Sampana na/sy sampan'asa", believer.dept_work],
-                ["Andraikitra", believer.responsibility],
+            ["Andraikitra", believer.responsibility],
+                ["Asa", believer.work],
             ]
             
         allRows =  [row1, row2, row3, row4]
-        dialog = ShowBelieverDialog(self.view)
+        
+        dialog = ViewBelieverDialog(self.view)
         dialog.table.setHorizontalHeaderLabels(self.presenter.labelsFamily)
             
         for i, row in enumerate(allRows):
             for j, column in enumerate(row):
                 dialog.addLabelValue(column[0], column[1], i,j)
+                
+        dialog.addNewLabelValue("Sampana", believer.dept_work)
                     
         data = self.model.fetch_all(id_conjoint=itemId)
         for value in self.model.fetch_all(id_father=itemId):
@@ -61,8 +64,8 @@ class MenuAction:
                 
         self.presenter.setData(dialog.table, data)
         dialog.table.contextMenuEvent = lambda e, dialog = dialog, data=data: self.rightClickTable(e, data, dialog)
-        dialog.yesButton.setText("Avoaka WORD")
-        dialog.cancelButton.setText("Miverina")
+        dialog.yesBtn.setText("Avoaka WORD")
+        dialog.cancelBtn.setText("Miverina")
         if dialog.exec():
             options = QFileDialog.Options()
             fileName, _ = QFileDialog.getSaveFileName(self.presenter.addView.nParent,"Export File", "","Word Files (*.docx);;All Files (*)", options=options)
@@ -130,7 +133,7 @@ class MenuAction:
                                 run.underline = True
                             
                 # Add a heading 
-                doc.add_heading('Fianakaviana', level=1)
+                '''doc.add_heading('Fianakaviana', level=1)
                 
                 dataFamily = [
                     ["Anarana","Fanampiny","Lahy sa vavy","Amin'ny fianakaviana",
@@ -156,7 +159,7 @@ class MenuAction:
                 
                 for i, row in enumerate(dataFamily):
                     for j, value in enumerate(row):
-                        tablefamily.cell(i, j).text = value
+                        tablefamily.cell(i, j).text = value'''
 
                 # Save the document
                 doc.save(fileName)
@@ -177,7 +180,7 @@ class MenuAction:
                             menu.addAction(
                             Action(
                                 FluentIcon.PEOPLE, 
-                                'Loham-pianakaviana hafa', 
+                                'Loha-mpianakaviana hafa', 
                                 triggered= lambda: self.newLeaderFamily(blv, dialog)))
             
                             self.posCur = QCursor().pos()
