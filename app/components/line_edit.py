@@ -78,6 +78,10 @@ class CheckBoxWithLabel(QVBoxLayout):
         else:
             self.itemsChecked.remove(sender.text())
             
+    def reset(self):
+        for item in self.checkboxs:
+            item.setChecked(False)
+            
     def check(self, text:str):
         data = text.split(", ")
         self.itemsChecked.clear()

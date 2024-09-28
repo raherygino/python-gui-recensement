@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QBoxLayout, QSizePolicy
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QPixmap
 from qfluentwidgets import ComboBox, PrimaryPushButton, CommandBar, FluentIcon, Action, \
     ToolButton, PushButton, RoundMenu, SearchLineEdit, IndeterminateProgressBar, \
@@ -126,7 +126,13 @@ class AddBelieverInterface(QWidget):
                     if widget == None:
                         lay = layout.itemAt(j)
                         for k in range(lay.count()):
-                            name = type(lay.itemAt(k).widget()).__name__
+                            nWidget = lay.itemAt(k).widget()
+                            name = type(nWidget).__name__
                             if name == "LineEdit":
-                                lay.itemAt(k).widget().clear()
+                                nWidget.clear()
+                            elif name == "DateEdit":
+                                nWidget.setDate(QDate(1950,1,1))
+                            elif name == "ComboBox":
+                                nWidget.setCurrentIndex(0)
+        self.deptWorkCheck.reset()
         

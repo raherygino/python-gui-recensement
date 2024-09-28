@@ -102,7 +102,7 @@ class AddFamilyDialog(BigDialog):
         self.baptismPlaceEdit.lineEdit.setText(data.place_of_baptism)
         self.recipientDateEdit.lineEdit.setDate(self.func.strToQDate(data.date_of_recipient))
         self.recipientPlaceEdit.lineEdit.setText(data.place_of_recipient)
-        self.recipientNumberEdit.lineEdit.setText(data.place_of_recipient)
+        self.recipientNumberEdit.lineEdit.setText(data.number_recipient)
         self.phoneEdit.lineEdit.setText(data.phone)
         self.deptWorkCheck.check(data.dept_work)
         self.responsibilityEdit.lineEdit.setText(data.responsibility)
