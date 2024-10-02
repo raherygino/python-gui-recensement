@@ -11,9 +11,9 @@ from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
 from ..common.signal_bus import signalBus
 from ..components import ConfirmDialog
 
-from ..models import PromotionModel, StudentModel, BelieverModel
-from . import HomeInterface, StudentsInterface, ListBelieverInterface, AddBelieverInterface
-from ..presenter import PromotionPresenter, StudentsPresenter, BelieverPresenter, MenuAction
+from ..models import BelieverModel
+from . import ListBelieverInterface, AddBelieverInterface
+from ..presenter import BelieverPresenter
 
 class FluentTitleBar(TitleBar):
     """ Fluent title bar"""
@@ -74,19 +74,12 @@ class MainWindow(FluentWindow):
         # create sub interface
         self.listBelieverInterface = ListBelieverInterface(self)
         self.addBelieverInterface = AddBelieverInterface(self)
-        self.settingInterface = SettingInterface(self)
-        #self.homeInterface = HomeInterface(self)
-        #self.studentsInterface = StudentsInterface(self)
+        #self.settingInterface = SettingInterface(self)
 
         # enable acrylic effect
         self.navigationInterface.setAcrylicEnabled(True)
         self.connectSignalToSlot()
 
-        """self.promModel = PromotionModel()
-        self.promotionPresenter = PromotionPresenter(self.homeInterface, self.promModel, self)
-        
-        self.studentModel = StudentModel()
-        self.studentsPresenter = StudentsPresenter(self.studentsInterface, self.studentModel)"""
         self.believerModel = BelieverModel()
         self.believerPresenter = BelieverPresenter(self.believerModel, self.addBelieverInterface, self.listBelieverInterface)
        
@@ -100,15 +93,13 @@ class MainWindow(FluentWindow):
 
     def initNavigation(self):
         # add navigation items
-        ''''self.addSubInterface(self.homeInterface, FluentIcon.HOME, 'Accueil')
-        self.addSubInterface(self.studentsInterface, FluentIcon.PEOPLE, "Elèves")'''
         self.addSubInterface(self.listBelieverInterface, FluentIcon.DOCUMENT, "Lisitra")
         self.addSubInterface(self.addBelieverInterface, FluentIcon.ADD, "Mampiditra")
         
         self.navigationInterface.addSeparator()
        
-        self.addSubInterface(
-            self.settingInterface, FluentIcon.SETTING, 'Paramètres', NavigationItemPosition.BOTTOM)
+        '''self.addSubInterface(
+            self.settingInterface, FluentIcon.SETTING, 'Paramètres', NavigationItemPosition.BOTTOM)'''
         
 
     def initWindow(self):
