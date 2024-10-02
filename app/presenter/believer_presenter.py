@@ -225,6 +225,7 @@ class BelieverPresenter:
                 firstname=firstname,
                 is_leader=1,
                 address=address,
+                gender="Lahy",
                 region=region,
                 diacon=diacon,
                 birthday=birthday,
@@ -349,7 +350,7 @@ class BelieverPresenter:
             data.append([believer.id, believer.lastname, believer.firstname, believer.gender, believer.pos_family, 
                          f'{believer.birthday} {believer.birthplace}', f'{believer.date_of_baptism} {believer.place_of_baptism}', 
                          f'{believer.date_of_recipient} {believer.place_of_recipient}',believer.number_recipient , believer.dept_work , 
-                         believer.responsibility, believer.work , believer.number_recipient])
+                         believer.responsibility, believer.work , believer.phone])
         table.setData(data)
     
     def fetchData(self, data):
