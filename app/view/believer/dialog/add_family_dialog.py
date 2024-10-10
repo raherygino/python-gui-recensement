@@ -26,10 +26,10 @@ class AddFamilyDialog(BigDialog):
         self.addChild(self.row2, [self.addressEdit, self.regionEdit])
         
         self.row3 = QHBoxLayout()
-        self.diaconEdit = ComboxEditWithLabel("Diakonina miandraikitra", ['-'])
         self.birthdayEdit = DateEditWithLabel("Daty nahaterahana")
         self.birthplaceEdit = LineEditWithLabel("Toerana nahaterahana")
-        self.addChild(self.row3, [self.diaconEdit, self.birthdayEdit, self.birthplaceEdit])
+        self.diaconEdit = ComboxEditWithLabel("Diakonina miandraikitra", ['-'])
+        self.addChild(self.row3, [self.birthdayEdit, self.birthplaceEdit, self.diaconEdit])
         
         
         self.row4 = QHBoxLayout()

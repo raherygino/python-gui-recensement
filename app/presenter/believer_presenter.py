@@ -21,6 +21,7 @@ class BelieverPresenter:
         self.view = view
         self.addView = addView
         self.model = model
+        #self.model.seed(50)
         self.diaconModel = DiaconModel()
         self.deptWorkModel = DeptWorkModel()
         self.func = Function()
@@ -60,7 +61,7 @@ class BelieverPresenter:
         
     def __init_combox(self, model, combox):
         data = ['-']
-        data.extend([item.name for item in model.fetch_all()])
+        data.extend([item.name for item in model.fetch_all(order="name")])
         combox.clear()
         combox.addItems(data)
 
@@ -148,19 +149,30 @@ class BelieverPresenter:
     def showDiaconDialog(self):
         diacons = self.diaconModel.fetch_all()
         items = [[str(item.id), item.name ] for item in diacons]
-        ids = [str(item.id) for item in diacons]
+        #ids = [str(item.id) for item in diacons]
         dialog = DiaconDialog(self.view)
         dialog.setData(items)
         if dialog.exec():
             data = dialog.table.getData()
+            dataCreated = []
+            dataUpdated = []
+            dataDeleted = []
+            ids = []
             for item in data:
                 if item[0] == "":
-                    self.diaconModel.create(Diacon(name=item[1]))
+                    dataCreated.append(Diacon(name=item[1]))
                 else:
-                    self.diaconModel.update_item(item[0], name=item[1])
+                    ids.append(item[0])
+                    dataUpdated.append(Diacon(id=item[0], name=item[1]))
+                    #self.diaconModel.update_item(item[0], name=item[1])
             for nItem in items:
-                if nItem[0] not in ids:
-                    self.diaconModel.delete_item(nItem[0])
+                if str(nItem[0]) not in ids:
+                    dataDeleted.append(Diacon(id=nItem[0], name=nItem[1]))
+                    #self.diaconModel.delete_item(nItem[0])
+            self.diaconModel.create_multiple(dataCreated)
+            self.diaconModel.update_multiple(dataUpdated)
+            self.diaconModel.delete_mutlitple(dataDeleted)
+            #print(dataDeleted)
             self.__init_combox(self.diaconModel, self.addView.diaconEdit.combox)
     
     def showDeptWorkDialog(self):

@@ -1,9 +1,9 @@
-from PyQt5.QtWidgets import QHBoxLayout, QTableWidgetItem
+from PyQt5.QtWidgets import QHBoxLayout, QTableWidgetItem, QFileDialog
 from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QCursor
 
-from qfluentwidgets import Dialog, Action, RoundMenu, MenuAnimationType, FluentIcon, PrimaryToolButton
-from ....components import TableView, BigDialog, LineEditWithLabel, ConfirmDialog
+from qfluentwidgets import Dialog, Action, RoundMenu, MenuAnimationType, FluentIcon, PrimaryToolButton, ToolButton
+from ....components import TableView, BigDialog, LineEditWithLabel, ConfirmDialog, ImportDialog, PrimaryButton, Button
 
 class ToolDialog(BigDialog):
     
@@ -12,9 +12,12 @@ class ToolDialog(BigDialog):
         self.row = QHBoxLayout()
         self.btnGroup = QHBoxLayout()
         self.btnAdd = PrimaryToolButton(FluentIcon.ACCEPT)
+        self.btnImport = ToolButton(FluentIcon.DOWNLOAD)
+        self.btnImport.clicked.connect(lambda: self.importData())
         self.btnAdd.clicked.connect(self.__addItem)
         self.btnAdd.setEnabled(False)
         self.btnGroup.addWidget(self.btnAdd)
+        self.btnGroup.addWidget(self.btnImport)
         self.btnGroup.setAlignment(Qt.AlignBottom)
         for label in labels:
             editLine = LineEditWithLabel(label)
@@ -37,13 +40,15 @@ class ToolDialog(BigDialog):
         self.cancelBtn.setText("Asorina")
         
     def setData(self, data:list):
-        self.table.setRowCount(len(data))
+        self.data = self.table.getData()
+        ps = len(self.data)
+        self.table.setRowCount(ps+len(data))
         for row, item in enumerate(data):
             for column, nItem in enumerate(item):
                 widgetItem = QTableWidgetItem(str(nItem))
                 if column == 0:
                     widgetItem.setFlags(widgetItem.flags() & ~Qt.ItemIsEditable)
-                self.table.setItem(row, column, widgetItem)
+                self.table.setItem(ps+row, column, widgetItem)
         self.table.resizeColumnsToContents()
       
     def contextMenu(self, event):
@@ -78,4 +83,49 @@ class ToolDialog(BigDialog):
 
     def __nameChanged(self, text):
         self.btnAdd.setEnabled(len(text) > 2)
+        
+    def exportData(self):
+        data = self.table.getData()
+        if len(data) > 0:
+            destination_path, _ = QFileDialog.getSaveFileName(self, "Exporter", "", "All Files (*);;Text Files (*.csv)")
+            if destination_path:
+                with open(destination_path, 'w') as f:
+                    for item in data:
+                        line = ";".join([nItem for nItem in item])
+                        f.writelines(f'{line}\n')
+        else:
+            self.utils.infoBarError('Erreur', "Aucune donnée à exporter", self)
+        
+    def importData(self):
+        destination_path, _ = QFileDialog.getOpenFileName(self, "Importer", "", "CSV File (*.csv)")
+        if destination_path:
+            lenData = len(self.table.getData())
+            with open(destination_path, 'r') as f:
+                data = []
+                for i, line in enumerate(f):
+                    i = lenData + i
+                    nLine = line.replace("\n", "").split(";")
+                    nLine.insert(0, '')
+                    data.append(nLine)
+                self.setData(data)
+                '''dialogImport = ImportDialog(data, self.table.getHorizontalLabels(), self)
+                dialogImport.yesBtn.clicked.connect(lambda:  self.addToTable(dialogImport))
+                dialogImport.exec()'''
+                
+    def addToTable(self, dialogImport: ImportDialog):
+        nData = dialogImport.getData()
+        first =  []
+        '''for nItem in nData[0]:
+            if nItem != None:
+                first.append(nItem)
+        if len(first) == 0:
+            print('Aucune données n\'a été choisi!')
+            #self.utils.infoBarError('Erreur', 'Aucune données n\'a été choisi!', dialog)
+        else:
+            for i, item in enumerate(nData):
+                self.table.insertRow(i)
+                for j, nItem in enumerate(item):
+                    qWidget = QTableWidgetItem(nItem)
+                    self.table.setItem(i, j, qWidget)
+            dialogImport.accept()'''
         

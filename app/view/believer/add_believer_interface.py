@@ -63,10 +63,10 @@ class AddBelieverInterface(QWidget):
         self.addChild(self.row1, [self.lastnameEdit, self.firstnameEdit, self.addressEdit, self.regionEdit])
         
         self.row2 = QHBoxLayout()
-        self.diaconEdit = ComboxEditWithLabel("Diakonina miandraikitra", ['-'])
         self.birthdayEdit = DateEditWithLabel("Daty nahaterahana")
         self.birthplaceEdit = LineEditWithLabel("Toerana nahaterahana")
-        self.addChild(self.row2, [self.diaconEdit, self.birthdayEdit, self.birthplaceEdit])
+        self.diaconEdit = ComboxEditWithLabel("Diakonina miandraikitra", ['-'])
+        self.addChild(self.row2, [self.birthdayEdit, self.birthplaceEdit, self.diaconEdit])
         
         self.row3 = QHBoxLayout()
         self.nameFatherEdit = LineEditWithLabel("Anaran'i Ray")

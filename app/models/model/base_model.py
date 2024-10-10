@@ -85,7 +85,7 @@ class Model:
                         cond += f'AND {key}="{value}" '
                         keys.append(key)
                 else:
-                    order += f" {key.upper()} BY {kwargs.get(key)} {'DESC' if key == 'order' else ''}"
+                    order += f" {key.upper()} BY {kwargs.get(key)} {'ASC' if key == 'order' else ''}"
                     orders.append(key)
             query += " WHERE "+cond[4:] if "order" not in keys and "group" not in keys else ""
             query = query.replace("WHERE","") if query.find("\"") == -1 else query
@@ -239,6 +239,32 @@ class Model:
         sql += f"WHERE {id_col}={item_id}"
         cursor.execute(sql)
         self.conn.commit()
+
+    def update_no_commit(self, item_id, **fields):
+        updated_at = self.current_date()
+        cursor = self.conn.cursor()
+        id_col = dataclasses.fields(self.entity)[0].name
+        
+        sql = f"UPDATE {self.TABLE} SET"
+
+        for i, key in enumerate(fields.keys()):
+            if i == 0:
+                sql += f" {key} = \"{fields.get(key).replace("\"", "")}\" "
+            else:
+                sql += f", {key} = \"{fields.get(key).replace("\"", "")}\" "
+            sql+= f", updated_at = '{updated_at}'"
+        sql += f"WHERE {id_col}={item_id}"
+        #print(sql)
+        cursor.execute(sql)
+        
+    def update_multiple(self, items):
+        for item in items:
+            dicObj = {}
+            fields = dataclasses.fields(item)
+            for field in fields[1:]:
+                dicObj[field.name] = item[field.name]
+            self.update_no_commit(item.id, **dicObj)
+        self.conn.commit()
     
     def update_multiple_int(self, conditions, values):
         cursor = self.conn.cursor()
@@ -273,7 +299,7 @@ class Model:
     def delete_mutlitple(self, items):
         for item in items:
             sql = f'DELETE FROM {self.TABLE} WHERE '
-            conditions = ' AND '.join([f'{key}="{item.get(key)}"' for key in item.keys()])
+            conditions = ' AND '.join([f'{field.name}="{item.get(field.name)}"' for field in dataclasses.fields(self.entity)])
             sql += conditions
             cursor = self.conn.cursor()
             cursor.execute(sql)
