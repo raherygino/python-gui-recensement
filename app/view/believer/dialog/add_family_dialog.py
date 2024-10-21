@@ -48,7 +48,8 @@ class AddFamilyDialog(BigDialog):
         self.phoneEdit = LineEditWithLabel("Laharan'ny finday")
         self.responsibilityEdit = LineEditWithLabel("Andraikitra")
         self.workEdit = LineEditWithLabel("Asa")
-        self.addChild(self.row6, [self.phoneEdit,  self.responsibilityEdit, self.workEdit])
+        self.obsEdit = LineEditWithLabel("Fanamarihana")
+        self.addChild(self.row6, [self.phoneEdit,  self.responsibilityEdit, self.workEdit, self.obsEdit])
         
         self.row7 = QHBoxLayout()
         self.deptWorkCheck = CheckBoxWithLabel("Sampana na/sy sampan'asa")
@@ -85,7 +86,8 @@ class AddFamilyDialog(BigDialog):
             phone = self.phoneEdit.lineEdit.text(),
             dept_work = self.deptWorkCheck.itemsCheckedText(),
             responsibility = self.responsibilityEdit.lineEdit.text(),
-            work = self.workEdit.lineEdit.text()
+            work = self.workEdit.lineEdit.text(),
+            obs = self.obsEdit.lineEdit.text()
         )
         
     def setData(self, data:Believer):
@@ -107,6 +109,7 @@ class AddFamilyDialog(BigDialog):
         self.deptWorkCheck.check(data.dept_work)
         self.responsibilityEdit.lineEdit.setText(data.responsibility)
         self.workEdit.lineEdit.setText(data.work)
+        self.obsEdit.lineEdit.setText(data.obs)
         self.yesBtn.setText("Ovaina")
         
     def __isValid(self, text):

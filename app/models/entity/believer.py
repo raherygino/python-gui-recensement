@@ -30,3 +30,4 @@ class Believer(Entity):
     dept_work: str = ""
     responsibility: str = ""
     work: str = ""
+    obs: str = ""

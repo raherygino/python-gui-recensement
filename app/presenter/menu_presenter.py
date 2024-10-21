@@ -45,6 +45,7 @@ class MenuAction:
         row4 = [
             ["Andraikitra", believer.responsibility],
                 ["Asa", believer.work],
+                ["Fanamarihana", believer.obs],
             ]
             
         allRows =  [row1, row2, row3, row4]
@@ -91,7 +92,7 @@ class MenuAction:
                     section.page_width = new_width
                     section.page_height = new_height
                     # Add a heading
-                    doc.add_heading('Loha-mpianakaviana', level=1)
+                    doc.add_heading('Loham-pianakaviana', level=1)
                     # Add some paragraphs
                     '''doc.add_paragraph('This is a sample paragraph.')
                     doc.add_paragraph('This is another paragraph.')
@@ -121,6 +122,11 @@ class MenuAction:
                         f'Laharan\'ny finday: \n{believer.phone}', 
                         f'Sampana na/sy sampan\'asa: \n{believer.dept_work}',
                         f'Andraikitra: \n{believer.responsibility}'],
+                        
+                        [f'Fanamarihana: \n{believer.obs}', 
+                        '', 
+                        '',
+                        ''],
                     ]
                     # Add a table
                     table = doc.add_table(rows=len(dataBeliever), cols=len(dataBeliever[0]))
@@ -141,7 +147,7 @@ class MenuAction:
                         dataFamily = [
                             ["Anarana","Fanampiny","Lahy sa vavy","Amin'ny fianakaviana",
                             "Daty sy toerana nahaterahana","Batisa","Daty sy toerana maha mpandray",
-                            "Laharana karatra mpandray","Sampana sy/na Sampan'asa"]
+                            "Laharana karatra mpandray","Sampana sy/na Sampan'asa", "Asa", "Fanamarihana"]
                         ]
                         for blv in data:
                             blv: Believer = blv
@@ -154,7 +160,9 @@ class MenuAction:
                                 f'{blv.date_of_baptism} {blv.place_of_baptism}',
                                 f'{blv.date_of_recipient} {blv.place_of_recipient}',
                                 blv.number_recipient,
-                                blv.dept_work
+                                blv.dept_work,
+                                blv.work,
+                                blv.obs
                             ])
                             
                         tablefamily = doc.add_table(rows=len(dataFamily), cols=len(dataFamily[0]))
@@ -183,7 +191,7 @@ class MenuAction:
                             menu.addAction(
                             Action(
                                 FluentIcon.PEOPLE, 
-                                'Loha-mpianakaviana hafa', 
+                                'Loham-pianakaviana hafa', 
                                 triggered= lambda: self.newLeaderFamily(blv, dialog)))
             
                             self.posCur = QCursor().pos()
@@ -237,6 +245,7 @@ class MenuAction:
         view.deptWorkCheck.check(believer.dept_work)
         view.responsibilityEdit.lineEdit.setText(believer.responsibility)
         view.workEdit.lineEdit.setText(believer.work)
+        view.obsEdit.lineEdit.setText(believer.obs)
         
         data = self.model.fetch_all(id_conjoint=item)
         for value in self.model.fetch_all(id_father=item):

@@ -50,7 +50,7 @@ class AddBelieverInterface(QWidget):
                 
     def __content(self):
         
-        self.titleLFamily = SubtitleLabel("LOHA-MPIANAKAVIANA")
+        self.titleLFamily = SubtitleLabel("LOHAM-PIANAKAVIANA")
         self.vBoxlayout.addWidget(self.titleLFamily)
         self.vBoxlayout.setSpacing(12)
         self.row1 = QHBoxLayout()
@@ -89,7 +89,8 @@ class AddBelieverInterface(QWidget):
         self.phoneEdit = LineEditWithLabel("Laharan'ny finday")
         self.responsibilityEdit = LineEditWithLabel("Andraikitra")
         self.workEdit = LineEditWithLabel("Asa")
-        self.addChild(self.row6, [self.phoneEdit,  self.responsibilityEdit, self.workEdit])
+        self.obsEdit = LineEditWithLabel("Fanamarihana")
+        self.addChild(self.row6, [self.phoneEdit,  self.responsibilityEdit, self.workEdit, self.obsEdit])
         
         self.row7 = QHBoxLayout()
         self.deptWorkCheck = CheckBoxWithLabel("Sampana na/sy sampan'asa")

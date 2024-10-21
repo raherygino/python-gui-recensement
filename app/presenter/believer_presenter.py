@@ -36,11 +36,11 @@ class BelieverPresenter:
         self.labels = [
             'ID', 'Anarana', 'Fanampiny','Daty sy toerana nahaterahana',
             'Daty sy toerana batisa', 'Daty sy toerana maha mpandray','Laharana mpandray', 
-            'Sampana sy/na Sampan\'asa','Andraikitra', 'Asa', 'Laharana finday']
+            'Sampana sy/na Sampan\'asa','Andraikitra', 'Asa', 'Laharana finday', 'Fanamarihana']
         self.labelsFamily = [
             'ID', 'Anarana', 'Fanampiny','Lahy sa vavy','Amin\'ny fianakaviana', 'Daty sy toerana nahaterahana',
             'Daty sy toerana batisa', 'Daty sy toerana maha mpandray','Laharana mpandray', 
-            'Sampana sy/na Sampan\'asa','Andraikitra', 'Asa', 'Laharana finday']
+            'Sampana sy/na Sampan\'asa','Andraikitra', 'Asa', 'Laharana finday', 'Fanamarihana']
         self.setTableHeaderLabels(self.labels)
         self.addView.familyTableView.setHorizontalHeaderLabels(self.labelsFamily)
         
@@ -232,6 +232,7 @@ class BelieverPresenter:
         deptWork = w.deptWorkCheck.itemsCheckedText()
         responsability = w.responsibilityEdit.lineEdit.text()
         work = w.workEdit.lineEdit.text()
+        obs = w.obsEdit.lineEdit.text()
         believer = Believer(
                 lastname=lastname,
                 firstname=firstname,
@@ -252,7 +253,8 @@ class BelieverPresenter:
                 phone=phone,
                 dept_work=deptWork,
                 responsibility=responsability,
-                work=work
+                work=work,
+                obs=obs
             )
         if self.idEdit == 0:
             self.model.create(believer)
@@ -321,6 +323,7 @@ class BelieverPresenter:
             phone = w.phoneEdit.text(0)
             deptWork = w.deptWorkEdit.text(0)
             responsability = w.responsibilityEdit.text(0)
+            obs = w.obsEdit.text(0)
             
             return Believer(
                 lastname=lastname,
@@ -339,7 +342,8 @@ class BelieverPresenter:
                 number_recipient=numberRecipient,
                 phone=phone,
                 dept_work=deptWork,
-                responsibility=responsability
+                responsibility=responsability,
+                obs=obs
             )
         
                 
@@ -362,7 +366,7 @@ class BelieverPresenter:
             data.append([believer.id, believer.lastname, believer.firstname, believer.gender, believer.pos_family, 
                          f'{believer.birthday} {believer.birthplace}', f'{believer.date_of_baptism} {believer.place_of_baptism}', 
                          f'{believer.date_of_recipient} {believer.place_of_recipient}',believer.number_recipient , believer.dept_work , 
-                         believer.responsibility, believer.work , believer.phone])
+                         believer.responsibility, believer.work , believer.phone, believer.obs])
         table.setData(data)
     
     def fetchData(self, data):
@@ -396,7 +400,7 @@ class BelieverPresenter:
         for item in data:
             dataList.append([item.id, item.lastname, item.firstname,f'{item.birthday} {item.birthplace}', 
                    f'{item.date_of_baptism} {item.place_of_baptism}',f'{item.date_of_recipient} {item.place_of_recipient}', 
-                   item.number_recipient,item.dept_work, item.responsibility, item.work, item.phone])
+                   item.number_recipient,item.dept_work, item.responsibility, item.work, item.phone, item.obs])
         self.view.tableView.setData(dataList)
         
     def setTableContextMenu(self, contextMenu):

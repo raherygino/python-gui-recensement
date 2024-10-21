@@ -107,13 +107,13 @@ class MainWindow(FluentWindow):
         self.setMinimumWidth(760)
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
         self.fluentTitleBar = FluentTitleBar(self)
-        #self.fluentTitleBar.setIcon(QIcon('app/resource/images/logo_eniap.png'))
+        self.fluentTitleBar.setIcon(QIcon('app/resource/images/icon.png'))
         self.fluentTitleBar.titleLabel.setText('Recensement')
         self.setTitleBar(self.fluentTitleBar)
 
         # create splash screen
         self.splashScreen = SplashScreen(self.windowIcon(), self)
-        self.splashScreen.setIcon(QIcon('app/resource/images/logo_eniap.png'))
+        self.splashScreen.setIcon(QIcon('app/resource/images/icon.png'))
         self.splashScreen.setIconSize(QSize(240, 240))
         self.splashScreen.raise_()
         

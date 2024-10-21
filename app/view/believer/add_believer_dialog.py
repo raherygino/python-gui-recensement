@@ -91,9 +91,11 @@ class AddBelieverDialog(MessageBoxBase):
         self.phoneEdit = editWithLabel("Laharan'ny finday", self, placeholders=["Laharan'ny finday"])
         self.deptWorkEdit = editWithLabel("Sampana na/sy sampan'asa", self, placeholders=["Sampana na/sy sampan'asa"])
         self.responsibilityEdit = editWithLabel("Andraikitra", self, placeholders=["Andraikitra"])
+        self.obsEdit = editWithLabel("Fanamarihana", self, placeholders=["Fanamarihana"])
         self.row_7.addLayout(self.phoneEdit)
         self.row_7.addLayout(self.deptWorkEdit)
         self.row_7.addLayout(self.responsibilityEdit)
+        self.row_7.addLayout(self.obsEdit)
         # add widget to view layout
         self.viewLayout.addWidget(self.titleLabel)
 

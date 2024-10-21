@@ -6,7 +6,7 @@ from ...components import LabelValue, TableView
 class ShowBelieverDialog(Dialog):
 
     def __init__(self, parent=None):
-        super().__init__("Loha-mpianakaviana", "", parent)
+        super().__init__("Loham-pianakaviana", "", parent)
         self.setTitleBarVisible(False)
         self.textLayout.removeWidget(self.contentLabel)
         
