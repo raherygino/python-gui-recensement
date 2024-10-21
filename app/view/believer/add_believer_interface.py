@@ -65,8 +65,11 @@ class AddBelieverInterface(QWidget):
         self.row2 = QHBoxLayout()
         self.birthdayEdit = DateEditWithLabel("Daty nahaterahana")
         self.birthplaceEdit = LineEditWithLabel("Toerana nahaterahana")
-        self.diaconEdit = ComboxEditWithLabel("Diakonina miandraikitra", ['-'])
-        self.addChild(self.row2, [self.birthdayEdit, self.birthplaceEdit, self.diaconEdit])
+        self.addChild(self.row2, [self.birthdayEdit, self.birthplaceEdit])
+        
+        
+        self.diaconEdit = LineEditWithLabel("Diakonina miandraikitra")
+        self.diaconEdit.lineEdit.setReadOnly(True)
         
         self.row3 = QHBoxLayout()
         self.nameFatherEdit = LineEditWithLabel("Anaran'i Ray")
@@ -104,7 +107,7 @@ class AddBelieverInterface(QWidget):
         #self.familyTableView.setHorizontalHeaderLabels()
         self.familyTableView.setMinimumHeight(200)
     
-        self.addChild(self.vBoxlayout, [self.row1, self.row2, self.row3, 
+        self.addChild(self.vBoxlayout, [self.row1, self.row2, self.diaconEdit, self.row3, 
                                         self.row4, self.row5, self.row6,  self.deptWorkCheck,
                                         self.row7 , self.familyTableView])
     

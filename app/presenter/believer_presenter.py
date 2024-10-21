@@ -5,7 +5,7 @@ from qfluentwidgets import FluentIcon, RoundMenu, MenuAnimationType, Action, Dia
 from ..components import ConfirmDialog
 from ..common import Function
 from ..models import DatabaseWorker, BelieverModel, Believer, DiaconModel, Diacon, DeptWork, DeptWorkModel
-from ..view import ListBelieverInterface, AddBelieverInterface, DiaconDialog, DeptWorkDialog, AddBelieverDialog, AddFamilyDialog
+from ..view import ListBelieverInterface, AddBelieverInterface, DiaconDialog, DeptWorkDialog, DiaconChooseDialog, AddFamilyDialog
 from .menu_presenter import MenuAction
 import dataclasses
 import os
@@ -55,7 +55,8 @@ class BelieverPresenter:
         self.addView.familyTableView.contextMenuEvent = lambda e : self.tableFamilyRightClicked(e)
         self.view.tableView.contextMenuEvent = lambda e : self.tableRightClicked(e)
         self.addView.nParent.stackedWidget.currentChanged.connect(self.stackedOnChange)
-        self.__init_combox(self.diaconModel, self.addView.diaconEdit.combox)
+        self.addView.diaconEdit.lineEdit.mouseReleaseEvent = lambda e : self.chooseDiacon(e)
+        #self.__init_combox(self.diaconModel, self.addView.diaconEdit.combox)
         self.addView.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
         
         
@@ -64,6 +65,14 @@ class BelieverPresenter:
         data.extend([item.name for item in model.fetch_all(order="name")])
         combox.clear()
         combox.addItems(data)
+        
+    def chooseDiacon(self, event):
+        dialog = DiaconChooseDialog(self.addView)
+        diacon = [[item.id, item.name] for item in self.diaconModel.fetch_all()]
+        dialog.dataChecked.extend([item for item in self.addView.diaconEdit.lineEdit.text().split(" - ")])
+        dialog.setData(diacon)
+        if dialog.exec():
+            self.addView.diaconEdit.lineEdit.setText(dialog.allChecked())
 
     def stackedOnChange(self, pos):
         if self.idEdit != 0 and pos != 1:
@@ -218,7 +227,7 @@ class BelieverPresenter:
         firstname = w.firstnameEdit.lineEdit.text()
         address = w.addressEdit.lineEdit.text()
         region = w.regionEdit.combox.currentText()
-        diacon = w.diaconEdit.combox.currentText()
+        diacon = w.diaconEdit.lineEdit.text()
         birthday = w.birthdayEdit.text()
         birthplace = w.birthplaceEdit.lineEdit.text()
         nameFather = w.nameFatherEdit.lineEdit.text()
