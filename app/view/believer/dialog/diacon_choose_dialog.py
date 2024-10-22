@@ -15,6 +15,8 @@ class DiaconChooseDialog(BigDialog):
         self.table.setMinimumHeight(300)
         self.contentLayout.addWidget(self.table)
         self.contentLayout.setAlignment(Qt.AlignTop)
+        self.yesBtn.setText("Ekena")
+        self.cancelBtn.setText("Esorina")
         
     def setData(self, data:list):
         self.table.setData(data)

@@ -43,20 +43,20 @@ class AddFamilyDialog(BigDialog):
         self.recipientPlaceEdit = LineEditWithLabel("Toerana nahampandray")
         self.recipientNumberEdit = LineEditWithLabel("Laharana ny mpandray")
         self.recipientNumberEdit.lineEdit.setText("B ")
-        self.addChild(self.row5, [self.recipientDateEdit, self.recipientPlaceEdit, self.recipientNumberEdit])
+        self.phoneEdit = LineEditWithLabel("Laharan'ny finday")
+        self.addChild(self.row5, [self.recipientDateEdit, self.recipientPlaceEdit, self.recipientNumberEdit, self.phoneEdit])
         
         self.row6 = QHBoxLayout()
-        self.phoneEdit = LineEditWithLabel("Laharan'ny finday")
         self.responsibilityEdit = LineEditWithLabel("Andraikitra")
         self.workEdit = LineEditWithLabel("Asa")
         self.obsEdit = LineEditWithLabel("Fanamarihana")
-        self.addChild(self.row6, [self.phoneEdit,  self.responsibilityEdit, self.workEdit, self.obsEdit])
+        self.addChild(self.row6, [  self.responsibilityEdit, self.workEdit, self.obsEdit])
         
         self.row7 = QHBoxLayout()
         self.deptWorkCheck = CheckBoxWithLabel("Sampana na/sy sampan'asa")
     
         self.addChild(self.contentLayout, [self.row1, self.row2, self.row3, self.diaconEdit, 
-                                        self.row4, self.row5, self.row6,  self.deptWorkCheck])
+                                        self.row4, self.row5, self.deptWorkCheck, self.row6])
         self.resize(800, 600)
         
         self.yesBtn.setText("Ampidirin")

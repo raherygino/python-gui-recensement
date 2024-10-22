@@ -43,6 +43,7 @@ class MenuAction:
             ]
         
         row4 = [
+            ["Sampana", believer.dept_work],
             ["Andraikitra", believer.responsibility],
                 ["Asa", believer.work],
                 ["Fanamarihana", believer.obs],
@@ -57,7 +58,7 @@ class MenuAction:
             for j, column in enumerate(row):
                 dialog.addLabelValue(column[0], column[1], i,j)
                 
-        dialog.addNewLabelValue("Sampana", believer.dept_work)
+        #dialog.addNewLabelValue()
                     
         data = self.model.fetch_all(id_conjoint=itemId)
         for value in self.model.fetch_all(id_father=itemId):
@@ -123,8 +124,8 @@ class MenuAction:
                         f'Sampana na/sy sampan\'asa: \n{believer.dept_work}',
                         f'Andraikitra: \n{believer.responsibility}'],
                         
-                        [f'Fanamarihana: \n{believer.obs}', 
-                        '', 
+                        [f'Asa: \n{believer.work}', 
+                        f'Fanamarihana: \n{believer.obs}', 
                         '',
                         ''],
                     ]

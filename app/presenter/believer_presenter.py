@@ -126,7 +126,7 @@ class BelieverPresenter:
     def editFamily(self, pos):
         family:Believer = self.family[pos]
         dialog = AddFamilyDialog(self.addView.nParent)
-        
+        dialog.diaconEdit.lineEdit.mouseReleaseEvent = lambda e : self.chooseDiacon(e, dialog.diaconEdit.lineEdit)
         dialog.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
         dialog.setData(family)
         if dialog.exec():
@@ -183,7 +183,6 @@ class BelieverPresenter:
             self.diaconModel.update_multiple(dataUpdated)
             self.diaconModel.delete_mutlitple(dataDeleted)
             #print(dataDeleted)
-            self.__init_combox(self.diaconModel, self.addView.diaconEdit.combox)
     
     def showDeptWorkDialog(self):
         dialog = DeptWorkDialog(self.view)

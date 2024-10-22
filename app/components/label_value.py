@@ -7,6 +7,8 @@ class LabelValue(QVBoxLayout):
         super().__init__(parent)
         self.setSpacing(2)
         self.addWidget(StrongBodyLabel(label))
-        self.addWidget(BodyLabel(value))
-        
+        valueL = BodyLabel(value)
+        # Activer le retour à la ligne automatique
+        valueL.setWordWrap(True)
+        self.addWidget(valueL)
         
