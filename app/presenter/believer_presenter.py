@@ -55,7 +55,8 @@ class BelieverPresenter:
         self.addView.familyTableView.contextMenuEvent = lambda e : self.tableFamilyRightClicked(e)
         self.view.tableView.contextMenuEvent = lambda e : self.tableRightClicked(e)
         self.addView.nParent.stackedWidget.currentChanged.connect(self.stackedOnChange)
-        self.addView.diaconEdit.lineEdit.mouseReleaseEvent = lambda e : self.chooseDiacon(e)
+        diaconLineEdit = self.addView.diaconEdit.lineEdit
+        self.addView.diaconEdit.lineEdit.mouseReleaseEvent = lambda e : self.chooseDiacon(e, diaconLineEdit)
         #self.__init_combox(self.diaconModel, self.addView.diaconEdit.combox)
         self.addView.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
         
@@ -66,13 +67,13 @@ class BelieverPresenter:
         combox.clear()
         combox.addItems(data)
         
-    def chooseDiacon(self, event):
+    def chooseDiacon(self, event, lineEdit):
         dialog = DiaconChooseDialog(self.addView)
         diacon = [[item.id, item.name] for item in self.diaconModel.fetch_all()]
-        dialog.dataChecked.extend([item for item in self.addView.diaconEdit.lineEdit.text().split(" - ")])
+        dialog.dataChecked.extend([item for item in lineEdit.text().split(" - ")])
         dialog.setData(diacon)
         if dialog.exec():
-            self.addView.diaconEdit.lineEdit.setText(dialog.allChecked())
+            lineEdit.setText(dialog.allChecked())
 
     def stackedOnChange(self, pos):
         if self.idEdit != 0 and pos != 1:
@@ -125,7 +126,7 @@ class BelieverPresenter:
     def editFamily(self, pos):
         family:Believer = self.family[pos]
         dialog = AddFamilyDialog(self.addView.nParent)
-        self.__init_combox(self.diaconModel, dialog.diaconEdit.combox)
+        
         dialog.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
         dialog.setData(family)
         if dialog.exec():
@@ -360,8 +361,7 @@ class BelieverPresenter:
         dialog = AddFamilyDialog(self.view.nParent)
         adrss = self.addView.addressEdit.lineEdit.text()
         dialog.addressEdit.lineEdit.setText(adrss)
-        
-        self.__init_combox(self.diaconModel, dialog.diaconEdit.combox)
+        dialog.diaconEdit.lineEdit.mouseReleaseEvent = lambda e : self.chooseDiacon(e, dialog.diaconEdit.lineEdit)
         dialog.deptWorkCheck.addData([item.name for item in self.deptWorkModel.fetch_all()])
         dialog.yesBtn.setText("Ampidirina")
         dialog.cancelBtn.setText("Esorina")

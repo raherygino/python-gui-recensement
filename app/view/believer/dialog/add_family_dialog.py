@@ -28,8 +28,9 @@ class AddFamilyDialog(BigDialog):
         self.row3 = QHBoxLayout()
         self.birthdayEdit = DateEditWithLabel("Daty nahaterahana")
         self.birthplaceEdit = LineEditWithLabel("Toerana nahaterahana")
-        self.diaconEdit = ComboxEditWithLabel("Diakonina miandraikitra", ['-'])
-        self.addChild(self.row3, [self.birthdayEdit, self.birthplaceEdit, self.diaconEdit])
+        self.diaconEdit = LineEditWithLabel("Diakonina miandraikitra")
+        self.diaconEdit.lineEdit.setReadOnly(True)
+        self.addChild(self.row3, [self.birthdayEdit, self.birthplaceEdit])
         
         
         self.row4 = QHBoxLayout()
@@ -54,7 +55,7 @@ class AddFamilyDialog(BigDialog):
         self.row7 = QHBoxLayout()
         self.deptWorkCheck = CheckBoxWithLabel("Sampana na/sy sampan'asa")
     
-        self.addChild(self.contentLayout, [self.row1, self.row2, self.row3, 
+        self.addChild(self.contentLayout, [self.row1, self.row2, self.row3, self.diaconEdit, 
                                         self.row4, self.row5, self.row6,  self.deptWorkCheck])
         self.resize(800, 600)
         
