@@ -72,7 +72,7 @@ class AddFamilyDialog(BigDialog):
             pos_family = self.posFamilyCombox.combox.currentText(),
             address = self.addressEdit.lineEdit.text(),
             region = self.regionEdit.combox.currentText(),
-            diacon = self.diaconEdit.combox.currentText(),
+            diacon = self.diaconEdit.lineEdit.text(),
             birthday = self.birthdayEdit.lineEdit.text(),
             birthplace = self.birthplaceEdit.lineEdit.text(),
             name_father = "",
@@ -98,7 +98,7 @@ class AddFamilyDialog(BigDialog):
         self.posFamilyCombox.combox.setCurrentText(data.pos_family)
         self.addressEdit.lineEdit.setText(data.address)
         self.regionEdit.combox.setCurrentText(data.region)
-        self.diaconEdit.combox.setCurrentText(data.diacon)
+        self.diaconEdit.lineEdit.setText(data.diacon)
         self.birthdayEdit.lineEdit.setDate(self.func.strToQDate(data.birthday))
         self.birthplaceEdit.lineEdit.setText(data.birthplace)
         self.baptismDateEdit.lineEdit.setDate(self.func.strToQDate(data.date_of_baptism))

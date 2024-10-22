@@ -233,7 +233,7 @@ class MenuAction:
         view.firstnameEdit.lineEdit.setText(believer.firstname)
         view.addressEdit.lineEdit.setText(believer.address)
         view.regionEdit.combox.setCurrentText(believer.region)
-        view.diaconEdit.combox.setCurrentText(believer.diacon)
+        view.diaconEdit.lineEdit.setText(believer.diacon)
         view.birthdayEdit.lineEdit.setDate(self.strToQDate(believer.birthday))
         view.birthplaceEdit.lineEdit.setText(believer.birthplace)
         view.baptismDateEdit.lineEdit.setDate(self.strToQDate(believer.date_of_baptism))
